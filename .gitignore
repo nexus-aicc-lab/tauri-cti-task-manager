@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Tauri build outputs (추가할 부분)
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# OS generated files
+Thumbs.db
