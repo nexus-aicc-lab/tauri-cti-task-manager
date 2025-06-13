@@ -4,61 +4,36 @@ Tauri + Vite + React로 만든 가로 막대바 형태의 CTI 업무용 상태�
 
 ## 📋 프로젝트 개요
 
-- **프로젝트명**: CTI Task Master (Tauri)
 - **기술 스택**: Tauri, Vite, React, TypeScript
 - **UI 형태**: 가로 막대바 (400x80)
 - **기능**: 상태 관리(대기중/통화중/후처리), 실시간 시계, 처리 건수 카운트
-- **특징**: 항상 맨 위에 표시, 드래그로 이동 가능, 프레임리스 창
+- **특징**: 항상 맨 위에 표시, 드래그 이동, 프레임리스 창
 
-## 🚀 프로젝트 설정
+## 🚀 설치 및 실행
 
-### 1. Tauri 프로젝트 생성
-
+### 1. 프로젝트 생성
 ```bash
-# Tauri 프로젝트 생성
 npm create tauri-app@latest
-
-# 설정 선택
-✔ Project name: › cti-task-manager-tauri
-✔ Choose which language to use for your frontend › TypeScript / JavaScript
-✔ Choose your package manager › npm
-✔ Choose your UI template › React
-✔ Choose your UI flavor › TypeScript
+# React + TypeScript 선택
 ```
 
-### 2. 프로젝트 구조
-
-```
-cti-task-manager-tauri/
-├── src/
-│   ├── App.tsx              # 메인 React 컴포넌트
-│   ├── App.css              # 스타일시트
-│   └── main.tsx             # React 엔트리포인트
-├── src-tauri/
-│   ├── src/
-│   │   └── main.rs          # Rust 메인 파일
-│   ├── tauri.conf.json      # Tauri 설정
-│   └── Cargo.toml           # Rust 의존성
-├── package.json
-└── README.md
+### 2. 개발 실행
+```bash
+npm install
+npm run tauri dev
 ```
 
-## ⚙️ 주요 설정 파일
+### 3. EXE 빌드
+```bash
+npm run tauri build
+# 결과: src-tauri/target/release/cti-task-master.exe
+```
 
-### tauri.conf.json (가로 막대바 설정)
+## ⚙️ 핵심 코드
 
+### tauri.conf.json
 ```json
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "CTI Task Master",
-  "version": "0.1.0",
-  "identifier": "com.cti-task-master.app",
-  "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
-  },
   "app": {
     "windows": [
       {
@@ -71,16 +46,12 @@ cti-task-manager-tauri/
         "skipTaskbar": true,
         "center": true
       }
-    ],
-    "security": {
-      "csp": null
-    }
+    ]
   }
 }
 ```
 
-### App.tsx (메인 컴포넌트)
-
+### App.tsx (완전한 코드)
 ```tsx
 import { useState, useEffect } from "react";
 import "./App.css";
@@ -123,6 +94,8 @@ function App() {
     }
   };
 
+  if (!mounted) return null;
+
   return (
     <main className="task-master">
       <div className="drag-area"></div>
@@ -154,160 +127,240 @@ function App() {
 export default App;
 ```
 
-## 🎨 주요 기능
+### App.css (완전한 코드)
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-### 상태 관리
-- **대기중** (파란색): 초기 상태
-- **통화중** (빨간색): 통화 진행 중
-- **후처리** (노란색): 통화 후 업무 처리
-- 상태 클릭으로 순환 변경 가능
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  color: #ffffff;
+  background-color: #1a1a1a;
+}
 
-### UI 특징
-- **가로 막대바 형태** (400x80 픽셀)
-- **실시간 시계** 표시
-- **처리 완료 건수** 카운트
-- **드래그로 창 이동** 가능
-- **오른쪽 상단 닫기 버튼**
-- **항상 화면 최상단**에 표시
-- **프레임리스 창**
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
 
-## 🔧 개발 및 빌드
+#root {
+  height: 100vh;
+  width: 100vw;
+}
 
-### 개발 모드 실행
+.task-master {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(90deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  border-radius: 6px;
+  border: 1px solid #444;
+  padding: 0 15px;
+}
 
-```bash
-# 의존성 설치
-npm install
+.drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 25px;
+  height: 100%;
+  -webkit-app-region: drag;
+  cursor: move;
+}
 
-# 개발 서버 실행
-npm run tauri dev
-```
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  z-index: 10;
+}
 
-### 프로덕션 빌드
+.close-btn:hover {
+  background: #ff4444;
+  color: white;
+}
 
-```bash
-# EXE 파일 빌드
-npm run tauri build
-```
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  -webkit-app-region: no-drag;
+}
 
-**빌드 결과물 위치:**
-```
-src-tauri/target/release/
-├── cti-task-master.exe          # 실행 파일
-└── bundle/
-    ├── msi/                     # Windows 설치 파일
-    └── nsis/                    # NSIS 설치 파일
-```
+.left-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-## 🔗 Spring Boot 연동 방법
+.title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
 
-### 방법 1: 프로세스 실행
-```java
-@RestController
-public class TaskMasterController {
-    
-    @PostMapping("/launch-task-master")
-    public ResponseEntity<String> launchTaskMaster() {
-        try {
-            String exePath = "C:/path/to/cti-task-master.exe";
-            ProcessBuilder pb = new ProcessBuilder(exePath);
-            pb.start();
-            return ResponseEntity.ok("Task Master launched");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Launch failed");
-        }
-    }
+.time {
+  font-size: 10px;
+  color: #cccccc;
+}
+
+.center-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.status {
+  padding: 6px 20px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+  min-width: 80px;
+  text-align: center;
+}
+
+.status:hover {
+  transform: scale(1.05);
+}
+
+.status:active {
+  transform: scale(0.95);
+}
+
+.status-waiting {
+  background: #2196F3;
+  color: white;
+}
+
+.status-waiting:hover {
+  background: #1976D2;
+}
+
+.status-calling {
+  background: #f44336;
+  color: white;
+}
+
+.status-calling:hover {
+  background: #d32f2f;
+}
+
+.status-processing {
+  background: #ff9800;
+  color: white;
+}
+
+.status-processing:hover {
+  background: #f57c00;
+}
+
+.status-default {
+  background: #666;
+  color: white;
+}
+
+.right-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.counter {
+  font-size: 10px;
+  color: #999;
+  text-align: right;
 }
 ```
 
-### 방법 2: REST API 연동
-```javascript
-// Tauri 앱에서 Spring Boot로 상태 전송
-const sendStatusToServer = async (status) => {
-    try {
-        await fetch('http://localhost:8080/api/task-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status, timestamp: new Date() })
-        });
-    } catch (error) {
-        console.error('Status update failed:', error);
-    }
-};
-```
+## 🔗 Spring Boot 연동
 
-### 방법 3: WebSocket 실시간 연동
+### 1. 프로세스 실행 (간단)
 ```java
-@Component
-public class TaskMasterWebSocketHandler extends TextWebSocketHandler {
-    
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        // Tauri 앱에서 실시간 상태 수신
-        String status = message.getPayload();
-        updateTaskStatus(status);
-    }
+@PostMapping("/launch-task-master")
+public ResponseEntity<String> launchTaskMaster() {
+    ProcessBuilder pb = new ProcessBuilder("C:/path/to/cti-task-master.exe");
+    pb.start();
+    return ResponseEntity.ok("Launched");
 }
 ```
 
-## 🚀 Tauri vs Electron 비교
+### 2. 실시간 상태 연동 (SSE)
+```java
+// Spring Boot - SSE 스트림
+@GetMapping(value = "/api/task/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public SseEmitter streamTaskStatus() {
+    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    // Redis Pub/Sub로 실시간 데이터 전송
+    return emitter;
+}
+```
 
+```tsx
+// Tauri App - SSE 수신
+useEffect(() => {
+    const eventSource = new EventSource('https://your-ec2.com/api/task/stream');
+    
+    eventSource.onmessage = (event) => {
+        const realtimeData = JSON.parse(event.data);
+        setRealTimeStats(realtimeData);
+    };
+    
+    return () => eventSource.close();
+}, []);
+```
+
+## 🎯 배포 아키텍처
+
+```
+상담사 PC                     EC2 서버
+┌─────────────┐              ┌─────────────┐
+│ JSP Web     │←─ HTTPS ────→│ Spring Boot │
+│ Tauri App   │              │ + Redis     │
+│ (.exe)      │              │ + Database  │
+└─────────────┘              └─────────────┘
+```
+
+## 📋 .gitignore
+```
+node_modules
+dist
+*.local
+src-tauri/target/
+src-tauri/Cargo.lock
+```
+
+## 🚀 Tauri vs Electron
 | 특징 | Tauri | Electron |
 |------|-------|----------|
-| **번들 크기** | ~10-15MB | ~150MB |
-| **메모리 사용량** | ~20-50MB | ~100-200MB |
-| **빌드 속도** | 빠름 (Vite) | 느림 (Webpack) |
-| **개발 경험** | 매우 좋음 | 복잡함 |
-| **정적 파일 문제** | 없음 | 자주 발생 |
-| **보안** | 우수 | 보통 |
-
-## 📁 파일 구조
-
-```
-cti-task-manager-tauri/
-├── dist/                        # Vite 빌드 결과
-├── src/
-│   ├── App.tsx                  # 메인 컴포넌트
-│   ├── App.css                  # 스타일시트
-│   └── main.tsx                 # React 엔트리
-├── src-tauri/
-│   ├── src/main.rs              # Rust 백엔드
-│   ├── tauri.conf.json          # Tauri 설정
-│   └── target/release/          # 빌드 결과물
-│       └── cti-task-master.exe  # 실행 파일
-├── package.json
-└── README.md
-```
-
-## 🎯 실행 방법
-
-### 개발 모드
-1. `npm install` - 의존성 설치
-2. `npm run tauri dev` - 개발 서버 실행
-
-### 프로덕션 빌드
-1. `npm run tauri build` - EXE 파일 생성
-2. `src-tauri/target/release/cti-task-master.exe` 실행
-
-## 📝 주요 특징
-
-- ✅ **즉시 실행**: 개발 모드에서도 네이티브 앱으로 실행
-- ✅ **빠른 빌드**: Vite 기반으로 초고속 개발
-- ✅ **작은 크기**: Electron 대비 1/10 크기
-- ✅ **안정적**: 정적 파일 로딩 문제 없음
-- ✅ **실시간 반영**: 코드 변경 시 즉시 반영
-- ✅ **간단한 설정**: 복잡한 설정 파일 불필요
-
-## 🔧 문제 해결
-
-### 빌드 시간 단축
-- 첫 빌드는 Rust 컴파일로 시간이 걸림
-- 두 번째부터는 빠른 증분 빌드
-
-### Windows Defender 경고
-- 새로운 실행 파일 경고 정상
-- "자세히 보기" → "실행" 선택
-
-## 📜 라이센스
-
-개인/회사 프로젝트용
+| **크기** | ~10MB | ~150MB |
+| **메모리** | ~30MB | ~100MB |
+| **빌드** | 간단 | 복잡 |
+| **속도** | 빠름 | 느림 |
