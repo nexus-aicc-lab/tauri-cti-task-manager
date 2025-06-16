@@ -1,7 +1,7 @@
 // src/components/Titlebar.jsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square, TrendingUp, Activity } from 'lucide-react';
+import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square, TrendingUp, Activity, Clock, Users } from 'lucide-react';
 import './Titlebar.css';
 
 interface TitlebarProps {
@@ -197,7 +197,7 @@ function Titlebar({
     };
 
     return (
-        <div className="custom-titlebar">
+        <div className="custom-titlebar py-5">
             {/* 왼쪽: 모드 토글 버튼 */}
             <div className="titlebar-left">
                 <div className="mode-toggle">
@@ -214,68 +214,59 @@ function Titlebar({
             {/* 중앙: 드래그 영역 및 타이틀/데이터 */}
             <div data-tauri-drag-region className="titlebar-drag">
                 {viewMode === 'bar' ? (
-                    // 1단 바 모드: 향상된 동적 데이터 표시
-                    <div className="titlebar-bar-content enhanced">
-                        {/* 시간 표시 */}
+                    // 바 모드: 핵심 정보만 간략하게
+                    <div className="titlebar-bar-content cti-enhanced">
+                        {/* 연결 상태 */}
+                        <div className="bar-data-item connection-item online">
+                            <span className="connection-icon">🟢</span>
+                            <span className="bar-text">ONLINE</span>
+                        </div>
+
+                        {/* 현재 시간 */}
                         <div className="bar-data-item time-item">
-                            <span className="bar-icon animated-icon">🕐</span>
-                            <span className="bar-text time-text">
+                            <Clock size={11} className="bar-icon-svg" />
+                            <span className="bar-text time-display">
                                 {time?.split(':').slice(0, 2).join(':') || '--:--'}
                             </span>
                         </div>
 
                         {/* 상태 표시 */}
                         <div className={`bar-data-item status-item ${getStatusClass(status)} ${pulseActive ? 'pulse' : ''}`}>
-                            <span className="bar-icon status-icon">
-                                {getStatusIcon(status)}
-                            </span>
-                            <span className="bar-text">{status || '대기중'}</span>
+                            <span className="status-indicator">{getStatusIcon(status)}</span>
+                            <span className="bar-text status-text">{status || '대기중'}</span>
                         </div>
 
-                        {/* 작업 진행률 */}
-                        <div className="bar-data-item progress-item">
-                            <span className="bar-icon">📊</span>
-                            <div className="progress-container">
-                                <div className="progress-bar-bg">
+                        {/* 효율성 + 진행률 */}
+                        <div className="bar-data-item efficiency-item">
+                            <TrendingUp size={11} className="bar-icon-svg" />
+                            <div className="efficiency-display">
+                                <span className="bar-text">{efficiency}%</span>
+                                <div className="mini-progress">
                                     <div
-                                        ref={progressBarRef}
-                                        className="progress-bar-fill"
-                                        style={{ backgroundColor: getEfficiencyColor(efficiency) }}
+                                        className="mini-progress-fill"
+                                        style={{
+                                            width: `${efficiency}%`,
+                                            backgroundColor: getEfficiencyColor(efficiency)
+                                        }}
                                     />
                                 </div>
-                                <span className="bar-text progress-text">{efficiency}%</span>
                             </div>
                         </div>
 
-                        {/* 완료된 작업 */}
-                        <div className="bar-data-item completed-item">
-                            <span className="bar-icon">✅</span>
-                            <span className="bar-text animated-number">
-                                {animatedCompletedTasks}
-                                <span className="total-tasks">/{animatedTaskCount}</span>
+                        {/* 작업 현황 */}
+                        <div className="bar-data-item counter-item">
+                            <Users size={11} className="bar-icon-svg" />
+                            <span className="bar-text">
+                                {animatedCompletedTasks}<span className="divider">/</span>{animatedTaskCount + animatedCompletedTasks}
                             </span>
-                        </div>
-
-                        {/* 시간당 통화 */}
-                        <div className="bar-data-item rate-item">
-                            <Activity size={12} className="bar-icon-svg" />
-                            <span className="bar-text rate-text">
-                                {callsPerHour}
-                                <span className="rate-unit">/h</span>
-                            </span>
-                        </div>
-
-                        {/* 트렌드 인디케이터 */}
-                        <div className="bar-data-item trend-item">
-                            <TrendingUp
-                                size={12}
-                                className={`bar-icon-svg trend-icon ${efficiency > 80 ? 'trend-up' : 'trend-down'}`}
-                            />
                         </div>
                     </div>
                 ) : (
-                    // 3단 패널 모드: 기본 타이틀
-                    <div className="titlebar-title">CTI Task Master</div>
+                    // 패널 모드: 브랜드 타이틀
+                    <div className="titlebar-title cti-title">
+                        <span className="title-main">CTI Task Master</span>
+                        <span className="title-version">v2.1</span>
+                    </div>
                 )}
             </div>
 
