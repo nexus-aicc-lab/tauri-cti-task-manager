@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import "./App.css";
 
 function App() {
@@ -18,24 +17,6 @@ function App() {
 
     return () => clearInterval(timer);
   }, []);
-
-  const handleClose = async () => {
-    try {
-      const appWindow = getCurrentWindow();
-      await appWindow.close();
-    } catch (error) {
-      console.error('창 닫기 실패:', error);
-    }
-  };
-
-  const handleMinimize = async () => {
-    try {
-      const appWindow = getCurrentWindow();
-      await appWindow.minimize();
-    } catch (error) {
-      console.error('창 최소화 실패:', error);
-    }
-  };
 
   const nextStatus = () => {
     setStatus(prev => {
@@ -61,11 +42,6 @@ function App() {
   if (!mounted) {
     return (
       <main className="task-master">
-        <div className="drag-area"></div>
-        <div className="window-controls">
-          <button className="minimize-btn" onClick={handleMinimize}>−</button>
-          <button className="close-btn" onClick={handleClose}>×</button>
-        </div>
         <div className="content">
           <div className="left-section">
             <h1 className="title">CTI Task Master</h1>
@@ -84,12 +60,6 @@ function App() {
 
   return (
     <main className="task-master">
-      <div className="drag-area"></div>
-      <div className="window-controls">
-        <button className="minimize-btn" onClick={handleMinimize}>−</button>
-        <button className="close-btn" onClick={handleClose}>×</button>
-      </div>
-
       <div className="content">
         <div className="left-section">
           <h1 className="title">CTI Task Master</h1>
