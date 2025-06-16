@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.cti-task-master.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "vite",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
@@ -13,17 +13,17 @@
     "windows": [
       {
         "title": "CTI Task Master",
-        "width": 400,
-        "height": 80,
-        "resizable": false,
-        "alwaysOnTop": true,
-        "decorations": false,
-        "skipTaskbar": true,
+        "width": 800,
+        "height": 100,
+        "resizable": true,
+        "alwaysOnTop": false,
+        "decorations": true,
+        "skipTaskbar": false,
         "center": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     }
   },
   "bundle": {
