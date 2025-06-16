@@ -1,7 +1,7 @@
 /* src/App.css */
 
 .app-container {
-  height: 100vh;
+  /* height: 100vh; */
   background: #f8fafc;
   display: flex;
   flex-direction: column;

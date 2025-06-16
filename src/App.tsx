@@ -14,7 +14,7 @@ function App() {
   const [completedTasks, setCompletedTasks] = useState(15);
   const [efficiency, setEfficiency] = useState(85);
   const [callsPerHour, setCallsPerHour] = useState(12);
-  const [viewMode, setViewMode] = useState<ViewMode>('panel');
+  const [viewMode, setViewMode] = useState<ViewMode>('bar');
   const [loginTime, setLoginTime] = useState('');
   const [sessionTime, setSessionTime] = useState('00:00:00');
   const [currentCall, setCurrentCall] = useState<string | null>(null);
