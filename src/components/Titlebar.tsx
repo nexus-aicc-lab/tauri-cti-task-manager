@@ -1,7 +1,7 @@
 // src/components/Titlebar.jsx
 
-import React, { useState, useEffect } from 'react';
-import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square, TrendingUp, Activity } from 'lucide-react';
 import './Titlebar.css';
 
 interface TitlebarProps {
@@ -10,11 +10,75 @@ interface TitlebarProps {
     status?: string;
     time?: string;
     taskCount?: number;
+    completedTasks?: number;
+    efficiency?: number;
+    callsPerHour?: number;
 }
 
-function Titlebar({ viewMode, onToggleMode, status, time, taskCount }: TitlebarProps) {
+function Titlebar({
+    viewMode,
+    onToggleMode,
+    status,
+    time,
+    taskCount = 0,
+    completedTasks = 0,
+    efficiency = 85,
+    callsPerHour = 12
+}: TitlebarProps) {
     const [isPinned, setIsPinned] = useState(true);
     const [isMaximized, setIsMaximized] = useState(false);
+    const [animatedTaskCount, setAnimatedTaskCount] = useState(0);
+    const [animatedCompletedTasks, setAnimatedCompletedTasks] = useState(0);
+    const [pulseActive, setPulseActive] = useState(false);
+    const progressBarRef = useRef<HTMLDivElement>(null);
+
+    // 숫자 카운트업 애니메이션
+    useEffect(() => {
+        const animateNumber = (target: number, setter: (value: number) => void, current: number) => {
+            const duration = 1000; // 1초
+            const steps = 30;
+            const increment = (target - current) / steps;
+            let step = 0;
+
+            const timer = setInterval(() => {
+                step++;
+                const newValue = Math.round(current + (increment * step));
+                setter(newValue);
+
+                if (step >= steps) {
+                    clearInterval(timer);
+                    setter(target);
+                }
+            }, duration / steps);
+
+            return timer;
+        };
+
+        const taskTimer = animateNumber(taskCount, setAnimatedTaskCount, animatedTaskCount);
+        const completedTimer = animateNumber(completedTasks, setAnimatedCompletedTasks, animatedCompletedTasks);
+
+        return () => {
+            clearInterval(taskTimer);
+            clearInterval(completedTimer);
+        };
+    }, [taskCount, completedTasks]);
+
+    // 상태 변경시 펄스 효과
+    useEffect(() => {
+        if (status === '통화중' || status === '후처리') {
+            setPulseActive(true);
+            const timer = setTimeout(() => setPulseActive(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [status]);
+
+    // 진행률 바 애니메이션
+    useEffect(() => {
+        if (progressBarRef.current && viewMode === 'bar') {
+            const progressWidth = Math.min(efficiency, 100);
+            progressBarRef.current.style.width = `${progressWidth}%`;
+        }
+    }, [efficiency, viewMode]);
 
     useEffect(() => {
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
@@ -45,6 +109,21 @@ function Titlebar({ viewMode, onToggleMode, status, time, taskCount }: TitlebarP
             case '통화중': return 'status-calling';
             case '후처리': return 'status-processing';
             default: return 'status-waiting';
+        }
+    };
+
+    const getEfficiencyColor = (efficiency: number) => {
+        if (efficiency >= 90) return '#10b981'; // green
+        if (efficiency >= 70) return '#f59e0b'; // yellow
+        return '#ef4444'; // red
+    };
+
+    const getStatusIcon = (status?: string) => {
+        switch (status) {
+            case '대기중': return '⏸️';
+            case '통화중': return '📞';
+            case '후처리': return '⚙️';
+            default: return '⏸️';
         }
     };
 
@@ -135,23 +214,63 @@ function Titlebar({ viewMode, onToggleMode, status, time, taskCount }: TitlebarP
             {/* 중앙: 드래그 영역 및 타이틀/데이터 */}
             <div data-tauri-drag-region className="titlebar-drag">
                 {viewMode === 'bar' ? (
-                    // 1단 바 모드: 헤더에 데이터 직접 출력
-                    <div className="titlebar-bar-content">
-                        <div className="bar-data-item">
-                            <span className="bar-icon">🕐</span>
-                            <span className="bar-text">{time?.split(':').slice(0, 2).join(':') || '--:--'}</span>
+                    // 1단 바 모드: 향상된 동적 데이터 표시
+                    <div className="titlebar-bar-content enhanced">
+                        {/* 시간 표시 */}
+                        <div className="bar-data-item time-item">
+                            <span className="bar-icon animated-icon">🕐</span>
+                            <span className="bar-text time-text">
+                                {time?.split(':').slice(0, 2).join(':') || '--:--'}
+                            </span>
                         </div>
 
-                        <div className={`bar-data-item status-item ${getStatusClass(status)}`}>
-                            <span className="bar-icon">
-                                {status === '대기중' ? '⏸️' : status === '통화중' ? '📞' : status === '후처리' ? '⚙️' : '⏸️'}
+                        {/* 상태 표시 */}
+                        <div className={`bar-data-item status-item ${getStatusClass(status)} ${pulseActive ? 'pulse' : ''}`}>
+                            <span className="bar-icon status-icon">
+                                {getStatusIcon(status)}
                             </span>
                             <span className="bar-text">{status || '대기중'}</span>
                         </div>
 
-                        <div className="bar-data-item">
+                        {/* 작업 진행률 */}
+                        <div className="bar-data-item progress-item">
+                            <span className="bar-icon">📊</span>
+                            <div className="progress-container">
+                                <div className="progress-bar-bg">
+                                    <div
+                                        ref={progressBarRef}
+                                        className="progress-bar-fill"
+                                        style={{ backgroundColor: getEfficiencyColor(efficiency) }}
+                                    />
+                                </div>
+                                <span className="bar-text progress-text">{efficiency}%</span>
+                            </div>
+                        </div>
+
+                        {/* 완료된 작업 */}
+                        <div className="bar-data-item completed-item">
                             <span className="bar-icon">✅</span>
-                            <span className="bar-text">{taskCount || 0}</span>
+                            <span className="bar-text animated-number">
+                                {animatedCompletedTasks}
+                                <span className="total-tasks">/{animatedTaskCount}</span>
+                            </span>
+                        </div>
+
+                        {/* 시간당 통화 */}
+                        <div className="bar-data-item rate-item">
+                            <Activity size={12} className="bar-icon-svg" />
+                            <span className="bar-text rate-text">
+                                {callsPerHour}
+                                <span className="rate-unit">/h</span>
+                            </span>
+                        </div>
+
+                        {/* 트렌드 인디케이터 */}
+                        <div className="bar-data-item trend-item">
+                            <TrendingUp
+                                size={12}
+                                className={`bar-icon-svg trend-icon ${efficiency > 80 ? 'trend-up' : 'trend-down'}`}
+                            />
                         </div>
                     </div>
                 ) : (
