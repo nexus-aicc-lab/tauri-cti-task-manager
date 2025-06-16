@@ -2,17 +2,20 @@
 
 .custom-titlebar {
     height: 32px;
-    background: rgba(255, 255, 255, 0.15);
-    /* 더 밝게 */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
+    /* 더 밝게 - 0.15에서 0.25로 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0;
     user-select: none;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(20px);
+    /* 블러 강화 */
     width: 100%;
     position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* 미묘한 그림자 추가 */
 }
 
 /* 드래그 영역 - 매우 중요한 설정들 */
@@ -73,7 +76,6 @@
     justify-content: center;
     transition: all 0.2s ease;
     outline: none;
-    font-size: 12px;
     opacity: 0.8;
 
     /* 버튼은 반드시 클릭 가능하도록 */
@@ -84,53 +86,37 @@
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
+    /* 호버 시 더 밝게 */
     opacity: 1;
     transform: scale(1.05);
 }
 
 .control-btn:active {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.3);
     transform: scale(0.95);
 }
 
-/* 핀 버튼 */
-.control-btn.pin-btn {
-    font-size: 14px;
+/* Lucide 아이콘 스타일 */
+.control-btn svg {
+    stroke-width: 2;
+    color: white;
 }
 
+/* 핀 버튼 */
 .control-btn.pin-btn.pinned {
-    background: rgba(231, 76, 60, 0.9);
+    background: rgba(76, 175, 80, 0.9);
+    /* 녹색으로 변경 - 고정됨을 의미 */
     opacity: 1;
-    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .control-btn.pin-btn.pinned:hover {
-    background: rgba(231, 76, 60, 1);
-    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
-}
-
-/* 최소화 버튼 */
-.control-btn.minimize-btn span {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 1;
-}
-
-/* 최대화 버튼 */
-.control-btn.maximize-btn span {
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1;
+    background: rgba(76, 175, 80, 1);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 /* 닫기 버튼 */
-.control-btn.close-btn span {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 1;
-}
-
 .control-btn.close-btn:hover {
     background: #e74c3c;
     opacity: 1;

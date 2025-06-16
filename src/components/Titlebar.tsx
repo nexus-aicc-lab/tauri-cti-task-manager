@@ -1,9 +1,15 @@
 // src/components/Titlebar.jsx
 
 import React, { useState, useEffect } from 'react';
+import { Pin, PinOff, Minus, Maximize2, X, LayoutGrid, Minus as MinusIcon } from 'lucide-react';
 import './Titlebar.css';
 
-function Titlebar() {
+type TitlebarProps = {
+    viewMode: string;
+    onToggleMode: () => void;
+};
+
+function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
     const [isPinned, setIsPinned] = useState(true); // 기본값 true (config와 일치)
     const [isMaximized, setIsMaximized] = useState(false);
 
@@ -110,45 +116,57 @@ function Titlebar() {
         <div className="custom-titlebar">
             {/* 드래그 영역 */}
             <div data-tauri-drag-region className="titlebar-drag">
+                {/* 왼쪽: 모드 토글 버튼 */}
+                <div className="titlebar-left">
+                    <button
+                        onClick={onToggleMode}
+                        className={`control-btn mode-toggle-btn ${viewMode}`}
+                        title={viewMode === 'bar' ? '패널 모드로 변경' : '바 모드로 변경'}
+                    >
+                        {viewMode === 'bar' ? <LayoutGrid size={14} /> : <MinusIcon size={14} />}
+                    </button>
+                </div>
+
+                {/* 중앙: 타이틀 */}
                 <div className="titlebar-title">CTI Task Master</div>
             </div>
 
             {/* 창 컨트롤 버튼들 */}
             <div className="titlebar-controls">
-                {/* 핀 버튼 */}
+                {/* 핀 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={togglePin}
                     className={`control-btn pin-btn ${isPinned ? 'pinned' : ''}`}
                     title={isPinned ? '항상 위에 표시 해제' : '항상 위에 표시'}
                 >
-                    {isPinned ? '📌' : '📍'}
+                    {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
                 </button>
 
-                {/* 최소화 버튼 */}
+                {/* 최소화 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleMinimize}
                     className="control-btn minimize-btn"
                     title="최소화"
                 >
-                    <span>−</span>
+                    <Minus size={14} />
                 </button>
 
-                {/* 최대화/복원 버튼 */}
+                {/* 최대화/복원 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleToggleMaximize}
                     className="control-btn maximize-btn"
                     title={isMaximized ? '이전 크기로' : '최대화'}
                 >
-                    <span>{isMaximized ? '❐' : '□'}</span>
+                    <Maximize2 size={14} />
                 </button>
 
-                {/* 닫기 버튼 */}
+                {/* 닫기 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleClose}
                     className="control-btn close-btn"
                     title="닫기"
                 >
-                    <span>×</span>
+                    <X size={14} />
                 </button>
             </div>
         </div>
