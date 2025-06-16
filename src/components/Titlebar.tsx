@@ -1,20 +1,22 @@
 // src/components/Titlebar.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Pin, PinOff, Minus, Maximize2, X, LayoutGrid, Minus as MinusIcon } from 'lucide-react';
+import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square } from 'lucide-react';
 import './Titlebar.css';
 
-type TitlebarProps = {
-    viewMode: string;
+interface TitlebarProps {
+    viewMode: 'bar' | 'panel';
     onToggleMode: () => void;
-};
+    status?: string;
+    time?: string;
+    taskCount?: number;
+}
 
-function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
-    const [isPinned, setIsPinned] = useState(true); // 기본값 true (config와 일치)
+function Titlebar({ viewMode, onToggleMode, status, time, taskCount }: TitlebarProps) {
+    const [isPinned, setIsPinned] = useState(true);
     const [isMaximized, setIsMaximized] = useState(false);
 
     useEffect(() => {
-        // Tauri 환경에서 초기 상태 확인
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
         if (isTauriEnv) {
@@ -27,11 +29,9 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
             const { getCurrentWindow } = await import('@tauri-apps/api/window');
             const appWindow = getCurrentWindow();
 
-            // Always On Top 상태 확인
             const alwaysOnTop = await appWindow.isAlwaysOnTop();
             setIsPinned(alwaysOnTop);
 
-            // 최대화 상태 확인
             const maximized = await appWindow.isMaximized();
             setIsMaximized(maximized);
         } catch (error) {
@@ -39,7 +39,15 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
         }
     };
 
-    // 핀 기능 (Always On Top 토글)
+    const getStatusClass = (status?: string) => {
+        switch (status) {
+            case '대기중': return 'status-waiting';
+            case '통화중': return 'status-calling';
+            case '후처리': return 'status-processing';
+            default: return 'status-waiting';
+        }
+    };
+
     const togglePin = async () => {
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
@@ -60,7 +68,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
         }
     };
 
-    // 최소화
     const handleMinimize = async () => {
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
@@ -75,7 +82,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
         }
     };
 
-    // 최대화/복원
     const handleToggleMaximize = async () => {
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
@@ -95,7 +101,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
         }
     };
 
-    // 닫기
     const handleClose = async () => {
         const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
@@ -114,26 +119,49 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
 
     return (
         <div className="custom-titlebar">
-            {/* 드래그 영역 */}
-            <div data-tauri-drag-region className="titlebar-drag">
-                {/* 왼쪽: 모드 토글 버튼 */}
-                <div className="titlebar-left">
+            {/* 왼쪽: 모드 토글 버튼 */}
+            <div className="titlebar-left">
+                <div className="mode-toggle">
                     <button
                         onClick={onToggleMode}
-                        className={`control-btn mode-toggle-btn ${viewMode}`}
-                        title={viewMode === 'bar' ? '패널 모드로 변경' : '바 모드로 변경'}
+                        className="mode-toggle-btn"
+                        title={viewMode === 'bar' ? '3단 모드로 전환' : '1단 바 모드로 전환'}
                     >
-                        {viewMode === 'bar' ? <LayoutGrid size={14} /> : <MinusIcon size={14} />}
+                        {viewMode === 'bar' ? <Grid3X3 size={14} /> : <Square size={14} />}
                     </button>
                 </div>
-
-                {/* 중앙: 타이틀 */}
-                <div className="titlebar-title">CTI Task Master</div>
             </div>
 
-            {/* 창 컨트롤 버튼들 */}
+            {/* 중앙: 드래그 영역 및 타이틀/데이터 */}
+            <div data-tauri-drag-region className="titlebar-drag">
+                {viewMode === 'bar' ? (
+                    // 1단 바 모드: 헤더에 데이터 직접 출력
+                    <div className="titlebar-bar-content">
+                        <div className="bar-data-item">
+                            <span className="bar-icon">🕐</span>
+                            <span className="bar-text">{time?.split(':').slice(0, 2).join(':') || '--:--'}</span>
+                        </div>
+
+                        <div className={`bar-data-item status-item ${getStatusClass(status)}`}>
+                            <span className="bar-icon">
+                                {status === '대기중' ? '⏸️' : status === '통화중' ? '📞' : status === '후처리' ? '⚙️' : '⏸️'}
+                            </span>
+                            <span className="bar-text">{status || '대기중'}</span>
+                        </div>
+
+                        <div className="bar-data-item">
+                            <span className="bar-icon">✅</span>
+                            <span className="bar-text">{taskCount || 0}</span>
+                        </div>
+                    </div>
+                ) : (
+                    // 3단 패널 모드: 기본 타이틀
+                    <div className="titlebar-title">CTI Task Master</div>
+                )}
+            </div>
+
+            {/* 오른쪽: 창 컨트롤 버튼들 */}
             <div className="titlebar-controls">
-                {/* 핀 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={togglePin}
                     className={`control-btn pin-btn ${isPinned ? 'pinned' : ''}`}
@@ -142,7 +170,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
                     {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
                 </button>
 
-                {/* 최소화 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleMinimize}
                     className="control-btn minimize-btn"
@@ -151,7 +178,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
                     <Minus size={14} />
                 </button>
 
-                {/* 최대화/복원 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleToggleMaximize}
                     className="control-btn maximize-btn"
@@ -160,7 +186,6 @@ function Titlebar({ viewMode, onToggleMode }: TitlebarProps) {
                     <Maximize2 size={14} />
                 </button>
 
-                {/* 닫기 버튼 - Lucide 아이콘 */}
                 <button
                     onClick={handleClose}
                     className="control-btn close-btn"

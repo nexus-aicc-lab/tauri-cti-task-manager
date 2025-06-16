@@ -51,7 +51,7 @@ function App() {
     const newMode = viewMode === 'bar' ? 'panel' : 'bar';
     setViewMode(newMode);
 
-    // Tauri 환경에서 창 크기 조정
+    // Tauri 환경에서 창 크기 조정 (권한이 있는 경우에만)
     const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window || navigator.userAgent.includes('tauri');
 
     if (isTauriEnv) {
@@ -61,12 +61,13 @@ function App() {
 
         // 모드에 따라 창 높이 조정
         if (newMode === 'bar') {
-          await appWindow.setSize(new LogicalSize(800, 80));
+          await appWindow.setSize(new LogicalSize(1000, 80));
         } else {
-          await appWindow.setSize(new LogicalSize(800, 120));
+          await appWindow.setSize(new LogicalSize(800, 320));
         }
       } catch (error) {
-        console.error('창 크기 조정 실패:', error);
+        console.warn('창 크기 자동 조정을 사용할 수 없습니다. 수동으로 창 크기를 조정해주세요.', error);
+        // 창 크기 조정이 실패해도 모드 전환은 정상 작동
       }
     }
   };
@@ -75,6 +76,7 @@ function App() {
     <div className="app-container">
       {/* 커스텀 타이틀바 */}
       <Titlebar viewMode={viewMode} onToggleMode={toggleViewMode} />
+
 
       {/* 메인 컨텐츠 */}
       <main className={`task-master ${viewMode}-mode`}>

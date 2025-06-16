@@ -1,210 +1,98 @@
-/* 기본 리셋 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* src/App.css */
 
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 12px;
-  color: #ffffff;
-  background-color: #1a1a1a;
-}
-
-body,
-html {
-  height: 100%;
+.app-container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
 }
 
-#root {
-  height: 100vh;
-  width: 100vw;
-}
-
-/* 가로 막대바 스타일 */
-.task-master {
-  height: 100vh;
-  width: 100vw;
-  background: linear-gradient(90deg, #1a1a1a 0%, #2d2d2d 100%);
+/* 1단 바 모드 오버레이 (최소 높이) */
+.bar-mode-overlay {
+  flex: 1;
+  cursor: pointer;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
   position: relative;
-  border-radius: 6px;
-  border: 1px solid #444;
-  padding: 0 15px;
+  min-height: 4px;
+  /* 최소한의 높이만 */
+  max-height: 8px;
 }
 
-/* 드래그 영역 */
-.drag-area {
+.bar-mode-overlay:hover {
+  background: rgba(255, 255, 255, 0.05);
+  max-height: 12px;
+}
+
+.bar-mode-overlay::after {
+  content: "클릭하여 상태 변경";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 50px;
-  /* 버튼들 공간 확보 */
-  height: 100%;
-  cursor: move;
-  z-index: 1;
+  bottom: 2px;
+  right: 12px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-/* 창 컨트롤 영역 */
-.window-controls {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  gap: 2px;
-  z-index: 10;
+.bar-mode-overlay:hover::after {
+  opacity: 1;
 }
 
-/* 최소화 버튼 */
-.minimize-btn {
-  width: 18px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  color: #888;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-.minimize-btn:hover {
-  background: #666;
-  color: white;
-}
-
-/* 닫기 버튼 */
-.close-btn {
-  width: 18px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  color: #888;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background: #ff4444;
-  color: white;
-}
-
-/* 컨텐츠 영역 - 가로 배치 */
-.content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  z-index: 5;
-}
-
-/* 왼쪽 영역 */
-.left-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* 타이틀 */
-.title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 2px;
-}
-
-/* 시간 표시 */
-.time {
-  font-size: 10px;
-  color: #cccccc;
-}
-
-/* 가운데 영역 */
-.center-section {
+/* 3단 패널 모드 */
+.task-master.panel-mode {
   flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
-/* 상태 버튼 - 컴팩트 */
-.status {
-  padding: 6px 20px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  outline: none;
-  min-width: 80px;
-  text-align: center;
-}
-
-.status:hover {
-  transform: scale(1.05);
-}
-
-.status:active {
-  transform: scale(0.95);
-}
-
-/* 상태별 색상 */
-.status-waiting {
-  background: #2196F3;
-  color: white;
-}
-
-.status-waiting:hover {
-  background: #1976D2;
-}
-
-.status-calling {
-  background: #f44336;
-  color: white;
-}
-
-.status-calling:hover {
-  background: #d32f2f;
-}
-
-.status-processing {
-  background: #ff9800;
-  color: white;
-}
-
-.status-processing:hover {
-  background: #f57c00;
-}
-
-.status-default {
-  background: #666;
-  color: white;
-}
-
-/* 오른쪽 영역 */
-.right-section {
+.panel-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  height: 100%;
+  max-width: 100%;
 }
 
-/* 카운터 */
-.counter {
-  font-size: 10px;
-  color: #999;
-  text-align: right;
+.left-section,
+.right-section,
+.center-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.time {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 16px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
