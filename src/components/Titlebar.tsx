@@ -1,7 +1,7 @@
 // src/components/Titlebar.jsx
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Pin, PinOff, Minus, Maximize2, X, Grid3X3, Square, TrendingUp, Activity, Clock, Users } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Pin, PinOff, Minus, Maximize2, X, TrendingUp, Clock, Users, AppWindow, SquareMinus } from 'lucide-react';
 import './Titlebar.css';
 
 interface TitlebarProps {
@@ -23,7 +23,6 @@ function Titlebar({
     taskCount = 0,
     completedTasks = 0,
     efficiency = 85,
-    callsPerHour = 12
 }: TitlebarProps) {
     const [isPinned, setIsPinned] = useState(true);
     const [isMaximized, setIsMaximized] = useState(false);
@@ -204,9 +203,9 @@ function Titlebar({
                     <button
                         onClick={onToggleMode}
                         className="mode-toggle-btn"
-                        title={viewMode === 'bar' ? '3단 모드로 전환' : '1단 바 모드로 전환'}
+                        title={viewMode === 'bar' ? '패널 모드' : '막대바'}
                     >
-                        {viewMode === 'bar' ? <Grid3X3 size={14} /> : <Square size={14} />}
+                        {viewMode === 'bar' ? <AppWindow size={14} /> : <SquareMinus size={14} />}
                     </button>
                 </div>
             </div>

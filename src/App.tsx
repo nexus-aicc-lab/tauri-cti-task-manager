@@ -1,14 +1,14 @@
 // src/App.tsx
 
 import { useState, useEffect } from "react";
-import { LayoutGrid, Phone, PhoneCall, Clock, User, Settings, Activity, TrendingUp, Headphones, PhoneIncoming, PhoneOutgoing, Timer } from "lucide-react";
+import { Phone, Clock, User, Settings, Activity, TrendingUp, Headphones, PhoneIncoming, PhoneOutgoing } from "lucide-react";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
 
 type ViewMode = 'bar' | 'panel';
 
 function App() {
-  const [status, setStatus] = useState<'대기중' | '통화중' | '후처리'>('대기중');
+  const [status, setStatus] = useState<'대기중' | '통화중' | '정지중'>('대기중');
   const [time, setTime] = useState('');
   const [taskCount, setTaskCount] = useState(0);
   const [completedTasks, setCompletedTasks] = useState(15);
@@ -81,7 +81,7 @@ function App() {
 
   // 상태 변경시 펄스 효과
   useEffect(() => {
-    if (status === '통화중' || status === '후처리') {
+    if (status === '통화중' || status === '정지중') {
       setPulseActive(true);
       const timer = setTimeout(() => setPulseActive(false), 2000);
       return () => clearTimeout(timer);
@@ -95,7 +95,7 @@ function App() {
         return '통화중';
       }
       if (prev === '통화중') {
-        return '후처리';
+        return '정지중';
       }
       setCurrentCall(null);
       return '대기중';
@@ -103,8 +103,8 @@ function App() {
 
     setStatusChangeCount(prev => prev + 1);
 
-    // 상태가 '후처리'에서 '대기중'으로 바뀔 때 카운트를 증가
-    if (status === '후처리') {
+    // 상태가 '정지중'에서 '대기중'으로 바뀔 때 카운트를 증가
+    if (status === '정지중') {
       setTaskCount(prev => prev + 1);
       setCompletedTasks(prev => prev + 1);
       setStats(prev => ({
@@ -123,7 +123,7 @@ function App() {
     switch (status) {
       case '대기중': return 'status-waiting';
       case '통화중': return 'status-calling';
-      case '후처리': return 'status-processing';
+      case '정지중': return 'status-processing';
       default: return 'status-default';
     }
   };
@@ -262,7 +262,7 @@ function App() {
                   title="클릭하여 상태 변경"
                 >
                   <div className="status-icon">
-                    {status === '대기중' ? '⏸️' : status === '통화중' ? '📞' : '⚙️'}
+                    {status === '대기중' ? '⏸️' : status === '통화중' ? '📞' : '⏹️'}
                   </div>
                   <div className="status-text">{status}</div>
                   {currentCall && (
@@ -290,7 +290,7 @@ function App() {
                 </div>
                 <div className="perf-item">
                   <Settings size={14} />
-                  <span className="perf-label">평균 후처리</span>
+                  <span className="perf-label">평균 정지 시간</span>
                   <span className="perf-value">{stats.avgWrapTime}</span>
                 </div>
                 <div className="perf-item efficiency-item">

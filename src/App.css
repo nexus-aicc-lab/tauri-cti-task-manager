@@ -584,7 +584,7 @@
 }
 
 .status-waiting {
-  background: linear-gradient(135deg, #6b7280, #4b5563);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
 }
 
@@ -595,7 +595,7 @@
 }
 
 .status-processing {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   color: white;
   animation: pulse-orange 2s infinite;
 }
