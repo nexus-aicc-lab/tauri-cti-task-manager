@@ -281,7 +281,25 @@ function App() {
               <div className="performance-panel">
                 <h4 className="panel-title">
                   <TrendingUp size={16} />
-                  성과 지표
+                  <span
+                    className="
+                      text-lg
+                      font-extrabold
+                      bg-gradient-to-r from-indigo-400 via-pink-400 to-yellow-400
+                      bg-clip-text
+                      text-transparent
+                      drop-shadow-lg
+                      tracking-widest
+                      animate-pulse
+                      px-3
+                      py-1
+                      rounded
+                      border-2 border-white/30
+                      shadow-xl
+                    "
+                  >
+                    성과 지표
+                  </span>
                 </h4>
                 <div className="perf-item">
                   <Clock size={14} />
