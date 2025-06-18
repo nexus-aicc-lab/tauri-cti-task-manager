@@ -214,10 +214,10 @@ function Titlebar({
             </div>
 
             {/* 중앙: 드래그 영역 및 타이틀/데이터 */}
-            <div data-tauri-drag-region className="flex-1 h-full flex items-center justify-center cursor-move px-4">
+            <div className="flex-1 h-full flex items-center justify-center cursor-move px-4">
                 {viewMode === 'bar' ? (
                     // 바 모드: 핵심 정보만 간략하게
-                    <div className="flex items-center justify-center gap-6 w-full max-w-full px-5">
+                    <div data-tauri-drag-region className="flex items-center justify-center gap-6 w-full max-w-full px-5 h-full">
                         {/* 연결 상태 */}
                         <div className="flex items-center gap-2 px-3.5 py-1.5 bg-green-900/30 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border border-green-500/30 transition-all duration-200 shadow-[0_2px_8px_rgba(34,197,94,0.2)] min-w-[80px] justify-center hover:bg-green-900/40 hover:-translate-y-0.5 hover:shadow-lg">
                             <span className="text-green-400 animate-pulse">🟢</span>
@@ -268,7 +268,7 @@ function Titlebar({
                     </div>
                 ) : (
                     // 패널 모드: 브랜드 타이틀
-                    <div className="flex items-center gap-2 text-white">
+                    <div data-tauri-drag-region className="flex items-center gap-2 text-white h-full">
                         <span className="text-base font-semibold tracking-wide">CTI Task Master</span>
                         <span className="text-xs text-white/60 font-medium">v2.1</span>
                     </div>
