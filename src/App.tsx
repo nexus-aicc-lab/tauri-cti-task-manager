@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Phone, Clock, User, Settings, Activity, TrendingUp, Headphones, PhoneIncoming, PhoneOutgoing } from "lucide-react";
-import Titlebar from "./components/Titlebar";
+import Titlebar from "./widgets/titlebar/ui/Titlebar";
 import { InfoHeader } from "./widgets/info-header/ui/InfoHeader";
 import { WINDOW_CONFIG } from "./config/windowConfig";
 

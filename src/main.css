@@ -1,1 +1,33 @@
+/* C:\tauri\cti-task-manager-tauri\src\main.css */
 @import "tailwindcss";
+
+/* 드롭다운 메뉴 스타일 */
+.dropdown-menu {
+    position: fixed !important;
+    z-index: 9999 !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    top: 100% !important;
+    margin-top: 4px !important;
+}
+
+/* 드롭다운 오버레이 */
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9998;
+    pointer-events: none;
+}
+
+/* Tauri 창이 작을 때 드롭다운이 잘리지 않도록 */
+.menu-dropdown {
+    position: fixed !important;
+    z-index: 9999 !important;
+    max-height: calc(100vh - 40px);
+    /* 뷰포트 높이에서 40px을 뺀 높이로 제한 */
+    overflow-y: auto;
+    /* 높이를 초과할 경우 스크롤 표시 */
+}
