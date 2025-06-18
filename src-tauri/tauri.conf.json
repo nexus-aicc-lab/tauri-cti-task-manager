@@ -14,7 +14,7 @@
       {
         "label": "main",
         "title": "CTI Task Master",
-        "width": 800,
+        "width": 900,
         "height": 32,
         "resizable": true,
         "alwaysOnTop": true,

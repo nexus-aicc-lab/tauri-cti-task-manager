@@ -3,13 +3,13 @@
 
 import { useState, useEffect } from "react";
 import { X, Minimize, Maximize, PanelTop, Pin } from "lucide-react";
-import AgentStatusContentForBarMode from "@/widgets/info-header/ui/AgentStatusContentForBarModeProps";
+import AgentStatusContentForBarMode from "@/widgets/info-header/ui/AgentStatusContentForBarMode";
 import { TITLEBAR_CLASSES } from "@/config/windowConfig";
 
 interface TitlebarProps {
     viewMode: 'bar' | 'panel';
     onToggleMode: () => void;
-    status: '대기중' | '통화중' | '정지중';
+    status: '대기' | '통화' | '정지중';
     time: string;
     taskCount: number;
     completedTasks: number;

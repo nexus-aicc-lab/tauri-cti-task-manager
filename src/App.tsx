@@ -9,7 +9,7 @@ import { WINDOW_CONFIG } from "./config/windowConfig";
 type ViewMode = 'bar' | 'panel';
 
 function App() {
-  const [status, setStatus] = useState<'대기중' | '통화중' | '정지중'>('대기중');
+  const [status, setStatus] = useState<'대기' | '통화' | '정지'>('대기');
   const [time, setTime] = useState('');
   const [taskCount, setTaskCount] = useState(0);
   const [completedTasks, setCompletedTasks] = useState(15);
@@ -82,7 +82,7 @@ function App() {
 
   // 상태 변경시 펄스 효과
   useEffect(() => {
-    if (status === '통화중' || status === '정지중') {
+    if (status === '통화' || status === '정지') {
       setPulseActive(true);
       const timer = setTimeout(() => setPulseActive(false), 2000);
       return () => clearTimeout(timer);
@@ -91,21 +91,21 @@ function App() {
 
   const nextStatus = () => {
     setStatus(prev => {
-      if (prev === '대기중') {
+      if (prev === '대기') {
         setCurrentCall(callQueue[0]?.number || '010-1234-5678');
-        return '통화중';
+        return '통화';
       }
-      if (prev === '통화중') {
-        return '정지중';
+      if (prev === '통화') {
+        return '정지';
       }
       setCurrentCall(null);
-      return '대기중';
+      return '대기';
     });
 
     setStatusChangeCount(prev => prev + 1);
 
     // 상태가 '정지중'에서 '대기중'으로 바뀔 때 카운트를 증가
-    if (status === '정지중') {
+    if (status === '정지') {
       setTaskCount(prev => prev + 1);
       setCompletedTasks(prev => prev + 1);
       setStats(prev => ({
@@ -122,9 +122,9 @@ function App() {
 
   const getStatusColor = () => {
     switch (status) {
-      case '대기중': return 'bg-gradient-to-br from-amber-500 to-orange-600';
-      case '통화중': return 'bg-gradient-to-br from-green-500 to-emerald-600';
-      case '정지중': return 'bg-gradient-to-br from-red-500 to-red-600';
+      case '대기': return 'bg-gradient-to-br from-amber-500 to-orange-600';
+      case '통화': return 'bg-gradient-to-br from-green-500 to-emerald-600';
+      case '정지': return 'bg-gradient-to-br from-red-500 to-red-600';
       default: return 'bg-gray-500';
     }
   };
@@ -230,7 +230,7 @@ function App() {
                   <div className="absolute inset-0 bg-gradient-conic from-transparent via-white/30 to-transparent animate-spin-slow opacity-30"></div>
 
                   <div className="text-3xl mb-2 z-10">
-                    {status === '대기중' ? '⏸️' : status === '통화중' ? '📞' : '⏹️'}
+                    {status === '대기' ? '⏸️' : status === '통화' ? '📞' : '⏹️'}
                   </div>
                   <div className="text-sm font-bold text-white z-10">{status}</div>
                   {currentCall && (
