@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Phone, Clock, User, Settings, Activity, TrendingUp, Headphones, PhoneIncoming, PhoneOutgoing } from "lucide-react";
 import Titlebar from "./components/Titlebar";
 import { InfoHeader } from "./widgets/info-header/ui/InfoHeader";
+import { WINDOW_CONFIG } from "./config/windowConfig";
 
 type ViewMode = 'bar' | 'panel';
 
@@ -140,11 +141,8 @@ function App() {
         const { getCurrentWindow, LogicalSize } = await import('@tauri-apps/api/window');
         const appWindow = getCurrentWindow();
 
-        if (newMode === 'bar') {
-          await appWindow.setSize(new LogicalSize(1000, 36));
-        } else {
-          await appWindow.setSize(new LogicalSize(900, 500));
-        }
+        const config = WINDOW_CONFIG[newMode];
+        await appWindow.setSize(new LogicalSize(config.width, config.height));
       } catch (error) {
         console.warn('창 크기 자동 조정을 사용할 수 없습니다.', error);
       }
