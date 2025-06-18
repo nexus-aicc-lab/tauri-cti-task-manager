@@ -1,8 +1,7 @@
-// src/components/Titlebar.jsx
+// src/components/Titlebar.tsx
 
 import { useState, useEffect, useRef } from 'react';
 import { Pin, PinOff, Minus, Maximize2, X, TrendingUp, Clock, Users, AppWindow, SquareMinus } from 'lucide-react';
-import './Titlebar.css';
 
 interface TitlebarProps {
     viewMode: 'bar' | 'panel';
@@ -104,10 +103,14 @@ function Titlebar({
 
     const getStatusClass = (status?: string) => {
         switch (status) {
-            case '대기중': return 'status-waiting';
-            case '통화중': return 'status-calling';
-            case '후처리': return 'status-processing';
-            default: return 'status-waiting';
+            case '대기중':
+                return 'bg-gradient-to-r from-blue-600/85 to-blue-700/85 border-blue-500/80 shadow-[0_2px_8px_rgba(59,130,246,0.3)]';
+            case '통화중':
+                return 'bg-gradient-to-r from-red-600/85 to-red-700/85 border-red-500/80 shadow-[0_2px_8px_rgba(239,68,68,0.3)]';
+            case '후처리':
+                return 'bg-gradient-to-r from-amber-600/85 to-orange-600/85 border-amber-500/80 shadow-[0_2px_8px_rgba(245,158,11,0.3)]';
+            default:
+                return 'bg-gradient-to-r from-blue-600/85 to-blue-700/85 border-blue-500/80';
         }
     };
 
@@ -196,13 +199,13 @@ function Titlebar({
     };
 
     return (
-        <div className="custom-titlebar py-5">
+        <div className="h-9 bg-gray-800 flex items-center justify-between select-none backdrop-blur-2xl w-full relative shadow-lg py-1">
             {/* 왼쪽: 모드 토글 버튼 */}
-            <div className="titlebar-left">
-                <div className="mode-toggle">
+            <div className="flex-none pl-2 z-[100]">
+                <div className="flex bg-white/10 rounded-md p-0.5 backdrop-blur-lg">
                     <button
                         onClick={onToggleMode}
-                        className="mode-toggle-btn"
+                        className="p-1.5 border-0 bg-white/10 text-white/90 rounded cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-white/30 hover:text-white hover:scale-105 active:scale-95"
                         title={viewMode === 'bar' ? '패널 모드' : '막대바'}
                     >
                         {viewMode === 'bar' ? <AppWindow size={14} /> : <SquareMinus size={14} />}
@@ -211,40 +214,43 @@ function Titlebar({
             </div>
 
             {/* 중앙: 드래그 영역 및 타이틀/데이터 */}
-            <div data-tauri-drag-region className="titlebar-drag">
+            <div data-tauri-drag-region className="flex-1 h-full flex items-center justify-center cursor-move px-4">
                 {viewMode === 'bar' ? (
                     // 바 모드: 핵심 정보만 간략하게
-                    <div className="titlebar-bar-content cti-enhanced">
+                    <div className="flex items-center justify-center gap-6 w-full max-w-full px-5">
                         {/* 연결 상태 */}
-                        <div className="bar-data-item connection-item online">
-                            <span className="connection-icon">🟢</span>
-                            <span className="bar-text">ONLINE</span>
+                        <div className="flex items-center gap-2 px-3.5 py-1.5 bg-green-900/30 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border border-green-500/30 transition-all duration-200 shadow-[0_2px_8px_rgba(34,197,94,0.2)] min-w-[80px] justify-center hover:bg-green-900/40 hover:-translate-y-0.5 hover:shadow-lg">
+                            <span className="text-green-400 animate-pulse">🟢</span>
+                            <span className="text-xs font-semibold text-green-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">ONLINE</span>
                         </div>
 
                         {/* 현재 시간 */}
-                        <div className="bar-data-item time-item">
-                            <Clock size={11} className="bar-icon-svg" />
-                            <span className="bar-text time-display">
+                        <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/15 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border border-white/25 transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.1)] min-w-[80px] justify-center hover:bg-white/25 hover:-translate-y-0.5 hover:shadow-lg">
+                            <Clock size={11} className="text-white/80" />
+                            <span className="text-xs font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] font-mono">
                                 {time?.split(':').slice(0, 2).join(':') || '--:--'}
                             </span>
                         </div>
 
                         {/* 상태 표시 */}
-                        <div className={`bar-data-item status-item ${getStatusClass(status)} ${pulseActive ? 'pulse' : ''}`}>
-                            <span className="status-indicator">{getStatusIcon(status)}</span>
-                            <span className="bar-text status-text">{status || '대기중'}</span>
+                        <div
+                            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border transition-all duration-200 cursor-pointer min-w-[100px] justify-center hover:-translate-y-0.5 hover:shadow-lg active:scale-95 ${getStatusClass(status)} ${pulseActive ? 'animate-pulse' : ''}`}
+                            onClick={onToggleMode}
+                        >
+                            <span className="text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{getStatusIcon(status)}</span>
+                            <span className="text-xs font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{status || '대기중'}</span>
                         </div>
 
                         {/* 효율성 + 진행률 */}
-                        <div className="bar-data-item efficiency-item">
-                            <TrendingUp size={11} className="bar-icon-svg" />
-                            <div className="efficiency-display">
-                                <span className="bar-text">{efficiency}%</span>
-                                <div className="mini-progress">
+                        <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/15 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border border-white/25 transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.1)] min-w-[100px] justify-center hover:bg-white/25 hover:-translate-y-0.5 hover:shadow-lg">
+                            <TrendingUp size={11} className="text-white/80" />
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{efficiency}%</span>
+                                <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden">
                                     <div
-                                        className="mini-progress-fill"
+                                        ref={progressBarRef}
+                                        className="h-full rounded-full transition-all duration-1000 ease-out"
                                         style={{
-                                            width: `${efficiency}%`,
                                             backgroundColor: getEfficiencyColor(efficiency)
                                         }}
                                     />
@@ -253,27 +259,28 @@ function Titlebar({
                         </div>
 
                         {/* 작업 현황 */}
-                        <div className="bar-data-item counter-item">
-                            <Users size={11} className="bar-icon-svg" />
-                            <span className="bar-text">
-                                {animatedCompletedTasks}<span className="divider">/</span>{animatedTaskCount + animatedCompletedTasks}
+                        <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/15 rounded-2xl backdrop-blur-xl text-white text-sm font-semibold border border-white/25 transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.1)] min-w-[80px] justify-center hover:bg-white/25 hover:-translate-y-0.5 hover:shadow-lg">
+                            <Users size={11} className="text-white/80" />
+                            <span className="text-xs font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+                                {animatedCompletedTasks}<span className="text-white/50 mx-0.5">/</span>{animatedTaskCount + animatedCompletedTasks}
                             </span>
                         </div>
                     </div>
                 ) : (
                     // 패널 모드: 브랜드 타이틀
-                    <div className="titlebar-title cti-title">
-                        <span className="title-main">CTI Task Master</span>
-                        <span className="title-version">v2.1</span>
+                    <div className="flex items-center gap-2 text-white">
+                        <span className="text-base font-semibold tracking-wide">CTI Task Master</span>
+                        <span className="text-xs text-white/60 font-medium">v2.1</span>
                     </div>
                 )}
             </div>
 
             {/* 오른쪽: 창 컨트롤 버튼들 */}
-            <div className="titlebar-controls">
+            <div className="flex items-center h-full">
                 <button
                     onClick={togglePin}
-                    className={`control-btn pin-btn ${isPinned ? 'pinned' : ''}`}
+                    className={`w-[46px] h-9 border-0 bg-transparent text-white cursor-pointer flex items-center justify-center transition-all duration-200 outline-none opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 ${isPinned ? 'bg-green-600/90 opacity-100 shadow-[0_2px_8px_rgba(34,197,94,0.3)] hover:bg-green-600 hover:shadow-[0_4px_12px_rgba(34,197,94,0.4)]' : 'hover:bg-white/20'
+                        }`}
                     title={isPinned ? '항상 위에 표시 해제' : '항상 위에 표시'}
                 >
                     {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
@@ -281,7 +288,7 @@ function Titlebar({
 
                 <button
                     onClick={handleMinimize}
-                    className="control-btn minimize-btn"
+                    className="w-[46px] h-9 border-0 bg-transparent text-white cursor-pointer flex items-center justify-center transition-all duration-200 outline-none opacity-80 hover:bg-white/20 hover:opacity-100 hover:scale-105 active:scale-95"
                     title="최소화"
                 >
                     <Minus size={14} />
@@ -289,7 +296,7 @@ function Titlebar({
 
                 <button
                     onClick={handleToggleMaximize}
-                    className="control-btn maximize-btn"
+                    className="w-[46px] h-9 border-0 bg-transparent text-white cursor-pointer flex items-center justify-center transition-all duration-200 outline-none opacity-80 hover:bg-white/20 hover:opacity-100 hover:scale-105 active:scale-95"
                     title={isMaximized ? '이전 크기로' : '최대화'}
                 >
                     <Maximize2 size={14} />
@@ -297,7 +304,7 @@ function Titlebar({
 
                 <button
                     onClick={handleClose}
-                    className="control-btn close-btn"
+                    className="w-[46px] h-9 border-0 bg-transparent text-white cursor-pointer flex items-center justify-center transition-all duration-200 outline-none opacity-80 hover:bg-red-600 hover:opacity-100 hover:shadow-[0_2px_8px_rgba(239,68,68,0.3)] active:scale-95 active:bg-red-700"
                     title="닫기"
                 >
                     <X size={14} />
