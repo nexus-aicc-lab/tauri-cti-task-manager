@@ -1,0 +1,591 @@
+<!-- <!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환경설정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .setting-group h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .setting-group p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .test-section {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .test-section h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 환경설정</h1>
+        </div>
+
+        <div class="content">
+            <div class="setting-group">
+                <h3>📋 일반 설정</h3>
+                <p>기본적인 애플리케이션 설정을 관리합니다.</p>
+            </div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="appName">애플리케이션 이름</label>
+                    <input type="text" id="appName" value="CTI Task Master" />
+                </div>
+
+                <div class="form-group">
+                    <label for="language">언어 설정</label>
+                    <select id="language">
+                        <option value="ko">한국어</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="theme">테마 설정</label>
+                    <select id="theme">
+                        <option value="light">라이트 모드</option>
+                        <option value="dark">다크 모드</option>
+                        <option value="auto">시스템 설정 따름</option>
+                    </select>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="notifications" checked />
+                    <label for="notifications">알림 받기</label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="autoStart" />
+                    <label for="autoStart">시스템 시작 시 자동 실행</label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="minimizeToTray" checked />
+                    <label for="minimizeToTray">트레이로 최소화</label>
+                </div>
+            </form>
+
+            <div class="test-section">
+                <h4>🧪 테스트 기능</h4>
+                <button class="btn btn-secondary" onclick="testDialog()">
+                    다이얼로그 테스트
+                </button>
+                <button class="btn btn-secondary" onclick="testNotification()">
+                    알림 테스트
+                </button>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="closeWindow()">취소</button>
+                <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 설정 저장
+        function saveSettings() {
+            const settings = {
+                appName: document.getElementById('appName').value,
+                language: document.getElementById('language').value,
+                theme: document.getElementById('theme').value,
+                notifications: document.getElementById('notifications').checked,
+                autoStart: document.getElementById('autoStart').checked,
+                minimizeToTray: document.getElementById('minimizeToTray').checked
+            };
+
+            console.log('설정 저장:', settings);
+            alert('설정이 저장되었습니다!');
+        }
+
+        // 윈도우 닫기
+        function closeWindow() {
+            if (window.__TAURI__) {
+                window.__TAURI__.window.appWindow.close();
+            } else {
+                window.close();
+            }
+        }
+
+        // 테스트 함수들
+        function testDialog() {
+            alert('다이얼로그 테스트입니다!');
+        }
+
+        function testNotification() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('테스트 알림', {
+                        body: '알림 기능이 정상적으로 작동합니다!',
+                        icon: '/favicon.ico'
+                    });
+                } else {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            new Notification('테스트 알림', {
+                                body: '알림 기능이 정상적으로 작동합니다!'
+                            });
+                        }
+                    });
+                }
+            } else {
+                alert('이 브라우저는 알림을 지원하지 않습니다.');
+            }
+        }
+
+        // 페이지 로드 시 설정 값 불러오기
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('환경설정 페이지 로드됨');
+
+            // 여기서 Tauri invoke를 통해 설정값 불러올 수 있음
+            // invoke('get_settings').then(settings => { ... });
+        });
+    </script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환경설정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .setting-group h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .setting-group p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .test-section {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .test-section h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 환경설정</h1>
+        </div>
+
+        <div class="content">
+            <div class="setting-group">
+                <h3>📋 일반 설정</h3>
+                <p>기본적인 애플리케이션 설정을 관리합니다.</p>
+            </div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="appName">애플리케이션 이름</label>
+                    <input type="text" id="appName" value="CTI Task Master" />
+                </div>
+
+                <div class="form-group">
+                    <label for="language">언어 설정</label>
+                    <select id="language">
+                        <option value="ko">한국어</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="theme">테마 설정</label>
+                    <select id="theme">
+                        <option value="light">라이트 모드</option>
+                        <option value="dark">다크 모드</option>
+                        <option value="auto">시스템 설정 따름</option>
+                    </select>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="notifications" checked />
+                    <label for="notifications">알림 받기</label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="autoStart" />
+                    <label for="autoStart">시스템 시작 시 자동 실행</label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="minimizeToTray" checked />
+                    <label for="minimizeToTray">트레이로 최소화</label>
+                </div>
+            </form>
+
+            <div class="test-section">
+                <h4>🧪 테스트 기능</h4>
+                <button class="btn btn-secondary" onclick="testDialog()">
+                    다이얼로그 테스트
+                </button>
+                <button class="btn btn-secondary" onclick="testNotification()">
+                    알림 테스트
+                </button>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="closeWindow()">취소</button>
+                <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 설정 저장
+        function saveSettings() {
+            const settings = {
+                appName: document.getElementById('appName').value,
+                language: document.getElementById('language').value,
+                theme: document.getElementById('theme').value,
+                notifications: document.getElementById('notifications').checked,
+                autoStart: document.getElementById('autoStart').checked,
+                minimizeToTray: document.getElementById('minimizeToTray').checked
+            };
+
+            console.log('설정 저장:', settings);
+            alert('설정이 저장되었습니다!');
+        }
+
+        // 윈도우 닫기 (더 확실한 방법)
+        async function closeWindow() {
+            try {
+                // Tauri v2 API 사용
+                const { getCurrentWindow } = await import('/__tauri__/api/window');
+                const currentWindow = getCurrentWindow();
+                await currentWindow.close();
+            } catch (error) {
+                console.error('Tauri 윈도우 닫기 실패:', error);
+                try {
+                    // 폴백 1: window.__TAURI__ 사용
+                    if (window.__TAURI__ && window.__TAURI__.window) {
+                        const { getCurrentWindow } = window.__TAURI__.window;
+                        const currentWindow = getCurrentWindow();
+                        currentWindow.close();
+                    } else {
+                        // 폴백 2: 일반 브라우저 방식
+                        window.close();
+                    }
+                } catch (fallbackError) {
+                    console.error('모든 윈도우 닫기 방법 실패:', fallbackError);
+                    // 최후의 수단: 페이지 완전히 숨기기
+                    document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 18px; color: #666;">창이 닫혔습니다.</div>';
+                }
+            }
+        }
+
+        // 테스트 함수들
+        function testDialog() {
+            alert('다이얼로그 테스트입니다!');
+        }
+
+        function testNotification() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('테스트 알림', {
+                        body: '알림 기능이 정상적으로 작동합니다!',
+                        icon: '/favicon.ico'
+                    });
+                } else {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            new Notification('테스트 알림', {
+                                body: '알림 기능이 정상적으로 작동합니다!'
+                            });
+                        }
+                    });
+                }
+            } else {
+                alert('이 브라우저는 알림을 지원하지 않습니다.');
+            }
+        }
+
+        // 페이지 로드 시 설정 값 불러오기
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('환경설정 페이지 로드됨');
+
+            // 여기서 Tauri invoke를 통해 설정값 불러올 수 있음
+            // invoke('get_settings').then(settings => { ... });
+        });
+    </script>
+</body>
+
+</html>

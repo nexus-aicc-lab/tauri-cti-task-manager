@@ -1,6 +1,17 @@
+// // Prevents additional console window on Windows in release, DO NOT REMOVE!!
+// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+// fn main() {
+//     cti_task_manager_tauri_lib::run()
+// }
+
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    cti_task_manager_tauri_lib::run()
+    tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_process::init())
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
