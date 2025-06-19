@@ -1,0 +1,7 @@
+{
+    "@tauri-apps/plugin-fs": {
+        "scope": [
+            "$APPDATA/*"
+        ]
+    }
+}
