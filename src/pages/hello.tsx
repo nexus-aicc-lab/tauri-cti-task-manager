@@ -1,4 +1,4 @@
-// src/pages/hello.tsx (or src/routes/hello.tsx for Vite SPA routing)
+// C:\tauri\cti-task-manager-tauri\src\pages\hello.tsx
 
 export default function HelloPage() {
     return (
