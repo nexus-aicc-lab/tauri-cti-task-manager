@@ -345,7 +345,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
 
                                 // 새 창 크기 설정
                                 const newWindowWidth = 600;
-                                const newWindowHeight = 400;
+                                const newWindowHeight = 650;
 
                                 // 스케일 팩터를 고려한 정확한 위치 계산
                                 const adjustedWidth = currentSize.width / scaleFactor;
@@ -403,7 +403,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
                                 console.log('최종 창 위치:', { x: finalX, y: finalY });
 
                                 const settingsWindow = new WebviewWindow('settings', {
-                                    url: '/settings', // 또는 별도의 HTML 파일 경로
+                                    url: '/settings.html', // HTML 파일 사용
                                     title: '환경설정',
                                     width: newWindowWidth,
                                     height: newWindowHeight,
@@ -411,7 +411,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
                                     center: false, // 중앙 정렬 비활성화 (수동으로 위치 지정)
                                     x: finalX,  // 최종 계산된 위치
                                     y: finalY,  // 최종 계산된 위치
-                                    decorations: true,
+                                    decorations: false, // 커스텀 타이틀바 사용
                                     alwaysOnTop: false,
                                     skipTaskbar: false
                                 });
