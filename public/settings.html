@@ -21,64 +21,8 @@
             overflow: hidden;
         }
 
-        .titlebar {
-            height: 30px;
-            background: #e2e8f0;
-            border-bottom: 1px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            -webkit-app-region: drag;
-        }
-
-        .titlebar-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .titlebar-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            -webkit-app-region: no-drag;
-        }
-
-        .titlebar-button {
-            width: 16px;
-            height: 16px;
-            border-radius: 2px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-
-        .minimize-btn {
-            background: #fbbf24;
-            color: #92400e;
-        }
-
-        .minimize-btn:hover {
-            background: #f59e0b;
-        }
-
-        .close-btn {
-            background: #ef4444;
-            color: white;
-        }
-
-        .close-btn:hover {
-            background: #dc2626;
-        }
-
         .container {
-            height: calc(100vh - 30px);
+            height: 100vh;
             display: flex;
             flex-direction: column;
             background: #ffffff;
@@ -266,23 +210,37 @@
 </head>
 
 <body>
-    <div class="titlebar">
-        <span class="titlebar-title">환경설정</span>
-        <div class="titlebar-controls">
-            <button class="titlebar-button minimize-btn" onclick="minimizeWindow()" title="최소화">−</button>
-            <button class="titlebar-button close-btn" onclick="closeWindow()" title="닫기">×</button>
-        </div>
-    </div>
-
     <div class="container">
-        <div class="header">
-            <h1>⚙️ 환경설정</h1>
-        </div>
 
         <div class="content">
+            <div class="setting-group">
+                <h3>📋 일반 설정</h3>
+                <p>기본적인 애플리케이션 설정을 관리합니다.</p>
+            </div>
 
             <form id="settingsForm">
+                <div class="form-group">
+                    <label for="appName">애플리케이션 이름</label>
+                    <input type="text" id="appName" value="CTI Task Master" />
+                </div>
 
+                <div class="form-group">
+                    <label for="language">언어 설정</label>
+                    <select id="language">
+                        <option value="ko">한국어</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="theme">테마 설정</label>
+                    <select id="theme">
+                        <option value="dark">다크 모드</option>
+                        <option value="light">라이트 모드</option>
+                        <option value="auto">시스템 설정 따름</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label for="serverUrl">서버 URL</label>
@@ -490,6 +448,12 @@
         window.addEventListener('DOMContentLoaded', () => {
             console.log('환경설정 페이지 로드됨');
 
+            // 여기서 Tauri invoke를 통해 설정값 불러올 수 있음
+            // invoke('get_settings').then(settings => {
+            //     document.getElementById('appName').value = settings.appName || 'CTI Task Master';
+            //     document.getElementById('language').value = settings.language || 'ko';
+            //     // ... 기타 설정값들
+            // });
         });
     </script>
 </body>

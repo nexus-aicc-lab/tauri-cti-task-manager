@@ -345,7 +345,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
 
                                 // 새 창 크기 설정
                                 const newWindowWidth = 600;
-                                const newWindowHeight = 400;
+                                const newWindowHeight = 600;
 
                                 // 스케일 팩터를 고려한 정확한 위치 계산
                                 const adjustedWidth = currentSize.width / scaleFactor;
