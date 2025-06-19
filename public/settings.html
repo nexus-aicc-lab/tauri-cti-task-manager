@@ -282,28 +282,7 @@
         <div class="content">
 
             <form id="settingsForm">
-                <!-- <div class="form-group">
-                    <label for="appName">애플리케이션 이름</label>
-                    <input type="text" id="appName" value="CTI Task Master" />
-                </div>
 
-                <div class="form-group">
-                    <label for="language">언어 설정</label>
-                    <select id="language">
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="theme">테마 설정</label>
-                    <select id="theme">
-                        <option value="dark">다크 모드</option>
-                        <option value="light">라이트 모드</option>
-                        <option value="auto">시스템 설정 따름</option>
-                    </select>
-                </div> -->
 
                 <div class="form-group">
                     <label for="serverUrl">서버 URL</label>
@@ -511,12 +490,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             console.log('환경설정 페이지 로드됨');
 
-            // 여기서 Tauri invoke를 통해 설정값 불러올 수 있음
-            // invoke('get_settings').then(settings => {
-            //     document.getElementById('appName').value = settings.appName || 'CTI Task Master';
-            //     document.getElementById('language').value = settings.language || 'ko';
-            //     // ... 기타 설정값들
-            // });
         });
     </script>
 </body>

@@ -345,7 +345,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
 
                                 // 새 창 크기 설정
                                 const newWindowWidth = 600;
-                                const newWindowHeight = 650;
+                                const newWindowHeight = 400;
 
                                 // 스케일 팩터를 고려한 정확한 위치 계산
                                 const adjustedWidth = currentSize.width / scaleFactor;
@@ -411,7 +411,7 @@ export function MenuDropdown({ className }: MenuDropdownProps) {
                                     center: false, // 중앙 정렬 비활성화 (수동으로 위치 지정)
                                     x: finalX,  // 최종 계산된 위치
                                     y: finalY,  // 최종 계산된 위치
-                                    decorations: false, // 커스텀 타이틀바 사용
+                                    decorations: true, // 네이티브 타이틀바 사용 (닫기 버튼 포함)
                                     alwaysOnTop: false,
                                     skipTaskbar: false
                                 });
