@@ -13,7 +13,9 @@
 - **저장 방식**: File System 기반 로컬 설정 저장
 
 
+
 ## 🚀 설치 및 실행
+
 
 ### 1. 개발 환경 설정
 
@@ -25,6 +27,7 @@ npm install
 npm run tauri dev
 ```
 
+
 ### 2. 배포용 빌드
 
 ```bash
@@ -33,6 +36,7 @@ npm run tauri build
 
 # 빌드 결과 위치: src-tauri/target/release/cti-task-master.exe
 ```
+
 
 ## 📜 사용 가능한 스크립트
 
@@ -44,6 +48,7 @@ npm run tauri build
 | `npm run preview` | Vite 빌드 결과 확인 서버 실행 |
 | `npm run tauri` | Tauri CLI 실행용 (예: `npm run tauri build`) |
 
+
 ## ✅ 완료된 기능
 
 - [x] Tauri + Vite + TailwindCSS + ShadCN UI 개발 환경 구축
@@ -52,6 +57,7 @@ npm run tauri build
 - [x] TanStack Router 기반 페이지 라우터 구성
 - [x] 사용자 바/패널 모드 설정 → 로컬 파일 시스템 저장 기능 구현
 
+
 ## 🔧 TODO 리스트
 
 - [ ] 상담사 실시간 데이터 polling 테스트 (TanStack Query, REST or Redis 연동)
@@ -59,6 +65,7 @@ npm run tauri build
 - [ ] 배포 및 설치 자동화 프로세스 구축 (예: .msi or .exe)
 - [ ] 전체 UI 메뉴 시스템 구성 및 파일 기반 설정 저장
 - [ ] 기타 고도화 작업 (테마, 다국어 등)
+
 
 ## 📁 폴더 구조 (FSD)
 
@@ -75,6 +82,7 @@ src/
     └── config/   # 설정 관련
 ```
 
+
 ## 🔗 참고 자료
 
 | 주제 | 링크 |
@@ -84,6 +92,7 @@ src/
 | 🧠 React 공식문서 | [https://ko.react.dev/learn](https://ko.react.dev/learn) |
 | 🐻 Zustand | [https://zustand-demo.pmnd.rs/](https://zustand-demo.pmnd.rs/) |
 | 🧭 TanStack Router | [https://tanstack.com/router/latest](https://tanstack.com/router/latest) |
+
 
 ## 🔍 Tauri vs Electron 비교
 
