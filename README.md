@@ -1,366 +1,96 @@
-# CTI Task Master (Tauri Version)
+# 🚀 CTI Task Master
 
-Tauri + Vite + React로 만든 가로 막대바 형태의 CTI 업무용 상태창 애플리케이션
+> Tauri + Vite + React 기반의 데스크탑 업무 상태바 애플리케이션
+상담사 개인 상태 표시, 실시간 시간 및 완료 건수를 제공
 
-## 📋 프로젝트 개요
 
-- **기술 스택**: Tauri, Vite, React, TypeScript
-- **UI 형태**: 가로 막대바 (400x80)
-- **기능**: 상태 관리(대기중/통화중/후처리), 실시간 시계, 처리 건수 카운트
-- **특징**: 항상 맨 위에 표시, 드래그 이동, 프레임리스 창
+## 📦 기술 스택
+
+- **프레임워크**: Tauri, Vite, React
+- **스타일링**: Tailwind CSS, ShadCN UI
+- **상태 관리**: Zustand
+- **라우팅**: TanStack Router
+- **저장 방식**: File System 기반 로컬 설정 저장
+
 
 ## 🚀 설치 및 실행
 
-### 1. 프로젝트 생성
-```bash
-npm create tauri-app@latest
-# React + TypeScript 선택
-```
+### 1. 개발 환경 설정
 
-### 2. 개발 실행
 ```bash
+# 의존성 설치
 npm install
+
+# 개발 서버 실행
 npm run tauri dev
 ```
 
-### 3. EXE 빌드
+### 2. 배포용 빌드
+
 ```bash
+# EXE 파일 빌드
 npm run tauri build
-# 결과: src-tauri/target/release/cti-task-master.exe
+
+# 빌드 결과 위치: src-tauri/target/release/cti-task-master.exe
 ```
 
-## ⚙️ 핵심 코드
+## 📜 사용 가능한 스크립트
 
-### tauri.conf.json
-```json
-{
-  "app": {
-    "windows": [
-      {
-        "title": "CTI Task Master",
-        "width": 400,
-        "height": 80,
-        "resizable": false,
-        "alwaysOnTop": true,
-        "decorations": false,
-        "skipTaskbar": true,
-        "center": true
-      }
-    ]
-  }
-}
-```
+| 명령어 | 설명 |
+|--------|------|
+| `npm run dev` | Vite 개발 서버 실행 (웹 전용) |
+| `npm run start` | Tauri 앱 개발 모드 실행 (Vite + Tauri) |
+| `npm run build` | TypeScript 타입 검사 후 Vite 빌드 |
+| `npm run preview` | Vite 빌드 결과 확인 서버 실행 |
+| `npm run tauri` | Tauri CLI 실행용 (예: `npm run tauri build`) |
 
-### App.tsx (완전한 코드)
-```tsx
-import { useState, useEffect } from "react";
-import "./App.css";
+## ✅ 완료된 기능
 
-function App() {
-  const [status, setStatus] = useState<'대기중' | '통화중' | '후처리'>('대기중');
-  const [time, setTime] = useState('');
-  const [taskCount, setTaskCount] = useState(0);
-  const [mounted, setMounted] = useState(false);
+- [x] Tauri + Vite + TailwindCSS + ShadCN UI 개발 환경 구축
+- [x] 기본 네이티브 메뉴 및 다이얼로그 팝업 테스트 완료
+- [x] FSD 기반 폴더 구조 설계 및 Zustand 스토어 셋업
+- [x] TanStack Router 기반 페이지 라우터 구성
+- [x] 사용자 바/패널 모드 설정 → 로컬 파일 시스템 저장 기능 구현
 
-  useEffect(() => {
-    setMounted(true);
-    setTime(new Date().toLocaleTimeString());
-    
-    const timer = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
-    }, 1000);
+## 🔧 TODO 리스트
 
-    return () => clearInterval(timer);
-  }, []);
+- [ ] 상담사 실시간 데이터 polling 테스트 (TanStack Query, REST or Redis 연동)
+- [ ] 웹 로그인 후 개인화 툴 자동 실행 연계
+- [ ] 배포 및 설치 자동화 프로세스 구축 (예: .msi or .exe)
+- [ ] 전체 UI 메뉴 시스템 구성 및 파일 기반 설정 저장
+- [ ] 기타 고도화 작업 (테마, 다국어 등)
 
-  const nextStatus = () => {
-    setStatus(prev => {
-      if (prev === '대기중') return '통화중';
-      if (prev === '통화중') return '후처리';
-      return '대기중';
-    });
-    
-    if (status === '후처리') {
-      setTaskCount(prev => prev + 1);
-    }
-  };
-
-  const getStatusColor = () => {
-    switch (status) {
-      case '대기중': return 'status-waiting';
-      case '통화중': return 'status-calling';
-      case '후처리': return 'status-processing';
-      default: return 'status-default';
-    }
-  };
-
-  if (!mounted) return null;
-
-  return (
-    <main className="task-master">
-      <div className="drag-area"></div>
-      <button className="close-btn">×</button>
-      
-      <div className="content">
-        <div className="left-section">
-          <h1 className="title">CTI Task Master</h1>
-          <div className="time">{time}</div>
-        </div>
-        
-        <div className="center-section">
-          <div 
-            className={`status ${getStatusColor()}`}
-            onClick={nextStatus}
-          >
-            {status}
-          </div>
-        </div>
-        
-        <div className="right-section">
-          <div className="counter">처리 완료: {taskCount}건</div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-export default App;
-```
-
-### App.css (완전한 코드)
-```css
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 12px;
-  color: #ffffff;
-  background-color: #1a1a1a;
-}
-
-body, html {
-  height: 100%;
-  overflow: hidden;
-}
-
-#root {
-  height: 100vh;
-  width: 100vw;
-}
-
-.task-master {
-  height: 100vh;
-  width: 100vw;
-  background: linear-gradient(90deg, #1a1a1a 0%, #2d2d2d 100%);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  border-radius: 6px;
-  border: 1px solid #444;
-  padding: 0 15px;
-}
-
-.drag-area {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 25px;
-  height: 100%;
-  -webkit-app-region: drag;
-  cursor: move;
-}
-
-.close-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 18px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  color: #888;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-  -webkit-app-region: no-drag;
-  z-index: 10;
-}
-
-.close-btn:hover {
-  background: #ff4444;
-  color: white;
-}
-
-.content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  -webkit-app-region: no-drag;
-}
-
-.left-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 2px;
-}
-
-.time {
-  font-size: 10px;
-  color: #cccccc;
-}
-
-.center-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.status {
-  padding: 6px 20px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  outline: none;
-  min-width: 80px;
-  text-align: center;
-}
-
-.status:hover {
-  transform: scale(1.05);
-}
-
-.status:active {
-  transform: scale(0.95);
-}
-
-.status-waiting {
-  background: #2196F3;
-  color: white;
-}
-
-.status-waiting:hover {
-  background: #1976D2;
-}
-
-.status-calling {
-  background: #f44336;
-  color: white;
-}
-
-.status-calling:hover {
-  background: #d32f2f;
-}
-
-.status-processing {
-  background: #ff9800;
-  color: white;
-}
-
-.status-processing:hover {
-  background: #f57c00;
-}
-
-.status-default {
-  background: #666;
-  color: white;
-}
-
-.right-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.counter {
-  font-size: 10px;
-  color: #999;
-  text-align: right;
-}
-```
-
-## 🔗 Spring Boot 연동
-
-### 1. 프로세스 실행 (간단)
-```java
-@PostMapping("/launch-task-master")
-public ResponseEntity<String> launchTaskMaster() {
-    ProcessBuilder pb = new ProcessBuilder("C:/path/to/cti-task-master.exe");
-    pb.start();
-    return ResponseEntity.ok("Launched");
-}
-```
-
-### 2. 실시간 상태 연동 (SSE)
-```java
-// Spring Boot - SSE 스트림
-@GetMapping(value = "/api/task/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-public SseEmitter streamTaskStatus() {
-    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-    // Redis Pub/Sub로 실시간 데이터 전송
-    return emitter;
-}
-```
-
-```tsx
-// Tauri App - SSE 수신
-useEffect(() => {
-    const eventSource = new EventSource('https://your-ec2.com/api/task/stream');
-    
-    eventSource.onmessage = (event) => {
-        const realtimeData = JSON.parse(event.data);
-        setRealTimeStats(realtimeData);
-    };
-    
-    return () => eventSource.close();
-}, []);
-```
-
-## 🎯 배포 아키텍처
+## 📁 폴더 구조 (FSD)
 
 ```
-상담사 PC                     EC2 서버
-┌─────────────┐              ┌─────────────┐
-│ JSP Web     │←─ HTTPS ────→│ Spring Boot │
-│ Tauri App   │              │ + Redis     │
-│ (.exe)      │              │ + Database  │
-└─────────────┘              └─────────────┘
+src/
+├── app/          # 애플리케이션 설정 및 초기화
+├── pages/        # 페이지 컴포넌트
+├── widgets/      # 독립적인 UI 블록
+├── features/     # 비즈니스 로직 기능
+├── entities/     # 비즈니스 엔티티
+└── shared/       # 공통 리소스
+    ├── lib/      # 유틸리티 함수
+    ├── store/    # Zustand 상태 관리
+    └── config/   # 설정 관련
 ```
 
-## 📋 .gitignore
-```
-node_modules
-dist
-*.local
-src-tauri/target/
-src-tauri/Cargo.lock
-```
+## 🔗 참고 자료
 
-## 🚀 Tauri vs Electron
-| 특징 | Tauri | Electron |
+| 주제 | 링크 |
+|------|------|
+| 📘 Tauri 공식문서 | [https://v2.tauri.app/](https://v2.tauri.app/) |
+| ⚡ Vite 가이드 | [https://ko.vite.dev/guide/](https://ko.vite.dev/guide/) |
+| 🧠 React 공식문서 | [https://ko.react.dev/learn](https://ko.react.dev/learn) |
+| 🐻 Zustand | [https://zustand-demo.pmnd.rs/](https://zustand-demo.pmnd.rs/) |
+| 🧭 TanStack Router | [https://tanstack.com/router/latest](https://tanstack.com/router/latest) |
+
+## 🔍 Tauri vs Electron 비교
+
+| 항목 | Tauri | Electron |
 |------|-------|----------|
-| **크기** | ~10MB | ~150MB |
-| **메모리** | ~30MB | ~100MB |
-| **빌드** | 간단 | 복잡 |
-| **속도** | 빠름 | 느림 |
+| 앱 크기 | ✅ 작음 (~10MB) | ❌ 큼 (~150MB) |
+| 메모리 사용량 | ✅ 낮음 (~30MB) | ❌ 높음 (~100MB) |
+| 빌드 속도 | ✅ 빠름 | ❌ 느림 |
+| 성능 | ✅ 네이티브 성능 | ❌ 웹 뷰 기반 |
+
