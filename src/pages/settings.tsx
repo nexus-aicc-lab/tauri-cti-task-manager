@@ -30,7 +30,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="h-full w-full flex flex-col items-center justify-center px-4">
+        <div className="min-h-screen w-full flex items-center justify-center px-4 bg-gray-50">
             <div className="max-w-md w-full bg-white dark:bg-zinc-900 shadow-xl rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800">
                 <div className="mb-6 text-center">
                     <div className="text-3xl font-bold mb-1 flex items-center justify-center gap-2">
