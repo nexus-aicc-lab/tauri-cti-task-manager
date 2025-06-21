@@ -1,224 +1,200 @@
-// C:\tauri\cti-task-manager-tauri\src\pages\SettingsMode\index.tsx
-// C:\tauri\cti-task-manager-tauri\src\pages\SettingsMode\index.tsx
-import React, { useState, useEffect } from 'react'
-import { switchViewMode } from '../../entry'
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { loadViewMode, saveViewMode } from '../../shared/lib/fs/viewModeStorage'
+// src/pages/SettingsMode.tsx (Sonner 토스트 적용)
+import React, { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { toast, Toaster } from 'sonner';
 
-const SettingsComponent = () => {
-    const [currentMode, setCurrentMode] = useState<'bar' | 'panel'>('bar')
-    const [windowSettings, setWindowSettings] = useState({
-        alwaysOnTop: false,
-        startWithWindows: false,
-        minimizeToTray: false,
-    })
-    const [isLoading, setIsLoading] = useState(true)
+interface AppSettings {
+    startup_mode: string;
+    auto_login: boolean;
+    theme: string;
+}
 
-    // 컴포넌트 마운트 시 현재 설정 로드
+const SettingsComponent: React.FC = () => {
+    const [settings, setSettings] = useState<AppSettings>({
+        startup_mode: 'launcher',
+        auto_login: false,
+        theme: 'light'
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+
     useEffect(() => {
-        const loadCurrentSettings = async () => {
-            try {
-                const savedMode = await loadViewMode()
-                if (savedMode) {
-                    setCurrentMode(savedMode as 'bar' | 'panel')
-                }
-                // TODO: 다른 설정들도 로드
-                setIsLoading(false)
-            } catch (error) {
-                console.error('설정 로드 실패:', error)
-                setIsLoading(false)
-            }
-        }
+        loadSettings();
+    }, []);
 
-        loadCurrentSettings()
-    }, [])
-
-    const handleModeChange = async (mode: 'bar' | 'panel') => {
+    const loadSettings = async () => {
         try {
-            setCurrentMode(mode)
-            await saveViewMode(mode)
-            await switchViewMode(mode)
-            console.log(`모드 변경: ${mode}`)
+            setIsLoading(true);
+            const loadedSettings = await invoke<AppSettings>('load_settings');
+            setSettings(loadedSettings);
         } catch (error) {
-            console.error('모드 변경 실패:', error)
+            console.error('❌ 설정 로드 실패:', error);
+            toast.error('설정 로드에 실패했습니다.');
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
-    const handleWindowSettingChange = (setting: keyof typeof windowSettings) => {
-        setWindowSettings(prev => ({
-            ...prev,
-            [setting]: !prev[setting]
-        }))
-    }
-
-    const handleSave = async () => {
+    const saveSettings = async () => {
         try {
-            // 모든 설정 저장
-            await saveViewMode(currentMode)
-
-            // TODO: 윈도우 설정들도 저장
-            console.log('모든 설정 저장 완료:', {
-                mode: currentMode,
-                windowSettings
-            })
-
-            // 저장 완료 알림
-            alert('설정이 저장되었습니다!')
+            setIsSaving(true);
+            await invoke('save_settings', { settings });
+            toast.success('설정이 저장되었습니다! 🎉');
         } catch (error) {
-            console.error('설정 저장 실패:', error)
-            alert('설정 저장에 실패했습니다.')
+            console.error('❌ 설정 저장 실패:', error);
+            toast.error('설정 저장에 실패했습니다.');
+        } finally {
+            setIsSaving(false);
         }
-    }
+    };
 
-    const handleReset = () => {
-        setCurrentMode('bar')
-        setWindowSettings({
-            alwaysOnTop: false,
-            startWithWindows: false,
-            minimizeToTray: false,
-        })
-    }
+    const closeWindow = async () => {
+        const currentWindow = getCurrentWebviewWindow();
+        await currentWindow.close();
+    };
 
-    const handleClose = async () => {
-        try {
-            const currentWindow = getCurrentWebviewWindow()
-            await currentWindow.close()
-        } catch (error) {
-            console.error('윈도우 닫기 실패:', error)
-        }
-    }
+    const resetSettings = () => {
+        setSettings({ startup_mode: 'launcher', auto_login: false, theme: 'light' });
+        toast.info('설정이 초기화되었습니다. 저장 버튼을 눌러 적용하세요.');
+    };
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-lg">설정을 불러오는 중...</div>
+            <div className="flex items-center justify-center h-screen"
+                style={{ backgroundColor: '#f59e0b' }}>
+                <div className="bg-white rounded-lg shadow-xl p-6 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
+                    <p className="text-gray-600">설정 로딩 중...</p>
+                </div>
             </div>
-        )
+        );
     }
 
     return (
-        <div className="settings-container p-6 min-h-screen bg-gray-50">
-            <div className="max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8 text-gray-800">
-                    CTI Task Master - Settings
-                </h1>
+        <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f59e0b' }}>
+            {/* Sonner 토스터 컴포넌트 */}
+            <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                duration={2000}
+            />
 
-                {/* View Mode Section */}
-                <div className="settings-section mb-8 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-700">
-                        View Mode
-                    </h2>
-                    <div className="space-y-3">
-                        <label className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input
-                                type="radio"
-                                name="viewMode"
-                                value="bar"
-                                checked={currentMode === 'bar'}
-                                onChange={() => handleModeChange('bar')}
-                                className="mr-3 text-blue-600"
-                            />
+            <div className="h-full flex flex-col">
+                {/* 헤더 */}
+                <div className="bg-white shadow-sm p-4 border-b">
+                    <h1 className="text-xl font-bold text-gray-800 text-center">
+                        ⚙️ 환경 설정
+                    </h1>
+                </div>
+
+                {/* 메인 컨텐츠 - 기존 메시지 영역 제거 */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {/* 시작 모드 설정 */}
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 className="font-semibold text-gray-800 mb-3">🚀 시작 모드</h3>
+                        <div className="space-y-2">
+                            {[
+                                { value: 'launcher', label: '🏠 런처', desc: '메뉴 선택 화면' },
+                                { value: 'bar', label: '📊 바 모드', desc: '작업 표시줄 (1000x40)' },
+                                { value: 'panel', label: '📋 패널 모드', desc: '전체 창 (1200x800)' }
+                            ].map(option => (
+                                <label key={option.value} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                                    <input
+                                        type="radio"
+                                        name="startup_mode"
+                                        value={option.value}
+                                        checked={settings.startup_mode === option.value}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, startup_mode: e.target.value }))}
+                                        className="w-4 h-4 text-orange-600"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-sm">{option.label}</div>
+                                        <div className="text-xs text-gray-500">{option.desc}</div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 기타 설정 */}
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 className="font-semibold text-gray-800 mb-3">🔧 기타 설정</h3>
+
+                        <div className="space-y-3">
+                            {/* 자동 로그인 */}
+                            <label className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                                <div>
+                                    <div className="font-medium text-sm">🔐 자동 로그인</div>
+                                    <div className="text-xs text-gray-500">저장된 인증 정보로 자동 로그인</div>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={settings.auto_login}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, auto_login: e.target.checked }))}
+                                    className="w-4 h-4 text-orange-600"
+                                />
+                            </label>
+
+                            {/* 테마 설정 */}
                             <div>
-                                <div className="font-medium">Bar Mode (Compact)</div>
-                                <div className="text-sm text-gray-500">
-                                    작고 간결한 바 형태의 인터페이스
+                                <div className="font-medium text-sm mb-2">🎨 테마</div>
+                                <div className="flex space-x-4">
+                                    {[
+                                        { value: 'light', label: '☀️ 라이트' },
+                                        { value: 'dark', label: '🌙 다크' },
+                                        { value: 'auto', label: '🔄 자동' }
+                                    ].map(theme => (
+                                        <label key={theme.value} className="flex items-center space-x-1 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="theme"
+                                                value={theme.value}
+                                                checked={settings.theme === theme.value}
+                                                onChange={(e) => setSettings(prev => ({ ...prev, theme: e.target.value }))}
+                                                className="w-3 h-3 text-orange-600"
+                                            />
+                                            <span className="text-xs">{theme.label}</span>
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
-                        </label>
-                        <label className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input
-                                type="radio"
-                                name="viewMode"
-                                value="panel"
-                                checked={currentMode === 'panel'}
-                                onChange={() => handleModeChange('panel')}
-                                className="mr-3 text-blue-600"
-                            />
-                            <div>
-                                <div className="font-medium">Panel Mode (Full)</div>
-                                <div className="text-sm text-gray-500">
-                                    전체 기능을 사용할 수 있는 패널 인터페이스
-                                </div>
-                            </div>
-                        </label>
+                        </div>
                     </div>
                 </div>
 
-                {/* Window Settings Section */}
-                <div className="settings-section mb-8 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-700">
-                        Window Settings
-                    </h2>
-                    <div className="space-y-4">
-                        <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <div>
-                                <div className="font-medium">Always on top</div>
-                                <div className="text-sm text-gray-500">
-                                    다른 창 위에 항상 표시
-                                </div>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={windowSettings.alwaysOnTop}
-                                onChange={() => handleWindowSettingChange('alwaysOnTop')}
-                                className="text-blue-600 focus:ring-blue-500"
-                            />
-                        </label>
-                        <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <div>
-                                <div className="font-medium">Start with Windows</div>
-                                <div className="text-sm text-gray-500">
-                                    Windows 시작 시 자동 실행
-                                </div>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={windowSettings.startWithWindows}
-                                onChange={() => handleWindowSettingChange('startWithWindows')}
-                                className="text-blue-600 focus:ring-blue-500"
-                            />
-                        </label>
-                        <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <div>
-                                <div className="font-medium">Minimize to tray</div>
-                                <div className="text-sm text-gray-500">
-                                    최소화 시 시스템 트레이로 이동
-                                </div>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={windowSettings.minimizeToTray}
-                                onChange={() => handleWindowSettingChange('minimizeToTray')}
-                                className="text-blue-600 focus:ring-blue-500"
-                            />
-                        </label>
-                    </div>
-                </div>
+                {/* 하단 버튼 */}
+                <div className="bg-white border-t p-4">
+                    <div className="flex justify-between space-x-2">
+                        <button
+                            onClick={closeWindow}
+                            className="bg-gray-500 hover:bg-gray-600 text-white text-sm py-2 px-4 rounded"
+                        >
+                            ✖️ 닫기
+                        </button>
 
-                {/* Actions Section */}
-                <div className="settings-actions flex flex-wrap gap-3 justify-end">
-                    <button
-                        onClick={handleReset}
-                        className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                        Reset
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                        Save Settings
-                    </button>
-                    <button
-                        onClick={handleClose}
-                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                    >
-                        Close
-                    </button>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={resetSettings}
+                                className="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded"
+                            >
+                                🔄 초기화
+                            </button>
+
+                            <button
+                                onClick={saveSettings}
+                                disabled={isSaving}
+                                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm py-2 px-4 rounded"
+                            >
+                                {isSaving ? '💾 저장 중...' : '💾 저장'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SettingsComponent
+export default SettingsComponent;

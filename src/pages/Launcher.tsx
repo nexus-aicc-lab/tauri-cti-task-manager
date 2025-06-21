@@ -1,4 +1,4 @@
-// src/pages/Launcher.tsx (로그인은 새 창으로 열기)
+// src/pages/Launcher.tsx (환경 설정 버튼 추가)
 import React from 'react';
 import { emit } from '@tauri-apps/api/event';
 
@@ -16,6 +16,16 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
             console.log('📤 로그인 창 열기 요청 전송');
         } catch (error) {
             console.error('❌ 로그인 창 열기 실패:', error);
+        }
+    };
+
+    // 환경 설정 창 열기 (새 창)
+    const openSettingsWindow = async () => {
+        try {
+            await emit('open-settings');
+            console.log('📤 환경 설정 창 열기 요청 전송');
+        } catch (error) {
+            console.error('❌ 환경 설정 창 열기 실패:', error);
         }
     };
 
@@ -56,6 +66,25 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                             전체 창 형태 (1200x800)
                         </div>
                     </button>
+
+                    {/* 환경 설정 버튼 추가 */}
+                    <button
+                        onClick={openSettingsWindow}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                    >
+                        ⚙️ 환경 설정 (새 창)
+                        <div className="text-sm text-orange-100 mt-1">
+                            시작 모드 및 앱 설정 (600x700)
+                        </div>
+                    </button>
+                </div>
+
+                {/* 하단 정보 */}
+                <div className="mt-8 pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 text-center">
+                        💡 환경 설정에서 시작 모드를 변경하면<br />
+                        다음 실행 시 해당 모드로 바로 시작됩니다.
+                    </p>
                 </div>
             </div>
         </div>
