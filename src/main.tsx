@@ -30,6 +30,11 @@ import { Toaster } from "sonner";
 import "./main.css";
 import { router } from "./route";
 
+import { launchInitialWindow } from './entry'; // ✅ 여기에 추가
+
+// ✅ 앱 시작 시 필요한 로직 실행
+launchInitialWindow();
+
 const queryClient = new QueryClient(); // ✅ 여기서 바로 생성해도 OK
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
