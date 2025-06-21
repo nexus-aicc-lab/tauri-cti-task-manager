@@ -1,77 +1,96 @@
+// src/App.tsx (URL 기반 모드 감지)
+import { useState, useEffect } from 'react';
+import { emit } from '@tauri-apps/api/event';
+import { Launcher } from './pages/Launcher';
+import BarComponent from './pages/BarMode';
+import PanelComponent from './pages/PanelMode';
 
+type Mode = 'launcher' | 'bar' | 'panel';
 
-'use client';
+function App() {
+  const [mode, setMode] = useState<Mode>('launcher');
 
-import { useEffect } from 'react';
-import { useUIStore } from '@/shared/store/useUIStore';
-import { getCurrentWindow, LogicalSize } from '@tauri-apps/api/window';
-import { WINDOW_CONFIG } from './config/windowConfig';
-import Titlebar from './widgets/titlebar/ui/Titlebar';
-import PanelContent from './widgets/main/ui/PanelContent';
-import { loadViewMode, saveViewMode } from '@/shared/lib/fs/viewModeStorage';
-
-declare global {
-  interface Window {
-    __TAURI__?: any;
-    __TAURI_INTERNALS__?: any;
-  }
-}
-
-export default function App() {
-  const viewMode = useUIStore((s) => s.viewMode);
-  const setViewMode = useUIStore((s) => s.setViewMode);
-
-  // 1) 앱 시작 시: 파일에서 모드 로드 / 없으면 기본('bar') 저장
+  // URL 파라미터에서 모드 감지
   useEffect(() => {
-    const init = async () => {
-      const isTauri =
-        typeof window.__TAURI__ !== 'undefined' ||
-        typeof window.__TAURI_INTERNALS__ !== 'undefined' ||
-        navigator.userAgent.toLowerCase().includes('tauri');
-      if (!isTauri) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlMode = urlParams.get('mode') as Mode;
 
-      const stored = await loadViewMode();
-      if (stored === null) {
-        await saveViewMode('bar');
-        setViewMode('bar');
-      } else {
-        setViewMode(stored);
-      }
-    };
-    init();
+    if (urlMode && ['launcher', 'bar', 'panel'].includes(urlMode)) {
+      setMode(urlMode);
+      console.log(`🎯 URL에서 모드 감지: ${urlMode}`);
+    }
   }, []);
 
-  // 2) viewMode 변경 시: 윈도우 크기 조절
-  useEffect(() => {
-    const resize = async () => {
-      const isTauri =
-        typeof window.__TAURI__ !== 'undefined' ||
-        typeof window.__TAURI_INTERNALS__ !== 'undefined' ||
-        navigator.userAgent.toLowerCase().includes('tauri');
-      if (!isTauri) return;
+  // 모드 전환 요청 (Rust에게 이벤트 전송)
+  const requestModeSwitch = async (newMode: Mode) => {
+    try {
+      await emit('switch-mode', newMode);
+      console.log(`📤 모드 전환 요청 전송: ${newMode}`);
+    } catch (error) {
+      console.error('❌ 모드 전환 요청 실패:', error);
+    }
+  };
 
-      try {
-        const win = getCurrentWindow();
-        const cfg = WINDOW_CONFIG[viewMode];
-        await win.setSize(new LogicalSize(cfg.width, cfg.height));
-        window.dispatchEvent(new Event('resize'));
-      } catch (e) {
-        console.error('[App] resize failed', e);
-      }
-    };
-    resize();
-  }, [viewMode]);
+  console.log(`🎨 현재 렌더링 모드: ${mode}`);
+
+  // 모드별 배경색
+  const getBackgroundColor = () => {
+    switch (mode) {
+      case 'launcher': return '#f3f4f6';
+      case 'bar': return '#1e40af';
+      case 'panel': return '#059669';
+    }
+  };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <Titlebar />
-      <div className="flex-1 min-h-0 overflow-auto">
-        {viewMode === 'panel' ? (
-          <PanelContent />
-        ) : (
-          <div className="h-full flex items-center justify-center">BAR MODE</div>
-        )}
-      </div>
+    <div style={{
+      backgroundColor: getBackgroundColor(),
+      minHeight: '100vh',
+      width: '100%',
+      overflow: 'hidden'
+    }}>
+      {mode === 'launcher' && (
+        <Launcher onModeChange={requestModeSwitch} />
+      )}
+      {mode === 'bar' && (
+        <div style={{ height: '40px', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+          <span style={{ color: 'white', marginRight: '16px' }}>📊 BAR MODE</span>
+          <button
+            onClick={() => requestModeSwitch('launcher')}
+            style={{
+              backgroundColor: '#1e3a8a',
+              color: 'white',
+              border: 'none',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            🏠 런처
+          </button>
+        </div>
+      )}
+      {mode === 'panel' && (
+        <div style={{ padding: '20px', color: 'white' }}>
+          <h1>📋 PANEL MODE</h1>
+          <button
+            onClick={() => requestModeSwitch('launcher')}
+            style={{
+              backgroundColor: '#047857',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '16px'
+            }}
+          >
+            🏠 런처로 돌아가기
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+export default App;

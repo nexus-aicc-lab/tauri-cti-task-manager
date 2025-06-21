@@ -5,10 +5,12 @@ export const WINDOW_CONFIG = {
     bar: {
         height: 32,        // 바 모드 전체 창 높이 (타이틀바와 동일)
         titlebarHeight: 32, // 타이틀바 높이
-        width: 1000
+        width: 1000,
+        resizable: true,
+        visible: true,
     },
     panel: {
-        height: 500,
+        height: 200,
         titlebarHeight: 36, // 타이틀바 높이
         width: 900
     }

@@ -14,17 +14,29 @@
       {
         "label": "main",
         "url": "index.html",
-        "width": 800,
+        "width": 500,
         "height": 600,
-        "resizable": true,
+        "resizable": false,
         "visible": true,
-        "title": "CTI Task Master"
+        "title": "CTI Task Master - 런처",
+        "center": true
       }
     ],
     "security": {
       "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost",
       "capabilities": [
-        "default"
+        {
+          "identifier": "window-capability",
+          "windows": [
+            "main",
+            "bar_*",
+            "panel_*",
+            "launcher_*"
+          ],
+          "permissions": [
+            "core:default"
+          ]
+        }
       ]
     }
   },
