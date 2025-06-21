@@ -13,12 +13,14 @@
     "windows": [
       {
         "label": "main",
-        "url": "index.html",
-        "width": 800,
-        "height": 600,
+        "title": "CTI Task Master",
+        "width": 900,
+        "height": 32,
         "resizable": true,
-        "visible": true,
-        "title": "CTI Task Master"
+        "alwaysOnTop": true,
+        "decorations": false,
+        "skipTaskbar": false,
+        "center": true
       }
     ],
     "security": {

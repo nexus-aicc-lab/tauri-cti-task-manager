@@ -663,6 +663,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-opener",
  "tauri-plugin-process",
+ "url",
 ]
 
 [[package]]
