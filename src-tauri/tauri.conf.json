@@ -28,13 +28,12 @@
         {
           "identifier": "window-capability",
           "windows": [
-            "main",
-            "bar_*",
-            "panel_*",
-            "launcher_*"
+            "*"
           ],
           "permissions": [
-            "core:default"
+            "core:default",
+            "core:window:default",
+            "core:event:default"
           ]
         }
       ]
