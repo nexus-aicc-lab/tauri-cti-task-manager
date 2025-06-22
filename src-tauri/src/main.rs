@@ -36,7 +36,7 @@ impl Default for AppSettings {
             startup_mode: "launcher".into(),
             window_position: None,
             auto_login: false,
-            theme: "light".into(),
+            theme: "dark".into(), // 기본값을 dark로 변경
         }
     }
 }
@@ -72,7 +72,15 @@ async fn load_settings() -> Result<AppSettings, String> {
     let path = get_settings_path()?;
     if path.exists() {
         let txt = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-        let settings: AppSettings = serde_json::from_str(&txt).map_err(|e| e.to_string())?;
+        let mut settings: AppSettings = serde_json::from_str(&txt).map_err(|e| e.to_string())?;
+
+        // 기존 설정 파일에 theme 필드가 없는 경우를 위한 처리
+        // theme이 "light"인 경우 "dark"로 변경 (마이그레이션)
+        if settings.theme == "light" {
+            settings.theme = "dark".into();
+            save_settings_sync(&settings)?;
+        }
+
         Ok(settings)
     } else {
         let default = AppSettings::default();

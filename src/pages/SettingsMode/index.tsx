@@ -1,4 +1,3 @@
-// src/pages/SettingsMode.tsx (Sonner 토스트 적용)
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
@@ -14,7 +13,7 @@ const SettingsComponent: React.FC = () => {
     const [settings, setSettings] = useState<AppSettings>({
         startup_mode: 'launcher',
         auto_login: false,
-        theme: 'light'
+        theme: 'dark'
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -55,14 +54,21 @@ const SettingsComponent: React.FC = () => {
     };
 
     const resetSettings = () => {
-        setSettings({ startup_mode: 'launcher', auto_login: false, theme: 'light' });
+        setSettings({ startup_mode: 'launcher', auto_login: false, theme: 'dark' });
         toast.info('설정이 초기화되었습니다. 저장 버튼을 눌러 적용하세요.');
+    };
+
+    // 테마별 미리보기 색상
+    const themePreview = {
+        red: 'bg-gradient-to-br from-red-500 to-pink-600',
+        yellow: 'bg-gradient-to-br from-yellow-400 to-orange-500',
+        green: 'bg-gradient-to-br from-green-500 to-emerald-600',
+        dark: 'bg-gradient-to-br from-gray-800 to-gray-900'
     };
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-screen"
-                style={{ backgroundColor: '#f59e0b' }}>
+            <div className="flex items-center justify-center h-screen bg-gray-100">
                 <div className="bg-white rounded-lg shadow-xl p-6 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
                     <p className="text-gray-600">설정 로딩 중...</p>
@@ -72,8 +78,7 @@ const SettingsComponent: React.FC = () => {
     }
 
     return (
-        <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f59e0b' }}>
-            {/* Sonner 토스터 컴포넌트 */}
+        <div className="h-screen overflow-hidden bg-gray-100">
             <Toaster
                 position="top-center"
                 richColors
@@ -89,7 +94,7 @@ const SettingsComponent: React.FC = () => {
                     </h1>
                 </div>
 
-                {/* 메인 컨텐츠 - 기존 메시지 영역 제거 */}
+                {/* 메인 컨텐츠 */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {/* 시작 모드 설정 */}
                     <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -118,6 +123,44 @@ const SettingsComponent: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* 테마 설정 */}
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 className="font-semibold text-gray-800 mb-3">🎨 로그인 화면 테마</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            {[
+                                { value: 'red', label: '🔴 빨간 계통', desc: 'Red & Pink' },
+                                { value: 'yellow', label: '🟡 노란 계통', desc: 'Yellow & Orange' },
+                                { value: 'green', label: '🟢 초록 계통', desc: 'Green & Emerald' },
+                                { value: 'dark', label: '⚫ 다크 모드', desc: 'Dark & Purple' }
+                            ].map(theme => (
+                                <label key={theme.value} className="cursor-pointer">
+                                    <div className={`border-2 rounded-lg p-3 transition-all ${settings.theme === theme.value
+                                            ? 'border-blue-500 shadow-md'
+                                            : 'border-gray-200 hover:border-gray-400'
+                                        }`}>
+                                        {/* 테마 미리보기 */}
+                                        <div className={`h-20 rounded-md mb-2 ${themePreview[theme.value]}`}></div>
+
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="radio"
+                                                name="theme"
+                                                value={theme.value}
+                                                checked={settings.theme === theme.value}
+                                                onChange={(e) => setSettings(prev => ({ ...prev, theme: e.target.value }))}
+                                                className="w-4 h-4"
+                                            />
+                                            <div>
+                                                <div className="font-medium text-sm">{theme.label}</div>
+                                                <div className="text-xs text-gray-500">{theme.desc}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* 기타 설정 */}
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                         <h3 className="font-semibold text-gray-800 mb-3">🔧 기타 설정</h3>
@@ -136,30 +179,6 @@ const SettingsComponent: React.FC = () => {
                                     className="w-4 h-4 text-orange-600"
                                 />
                             </label>
-
-                            {/* 테마 설정 */}
-                            <div>
-                                <div className="font-medium text-sm mb-2">🎨 테마</div>
-                                <div className="flex space-x-4">
-                                    {[
-                                        { value: 'light', label: '☀️ 라이트' },
-                                        { value: 'dark', label: '🌙 다크' },
-                                        { value: 'auto', label: '🔄 자동' }
-                                    ].map(theme => (
-                                        <label key={theme.value} className="flex items-center space-x-1 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="theme"
-                                                value={theme.value}
-                                                checked={settings.theme === theme.value}
-                                                onChange={(e) => setSettings(prev => ({ ...prev, theme: e.target.value }))}
-                                                className="w-3 h-3 text-orange-600"
-                                            />
-                                            <span className="text-xs">{theme.label}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -185,7 +204,7 @@ const SettingsComponent: React.FC = () => {
                             <button
                                 onClick={saveSettings}
                                 disabled={isSaving}
-                                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm py-2 px-4 rounded"
+                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm py-2 px-4 rounded"
                             >
                                 {isSaving ? '💾 저장 중...' : '💾 저장'}
                             </button>

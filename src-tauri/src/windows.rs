@@ -1,6 +1,6 @@
 // src-tauri/src/windows.rs
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// 앱에서 사용할 윈도우 모드 종류 정의
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -71,10 +71,10 @@ impl WindowMode {
             WindowMode::Login => WindowConfig {
                 url: "index.html?mode=login".into(),
                 title: "CTI Task Master - 로그인".into(),
-                width: 400.0,
-                height: 500.0,
+                width: 500.0,  // 런처와 동일한 크기로 변경
+                height: 600.0, // 런처와 동일한 크기로 변경
                 resizable: false,
-                always_on_top: false,
+                always_on_top: true, // 로그인 창은 항상 위에
             },
         }
     }
@@ -90,15 +90,43 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
 
     let label = format!("{:?}_{}", mode, timestamp).to_lowercase();
 
-    let window_result =
+    let mut window_builder =
         WebviewWindowBuilder::new(handle, &label, WebviewUrl::App(config.url.parse().unwrap()))
             .title(&config.title)
             .inner_size(config.width, config.height)
             .resizable(config.resizable)
             .always_on_top(config.always_on_top)
-            .center()
-            .visible(true)
-            .build();
+            .visible(true);
+
+    // 로그인 창일 경우, 런처 창의 위치를 찾아서 그 위에 배치
+    if matches!(mode, WindowMode::Login) {
+        let windows = handle.webview_windows();
+        for (window_label, window) in windows.iter() {
+            if window_label.starts_with("launcher_") {
+                if let Ok(position) = window.outer_position() {
+                    // 런처 창과 정확히 같은 위치에 배치
+                    let new_position = LogicalPosition::new(
+                        position.x as f64,
+                        position.y as f64, // 동일한 위치
+                    );
+                    window_builder = window_builder.position(new_position.x, new_position.y);
+                    break;
+                }
+            }
+        }
+        // 런처 창을 찾지 못한 경우 중앙에 배치
+        if !windows
+            .iter()
+            .any(|(label, _)| label.starts_with("launcher_"))
+        {
+            window_builder = window_builder.center();
+        }
+    } else {
+        // 다른 창들은 중앙에 배치
+        window_builder = window_builder.center();
+    }
+
+    let window_result = window_builder.build();
 
     match window_result {
         Ok(_) => {
