@@ -180,9 +180,27 @@ fn close_devtools(app: tauri::AppHandle) -> Result<(), String> {
     }
 }
 
-// 🆕 딥링크 데이터를 파일에 저장
+// 🚀 로그인 요청 확인 함수
+fn is_login_request(deep_link_data: &DeepLinkData) -> bool {
+    // URL path에 "/login"이 포함되어 있거나, 쿼리 파라미터에 로그인 관련 데이터가 있는지 확인
+    let path_has_login =
+        deep_link_data.path.contains("/login") || deep_link_data.url.contains("login");
+
+    // 로그인 관련 필수 파라미터들이 있는지 확인
+    let has_login_params = deep_link_data.query_params.iter().any(|(key, _)| {
+        matches!(
+            key.as_str(),
+            "safe_token" | "username" | "session_id" | "login_method"
+        )
+    });
+
+    path_has_login || has_login_params
+}
+
+// 🆕 개선된 딥링크 데이터를 파일에 저장 (로그인/일반 요청 구분)
 fn save_deep_link_to_file(deep_link_data: DeepLinkData) -> Result<(), String> {
     let file_path = get_deep_link_file_path()?;
+    let is_login = is_login_request(&deep_link_data);
 
     // 기존 데이터 읽기
     let mut history: Vec<DeepLinkData> = if file_path.exists() {
@@ -193,10 +211,26 @@ fn save_deep_link_to_file(deep_link_data: DeepLinkData) -> Result<(), String> {
         Vec::new()
     };
 
-    // 새 데이터 추가 (최대 50개까지만 저장)
-    history.push(deep_link_data);
-    if history.len() > 50 {
-        history.remove(0);
+    if is_login {
+        // 🔥 로그인 요청인 경우: 기존 로그인 데이터만 제거하고 새로운 로그인 데이터 추가
+        println!("🔐 로그인 요청 감지 - 기존 로그인 데이터 삭제 후 새 데이터 추가");
+
+        // 기존 로그인 데이터 제거
+        history.retain(|item| !is_login_request(item));
+
+        // 새로운 로그인 데이터 추가 (맨 앞에 추가)
+        history.insert(0, deep_link_data);
+
+        println!("✅ 기존 로그인 데이터 제거 완료, 새 로그인 데이터 저장");
+    } else {
+        // 🔗 일반 요청인 경우: 기존 로직대로 히스토리에 추가
+        println!("🔗 일반 요청 - 히스토리에 추가");
+
+        // 새 데이터 추가 (최대 50개까지만 저장)
+        history.push(deep_link_data);
+        if history.len() > 50 {
+            history.remove(0);
+        }
     }
 
     // 파일에 저장
@@ -204,146 +238,44 @@ fn save_deep_link_to_file(deep_link_data: DeepLinkData) -> Result<(), String> {
         serde_json::to_string_pretty(&history).map_err(|e| format!("JSON 변환 실패: {}", e))?;
     fs::write(&file_path, json_content).map_err(|e| format!("파일 저장 실패: {}", e))?;
 
-    println!("✅ 딥링크가 파일에 저장되었습니다: {}", file_path.display());
+    println!(
+        "✅ 딥링크가 파일에 저장되었습니다: {} (총 {}개 항목)",
+        file_path.display(),
+        history.len()
+    );
     Ok(())
 }
 
-// fn main() {
-//     tauri::Builder::default()
-//         .manage(AppState::new())
-//         .setup(|app| {
-//             let handle = app.handle();
+// 🆕 로그인 데이터만 삭제하는 명령어 추가
+#[tauri::command]
+async fn clear_login_data() -> Result<(), String> {
+    let file_path = get_deep_link_file_path()?;
 
-//             // 🔗 딥링크 스킴 등록 추가!
-//             #[cfg(desktop)]
-//             app.deep_link().register("cti-personal")?;
+    if file_path.exists() {
+        let content =
+            fs::read_to_string(&file_path).map_err(|e| format!("파일 읽기 실패: {}", e))?;
+        let mut history: Vec<DeepLinkData> =
+            serde_json::from_str(&content).unwrap_or_else(|_| Vec::new());
 
-//             println!("🟡 딥링크 핸들러 등록 시도...");
+        let original_count = history.len();
 
-//             // 🆕 딥링크 핸들러 추가
-//             app.deep_link().on_open_url(|event| {
-//                 let urls = event.urls();
-//                 println!("🟡 딥링크 핸들러 등록 시도..2");
+        // 로그인 데이터만 제거
+        history.retain(|item| !is_login_request(item));
 
-//                 println!("🔗 딥링크 URLs 받음: {:?}", urls);
+        let removed_count = original_count - history.len();
 
-//                 for url in urls {
-//                     println!("처리할 URL: {}", url);
+        // 파일에 저장
+        let json_content =
+            serde_json::to_string_pretty(&history).map_err(|e| format!("JSON 변환 실패: {}", e))?;
+        fs::write(&file_path, json_content).map_err(|e| format!("파일 저장 실패: {}", e))?;
 
-//                     if let Ok(parsed_url) = url::Url::parse(url.as_str()) {
-//                         // 현재 시간 가져오기
-//                         let timestamp = chrono::Utc::now()
-//                             .format("%Y-%m-%d %H:%M:%S UTC")
-//                             .to_string();
-
-//                         // 쿼리 파라미터 수집
-//                         let query_params: Vec<(String, String)> = parsed_url
-//                             .query_pairs()
-//                             .map(|(key, value)| (key.to_string(), value.to_string()))
-//                             .collect();
-
-//                         let deep_link_data = DeepLinkData {
-//                             timestamp,
-//                             url: url.to_string(),
-//                             scheme: parsed_url.scheme().to_string(),
-//                             path: parsed_url.path().to_string(),
-//                             query_params,
-//                         };
-
-//                         // 파일에 저장
-//                         if let Err(e) = save_deep_link_to_file(deep_link_data) {
-//                             println!("❌ 딥링크 저장 실패: {}", e);
-//                         } else {
-//                             println!("✅ 딥링크가 성공적으로 저장되었습니다");
-//                         }
-//                     }
-//                 }
-//             });
-
-//             println!("🟡 딥링크 핸들러 등록 시도...3");
-
-//             // 초기 런처 창 띄우기
-//             create_window(&handle, WindowMode::Launcher);
-
-//             // 이벤트 리스너 설정 (app.listen 사용)
-//             let event_handle = handle.clone();
-//             app.listen("switch-mode", move |event| {
-//                 let payload = event.payload();
-
-//                 // 문자열로 받은 경우와 JSON으로 받은 경우 모두 처리
-//                 if let Ok(mode) = serde_json::from_str::<WindowMode>(payload) {
-//                     create_window(&event_handle, mode);
-//                 } else if let Ok(mode_str) = serde_json::from_str::<String>(payload) {
-//                     // 문자열로 받은 경우 WindowMode로 변환
-//                     match mode_str.as_str() {
-//                         "launcher" => create_window(&event_handle, WindowMode::Launcher),
-//                         "bar" => create_window(&event_handle, WindowMode::Bar),
-//                         "panel" => create_window(&event_handle, WindowMode::Panel),
-//                         "settings" => create_window(&event_handle, WindowMode::Settings),
-//                         "login" => create_window(&event_handle, WindowMode::Login),
-//                         _ => println!("⚠️ Unknown mode: {}", mode_str),
-//                     }
-//                 } else {
-//                     println!("⚠️ Failed to parse mode from payload: {}", payload);
-//                 }
-//             });
-
-//             // 설정 창 열기 이벤트
-//             let settings_handle = handle.clone();
-//             app.listen("open-settings", move |_| {
-//                 println!("⚙️ 환경 설정 창 열기 요청");
-//                 create_window(&settings_handle, WindowMode::Settings);
-//             });
-
-//             // 로그인 창 열기 이벤트
-//             let login_handle = handle.clone();
-//             app.listen("open-login", move |_| {
-//                 println!("🔐 로그인 창 열기 요청");
-//                 create_window(&login_handle, WindowMode::Login);
-//             });
-
-//             // 자동 시작 모드 전환
-//             {
-//                 let auto_handle = handle.clone();
-//                 thread::spawn(move || {
-//                     thread::sleep(Duration::from_millis(500));
-
-//                     let rt = Runtime::new().unwrap();
-//                     rt.block_on(async {
-//                         if let Ok(settings) = load_settings().await {
-//                             if settings.startup_mode != "launcher" {
-//                                 println!("🔄 저장된 시작 모드로 전환: {}", settings.startup_mode);
-
-//                                 // emit 메서드 사용 (emit_all 대신)
-//                                 if let Err(e) =
-//                                     auto_handle.emit("switch-mode", settings.startup_mode)
-//                                 {
-//                                     eprintln!("❌ 자동 모드 전환 실패: {}", e);
-//                                 }
-//                             }
-//                         }
-//                     });
-//                 });
-//             }
-
-//             Ok(())
-//         })
-//         .invoke_handler(generate_handler![
-//             load_settings,
-//             save_settings,
-//             set_startup_mode,
-//             get_startup_mode,
-//             get_deep_link_history,
-//             open_devtools,
-//             close_devtools
-//         ])
-//         .plugin(tauri_plugin_dialog::init())
-//         .plugin(tauri_plugin_process::init())
-//         .plugin(tauri_plugin_fs::init())
-//         .plugin(tauri_plugin_deep_link::init()) // 👈 요거 추가!
-//         .run(tauri::generate_context!())
-//         .expect("❌ Error while running Tauri application");
-// }
+        println!("🗑️ 로그인 데이터 {}개 삭제 완료", removed_count);
+        Ok(())
+    } else {
+        println!("📭 삭제할 딥링크 파일이 없습니다");
+        Ok(())
+    }
+}
 
 fn main() {
     tauri::Builder::default()
@@ -483,7 +415,8 @@ fn main() {
             get_deep_link_history,
             open_devtools,
             close_devtools,
-            manual_deep_link_test // ➕ 수동 테스트 명령어 추가
+            manual_deep_link_test, // 수동 테스트 명령어
+            clear_login_data       // 🆕 로그인 데이터 삭제 명령어 추가
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
