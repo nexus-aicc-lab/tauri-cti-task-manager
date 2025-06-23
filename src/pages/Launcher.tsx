@@ -368,12 +368,6 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                 </div>
             </div>
 
-            {/* 🔧 하단 디버깅 정보 - 컴팩트하게 */}
-            <div className="mt-4 text-center">
-                <div className="text-xs text-gray-400">
-                    🎯 딥링크 테스트: <code className="bg-gray-200 px-1 rounded">cti-personal://test</code>
-                </div>
-            </div>
         </div>
     );
 };
