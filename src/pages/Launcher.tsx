@@ -107,6 +107,27 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
         return token.length > 20 ? `${token.substring(0, 15)}...` : token;
     };
 
+    // 🆕 URL 축약 함수
+    const shortenUrl = (url: string) => {
+        try {
+            const urlObj = new URL(url);
+            const baseUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+            const pathAndQuery = `${urlObj.pathname}${urlObj.search}`;
+
+            // 경로+쿼리가 긴 경우 축약
+            if (pathAndQuery.length > 30) {
+                return `${baseUrl}${pathAndQuery.substring(0, 15)}...${pathAndQuery.substring(pathAndQuery.length - 10)}`;
+            }
+            return url;
+        } catch {
+            // URL 파싱 실패 시 문자열로 축약
+            if (url.length > 50) {
+                return `${url.substring(0, 25)}...${url.substring(url.length - 15)}`;
+            }
+            return url;
+        }
+    };
+
     // 로그인 창 열기 (새 창)
     const openLoginWindow = async () => {
         try {
@@ -159,20 +180,25 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
 
                                 return (
                                     <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 shadow-sm">
-                                        {/* 상단: 타입과 시간 */}
+                                        {/* 상단: 타입, 축약된 URL, 시간 */}
                                         <div className="flex items-center justify-between mb-3">
-                                            <div className="flex items-center gap-2">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isLoginRequest
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-blue-100 text-blue-800'
+                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium flex-shrink-0 ${isLoginRequest
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-blue-100 text-blue-800'
                                                     }`}>
                                                     {isLoginRequest ? '🔐 로그인' : '🔗 일반'}
                                                 </span>
-                                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                                    {link.scheme}://
-                                                </span>
+                                                <div className="flex items-center gap-1 min-w-0 flex-1">
+                                                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                                                        {link.scheme}://
+                                                    </span>
+                                                    <span className="text-xs text-gray-600 font-mono truncate">
+                                                        {shortenUrl(link.url)}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-gray-500 flex-shrink-0 ml-2">
                                                 {new Date(link.timestamp).toLocaleString('ko-KR', {
                                                     month: 'short',
                                                     day: 'numeric',
@@ -228,33 +254,39 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            /* 일반 요청인 경우 파라미터 표시 */
+                                            /* 🆕 일반 요청인 경우 더 많은 파라미터 표시 */
                                             link.query_params.length > 0 && (
                                                 <div className="bg-white rounded-lg p-3 mb-3 border border-blue-200">
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {link.query_params.slice(0, 6).map(([key, value], paramIndex) => (
-                                                            <span key={paramIndex} className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                                                <span className="font-medium">{key}:</span>
-                                                                <span className="ml-1">{value.length > 10 ? value.substring(0, 10) + '...' : value}</span>
-                                                            </span>
-                                                        ))}
-                                                        {link.query_params.length > 6 && (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">
-                                                                +{link.query_params.length - 6} more
-                                                            </span>
-                                                        )}
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-xs font-medium text-gray-600">
+                                                            📋 파라미터 ({link.query_params.length}개)
+                                                        </span>
+                                                    </div>
+                                                    <div className="max-h-32 overflow-y-auto">
+                                                        <div className="grid grid-cols-1 gap-2">
+                                                            {link.query_params.map(([key, value], paramIndex) => (
+                                                                <div key={paramIndex} className="flex items-start gap-2 bg-blue-50 rounded p-2">
+                                                                    <span className="text-xs font-medium text-blue-700 flex-shrink-0 min-w-0">
+                                                                        {key}:
+                                                                    </span>
+                                                                    <span className="text-xs text-blue-900 font-mono break-all">
+                                                                        {value.length > 40 ? `${value.substring(0, 40)}...` : value}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )
                                         )}
 
-                                        {/* 하단: 원본 URL */}
+                                        {/* 하단: 원본 URL - 더 간결하게 */}
                                         <details className="group">
                                             <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700 flex items-center gap-1">
                                                 <span className="group-open:rotate-90 transition-transform">▶</span>
-                                                원본 URL 보기
+                                                원본 URL
                                             </summary>
-                                            <div className="mt-2 p-2 bg-gray-50 rounded text-xs font-mono text-gray-600 break-all">
+                                            <div className="mt-2 p-2 bg-gray-50 rounded text-xs font-mono text-gray-600 break-all max-h-20 overflow-y-auto">
                                                 {link.url}
                                             </div>
                                         </details>
