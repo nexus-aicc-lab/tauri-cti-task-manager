@@ -1,20 +1,6 @@
-// // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-// #[tauri::command]
-// fn greet(name: &str) -> String {
-//     format!("Hello, {}! You've been greeted from Rust!", name)
-// }
-
-// #[cfg_attr(mobile, tauri::mobile_entry_point)]
-// pub fn run() {
-//     tauri::Builder::default()
-//         .plugin(tauri_plugin_opener::init())
-//         .invoke_handler(tauri::generate_handler![greet])
-//         .run(tauri::generate_context!())
-//         .expect("error while running tauri application");
-// }
-
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 // 다이얼로그 플러그인 사용을 위한 import
+use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 // 기존 greet 명령어 - 테스트용
@@ -71,6 +57,13 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         // 프로세스 관리 플러그인 초기화
         .plugin(tauri_plugin_process::init())
+        // 🔗 딥링크 플러그인 등록
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.deep_link().register("cti-personal")?; // 스킴 등록
+            Ok(())
+        })
         // 프론트엔드에서 호출 가능한 명령어들 등록
         .invoke_handler(tauri::generate_handler![
             greet,               // 기존 테스트 명령어

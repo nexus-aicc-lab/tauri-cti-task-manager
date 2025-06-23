@@ -42,6 +42,7 @@
       "allow": [
         "**/*"
       ]
-    }
+    },
+    "deep-link:default"
   ]
 }

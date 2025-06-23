@@ -14,6 +14,9 @@ use tauri::{generate_handler, Emitter, Listener, Manager};
 use tokio::runtime::Runtime;
 use windows::{create_window, WindowMode};
 
+// 웹에서 deep link를 처리하기 위한 플러그인
+use tauri_plugin_deep_link;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 struct AppSettings {
     startup_mode: String,
@@ -195,6 +198,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_deep_link::init()) // 👈 요거 추가!
         .run(tauri::generate_context!())
         .expect("❌ Error while running Tauri application");
 }
