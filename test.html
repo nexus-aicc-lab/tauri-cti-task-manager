@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTI 딥링크 테스터</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #334155;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 헤더 */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 32px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            border-radius: 24px;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* 카드 스타일 */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.12),
+                0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            transform: translateY(-4px);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 알림 */
+        .notice {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #f59e0b;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            color: #92400e;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.1);
+        }
+
+        .notice strong {
+            color: #78350f;
+        }
+
+        /* 로그인 폼 */
+        .login-form {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #7c3aed 100%);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow:
+                0 8px 32px rgba(59, 130, 246, 0.3),
+                0 1px 0 rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .login-form .card-title {
+            color: #ffffff;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #334155;
+            font-size: 1rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            outline: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            border-color: #fbbf24;
+            background: #ffffff;
+            box-shadow:
+                0 0 0 3px rgba(251, 191, 36, 0.1),
+                0 2px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* 로그인 버튼 */
+        .login-button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow:
+                0 4px 16px rgba(251, 191, 36, 0.3),
+                0 1px 0 rgba(255, 255, 255, 0.2) inset;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-button:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 20px rgba(251, 191, 36, 0.4),
+                0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        }
+
+        .login-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* 액션 버튼들 */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-btn {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #3b82f6;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            background: #ffffff;
+            border-color: #fbbf24;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 테스트 버튼들 */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .test-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #ffffff;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            color: #333333;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .test-btn:hover {
+            border-color: #fee500;
+            background: #fffef7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-btn .emoji {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .test-btn .content {
+            flex: 1;
+        }
+
+        .test-btn .title {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 2px;
+        }
+
+        .test-btn .desc {
+            font-size: 0.8rem;
+            color: #888888;
+        }
+
+        /* 색상 변형 */
+        .test-btn.blue {
+            border-color: #e3f2fd;
+        }
+
+        .test-btn.blue:hover {
+            border-color: #2196f3;
+            background: #f3f9ff;
+        }
+
+        .test-btn.green {
+            border-color: #e8f5e8;
+        }
+
+        .test-btn.green:hover {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .test-btn.purple {
+            border-color: #f3e5f5;
+        }
+
+        .test-btn.purple:hover {
+            border-color: #9c27b0;
+            background: #fce4ec;
+        }
+
+        .test-btn.orange {
+            border-color: #fff3e0;
+        }
+
+        .test-btn.orange:hover {
+            border-color: #ff9800;
+            background: #fff8e1;
+        }
+
+        .test-btn.red {
+            border-color: #ffebee;
+        }
+
+        .test-btn.red:hover {
+            border-color: #f44336;
+            background: #fef5f5;
+        }
+
+        /* URL 디스플레이 */
+        .url-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.8rem;
+            color: #495057;
+            word-break: break-all;
+            border-left: 4px solid #fee500;
+        }
+
+        /* 커스텀 입력 */
+        .custom-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #333333;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .custom-input:focus {
+            border-color: #fee500;
+            box-shadow: 0 0 0 3px rgba(254, 229, 0, 0.1);
+        }
+
+        /* 주의사항 리스트 */
+        .warning-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .warning-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666666;
+            font-size: 0.9rem;
+        }
+
+        .warning-list li:last-child {
+            border-bottom: none;
+        }
+
+        .warning-list strong {
+            color: #333333;
+            font-weight: 600;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 20px;
+                margin-bottom: 16px;
+            }
+        }
+
+        /* 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fee500;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fdd835;
+        }
+
+        /* 특별한 효과들 */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header floating">
+            <h1>🔗 CTI 딥링크 테스터</h1>
+            <p class="subtitle">간편하고 친근한 딥링크 테스트 도구 (한글 완전 지원)</p>
+        </div>
+
+        <!-- 알림 -->
+        <div class="notice">
+            <strong>💡 사용법:</strong>
+            아래 버튼들을 눌러서 CTI Task Master 앱으로 딥링크를 보낼 수 있어요!
+            앱이 켜져 있어야 하고, 테스트 결과는 앱에서 확인할 수 있답니다. 😊
+        </div>
+
+        <!-- 로그인 테스트 -->
+        <div class="login-form">
+            <h2 class="card-title">👤 로그인 테스트</h2>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username" class="form-label">아이디</label>
+                    <input type="text" id="username" class="form-input" placeholder="아이디를 입력하세요" value="김개발" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" id="password" class="form-input" placeholder="비밀번호를 입력하세요"
+                        value="password123" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="department" class="form-label">소속 부서</label>
+                        <select id="department" class="form-input">
+                            <option value="dev">개발팀</option>
+                            <option value="design">디자인팀</option>
+                            <option value="marketing">마케팅팀</option>
+                            <option value="sales">영업팀</option>
+                            <option value="hr">인사팀</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role" class="form-label">권한</label>
+                        <select id="role" class="form-input">
+                            <option value="user">일반 사용자</option>
+                            <option value="manager">팀장</option>
+                            <option value="admin">관리자</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">이메일</label>
+                    <input type="email" id="email" class="form-input" placeholder="이메일 주소를 입력하세요"
+                        value="kim@company.com">
+                </div>
+
+                <button type="submit" class="login-button">
+                    🚀 로그인해서 앱 열기
+                </button>
+
+                <div class="action-buttons">
+                    <button type="button" class="action-btn" onclick="fillTestData()">
+                        🎲 랜덤 데이터 넣기
+                    </button>
+                    <button type="button" class="action-btn" onclick="clearForm()">
+                        🗑️ 폼 초기화
+                    </button>
+                </div>
+            </form>
+
+            <div id="loginUrlDisplay" class="url-display" style="display: none;">
+                <!-- 생성된 URL이 여기 표시됩니다 -->
+            </div>
+        </div>
+
+        <!-- 로그인 시나리오 -->
+        <div class="card">
+            <h2 class="card-title">🔐 로그인 시나리오</h2>
+            <div class="button-grid">
+                <a href="cti-personal://login?token=admin_token_123&role=admin" class="test-btn red">
+                    <span class="emoji">👑</span>
+                    <div class="content">
+                        <div class="title">관리자 로그인</div>
+                        <div class="desc">모든 권한으로 접속</div>
+                    </div>
+                </a>
+                <a href="cti-personal://auth?code=AUTH_123&state=secure" class="test-btn red">
+                    <span class="emoji">🔑</span>
+                    <div class="content">
+                        <div class="title">보안 인증</div>
+                        <div class="desc">OAuth 인증 방식</div>
+                    </div>
+                </a>
+                <a href="cti-personal://sso?provider=company&user=김개발" class="test-btn red">
+                    <span class="emoji">🏢</span>
+                    <div class="content">
+                        <div class="title">회사 SSO</div>
+                        <div class="desc">통합 로그인</div>
+                    </div>
+                </a>
+                <a href="cti-personal://guest?temp_id=guest123&expires=1800" class="test-btn red">
+                    <span class="emoji">👤</span>
+                    <div class="content">
+                        <div class="title">게스트 접속</div>
+                        <div class="desc">임시 계정으로 체험</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 기본 테스트 -->
+        <div class="card">
+            <h2 class="card-title">🧪 기본 테스트</h2>
+            <div class="button-grid">
+                <a href="cti-personal://test" class="test-btn">
+                    <span class="emoji">🔬</span>
+                    <div class="content">
+                        <div class="title">기본 테스트</div>
+                        <div class="desc">딥링크 작동 확인</div>
+                    </div>
+                </a>
+                <a href="cti-personal://home" class="test-btn">
+                    <span class="emoji">🏠</span>
+                    <div class="content">
+                        <div class="title">홈 화면</div>
+                        <div class="desc">메인 대시보드로 이동</div>
+                    </div>
+                </a>
+                <a href="cti-personal://dashboard" class="test-btn">
+                    <span class="emoji">📊</span>
+                    <div class="content">
+                        <div class="title">대시보드</div>
+                        <div class="desc">통계 및 현황 보기</div>
+                    </div>
+                </a>
+                <button onclick="openDeepLink('cti-personal://hello')" class="test-btn">
+                    <span class="emoji">👋</span>
+                    <div class="content">
+                        <div class="title">인사말 테스트</div>
+                        <div class="desc">JavaScript로 실행</div>
+                    </div>
+                </button>
+            </div>
+            <div class="url-display">cti-personal://test</div>
+        </div>
+
+        <!-- 작업 관리 -->
+        <div class="card">
+            <h2 class="card-title">📝 작업 관리</h2>
+            <div class="button-grid">
+                <a href="cti-personal://tasks" class="test-btn blue">
+                    <span class="emoji">📋</span>
+                    <div class="content">
+                        <div class="title">할 일 목록</div>
+                        <div class="desc">모든 작업 보기</div>
+                    </div>
+                </a>
+                <a href="cti-personal://tasks/new" class="test-btn blue">
+                    <span class="emoji">➕</span>
+                    <div class="content">
+                        <div class="title">새 작업 만들기</div>
+                        <div class="desc">할 일 추가하기</div>
+                    </div>
+                </a>
+                <a href="cti-personal://projects/work" class="test-btn blue">
+                    <span class="emoji">💼</span>
+                    <div class="content">
+                        <div class="title">업무 프로젝트</div>
+                        <div class="desc">진행 중인 프로젝트</div>
+                    </div>
+                </a>
+                <a href="cti-personal://calendar/today" class="test-btn blue">
+                    <span class="emoji">📅</span>
+                    <div class="content">
+                        <div class="title">오늘 일정</div>
+                        <div class="desc">오늘의 스케줄 확인</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 고급 기능 -->
+        <div class="card">
+            <h2 class="card-title">⚡ 고급 기능</h2>
+            <div class="button-grid">
+                <a href="cti-personal://search?q=회의&filter=today" class="test-btn purple">
+                    <span class="emoji">🔍</span>
+                    <div class="content">
+                        <div class="title">회의 검색</div>
+                        <div class="desc">오늘 회의 찾기</div>
+                    </div>
+                </a>
+                <a href="cti-personal://tasks?priority=high&due=today" class="test-btn purple">
+                    <span class="emoji">🔥</span>
+                    <div class="content">
+                        <div class="title">긴급 작업</div>
+                        <div class="desc">우선순위 높은 일</div>
+                    </div>
+                </a>
+                <a href="cti-personal://create?type=meeting&title=팀회의" class="test-btn purple">
+                    <span class="emoji">🤝</span>
+                    <div class="content">
+                        <div class="title">회의 생성</div>
+                        <div class="desc">새 미팅 일정 만들기</div>
+                    </div>
+                </a>
+                <a href="cti-personal://sync?provider=google&auto=true" class="test-btn purple">
+                    <span class="emoji">🔄</span>
+                    <div class="content">
+                        <div class="title">구글 동기화</div>
+                        <div class="desc">캘린더 자동 동기화</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 시스템 기능 -->
+        <div class="card">
+            <h2 class="card-title">⚙️ 시스템 기능</h2>
+            <div class="button-grid">
+                <a href="cti-personal://settings/profile" class="test-btn green">
+                    <span class="emoji">👤</span>
+                    <div class="content">
+                        <div class="title">프로필 설정</div>
+                        <div class="desc">내 정보 수정</div>
+                    </div>
+                </a>
+                <a href="cti-personal://import?type=excel&auto_parse=true" class="test-btn green">
+                    <span class="emoji">📊</span>
+                    <div class="content">
+                        <div class="title">엑셀 가져오기</div>
+                        <div class="desc">데이터 일괄 업로드</div>
+                    </div>
+                </a>
+                <a href="cti-personal://export?format=pdf&range=month" class="test-btn green">
+                    <span class="emoji">📄</span>
+                    <div class="content">
+                        <div class="title">월간 리포트</div>
+                        <div class="desc">PDF 보고서 생성</div>
+                    </div>
+                </a>
+                <a href="cti-personal://backup?auto=true&cloud=true" class="test-btn green">
+                    <span class="emoji">☁️</span>
+                    <div class="content">
+                        <div class="title">클라우드 백업</div>
+                        <div class="desc">데이터 자동 백업</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 특별 기능 -->
+        <div class="card">
+            <h2 class="card-title">🎉 특별 기능</h2>
+            <div class="button-grid">
+                <a href="cti-personal://webhook?action=slack&channel=dev&message=테스트완료" class="test-btn orange">
+                    <span class="emoji">📢</span>
+                    <div class="content">
+                        <div class="title">슬랙 알림</div>
+                        <div class="desc">개발팀에 메시지 전송</div>
+                    </div>
+                </a>
+                <a href="cti-personal://ai?mode=summary&period=week" class="test-btn orange">
+                    <span class="emoji">🤖</span>
+                    <div class="content">
+                        <div class="title">AI 주간 요약</div>
+                        <div class="desc">인공지능 업무 분석</div>
+                    </div>
+                </a>
+                <a href="cti-personal://teamwork?action=celebrate&type=project_done" class="test-btn orange">
+                    <span class="emoji">🎊</span>
+                    <div class="content">
+                        <div class="title">프로젝트 완료 축하</div>
+                        <div class="desc">팀 성과 공유</div>
+                    </div>
+                </a>
+                <a href="cti-personal://wellness?reminder=break&interval=hour" class="test-btn orange">
+                    <span class="emoji">☕</span>
+                    <div class="content">
+                        <div class="title">휴식 알리미</div>
+                        <div class="desc">건강한 업무 습관</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 나만의 딥링크 -->
+        <div class="card">
+            <h2 class="card-title">✏️ 나만의 딥링크</h2>
+            <input type="text" id="customUrl" class="custom-input" placeholder="cti-personal://원하는경로?파라미터=값"
+                value="cti-personal://custom?hello=world&time=now">
+            <button onclick="openCustomDeepLink()" class="test-btn" style="width: 100%; justify-content: center;">
+                <span class="emoji">🚀</span>
+                <div class="content">
+                    <div class="title">내가 만든 딥링크 실행하기</div>
+                </div>
+            </button>
+        </div>
+
+        <!-- 도움말 -->
+        <div class="card">
+            <h2 class="card-title">💡 도움말</h2>
+            <ul class="warning-list">
+                <li><strong>앱 실행:</strong> CTI Task Master가 켜져 있어야 딥링크가 동작해요</li>
+                <li><strong>등록 확인:</strong> 딥링크가 시스템에 등록되어 있는지 확인해주세요</li>
+                <li><strong>브라우저 팝업:</strong> 브라우저에서 앱 열기 확인 창이 나올 수 있어요</li>
+                <li><strong>보안 주의:</strong> 실제 비밀번호는 URL에 넣지 마시고 토큰을 사용하세요</li>
+                <li><strong>특수문자:</strong> 한글이나 특수문자는 자동으로 인코딩 처리됩니다</li>
+                <li><strong>결과 확인:</strong> 런처나 설정 화면에서 딥링크 기록을 볼 수 있어요</li>
+                <li><strong>테스트 계정:</strong> 폼의 기본값들은 모두 테스트용 가짜 정보입니다</li>
+                <li><strong>한글 지원:</strong> 이제 한글 이름도 완벽하게 지원됩니다! 🎉</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 딥링크 실행
+        function openDeepLink(url) {
+            console.log('🔗 딥링크 실행:', url);
+            window.location.href = url;
+        }
+
+        // 나만의 딥링크 실행
+        function openCustomDeepLink() {
+            let customUrl = document.getElementById('customUrl').value;
+            if (customUrl.trim()) {
+                // 현재 시간으로 치환
+                customUrl = customUrl.replace(/{{time}}/g, new Date().toISOString());
+                customUrl = customUrl.replace(/{{timestamp}}/g, Date.now());
+
+                console.log('🔗 나만의 딥링크 실행:', customUrl);
+                window.location.href = customUrl;
+            } else {
+                alert('딥링크 URL을 입력해주세요! 😊');
+            }
+        }
+
+        // 🔧 완전히 새로운 한글 안전 로그인 처리
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                department: document.getElementById('department').value,
+                role: document.getElementById('role').value,
+                email: document.getElementById('email').value
+            };
+
+            const timestamp = Date.now();
+
+            // 🎯 btoa 완전히 제거! 한글 안전 토큰 생성
+            const safeToken = `TOKEN_${timestamp}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+            console.log('🔐 안전한 토큰 생성:', safeToken);
+
+            // 친근한 딥링크 URL 생성 (btoa 없이!)
+            const loginUrl = `cti-personal://login?` +
+                `safe_token=${encodeURIComponent(safeToken)}&` +
+                `username=${encodeURIComponent(formData.username)}&` +
+                `department=${encodeURIComponent(formData.department)}&` +
+                `role=${encodeURIComponent(formData.role)}&` +
+                `email=${encodeURIComponent(formData.email)}&` +
+                `timestamp=${timestamp}&` +
+                `session_id=sess_${timestamp}&` +
+                `login_method=safe_form&` +
+                `korean_support=true&` +
+                `version=2.0`;
+
+            // URL 미리보기
+            const urlDisplay = document.getElementById('loginUrlDisplay');
+            urlDisplay.textContent = loginUrl;
+            urlDisplay.style.display = 'block';
+
+            console.log('🔐 로그인 정보:');
+            console.log('   사용자:', formData.username);
+            console.log('   부서:', formData.department);
+            console.log('   권한:', formData.role);
+            console.log('   안전 토큰:', safeToken);
+            console.log('   ✅ 한글 완전 지원!');
+
+            // 친근한 확인 메시지
+            if (confirm(`😊 CTI Task Master에 로그인할까요?\n\n👤 사용자: ${formData.username}\n🏢 부서: ${formData.department}\n⭐ 권한: ${formData.role}\n\n🎉 한글 이름 완전 지원!`)) {
+                console.log('🚀 딥링크 실행:', loginUrl);
+                window.location.href = loginUrl;
+            }
+
+            return false;
+        }
+
+        // 랜덤 테스트 데이터 생성
+        function fillTestData() {
+            const testUsers = [
+                {
+                    username: '김개발',
+                    password: 'dev123!',
+                    department: 'dev',
+                    role: 'user',
+                    email: 'kim.dev@company.com'
+                },
+                {
+                    username: '박매니저',
+                    password: 'manager456',
+                    department: 'design',
+                    role: 'manager',
+                    email: 'park.manager@company.com'
+                },
+                {
+                    username: '최관리자',
+                    password: 'admin789',
+                    department: 'hr',
+                    role: 'admin',
+                    email: 'choi.admin@company.com'
+                },
+                {
+                    username: '이디자인',
+                    password: 'design2024',
+                    department: 'design',
+                    role: 'user',
+                    email: 'lee.design@company.com'
+                },
+                {
+                    username: '정마케팅',
+                    password: 'marketing!',
+                    department: 'marketing',
+                    role: 'manager',
+                    email: 'jung.marketing@company.com'
+                },
+                {
+                    username: '홍길동',
+                    password: 'hong2024',
+                    department: 'sales',
+                    role: 'user',
+                    email: 'hong.gildong@company.com'
+                },
+                {
+                    username: '강개발자',
+                    password: 'kang!@#',
+                    department: 'dev',
+                    role: 'manager',
+                    email: 'kang.dev@company.com'
+                }
+            ];
+
+            const randomUser = testUsers[Math.floor(Math.random() * testUsers.length)];
+
+            Object.keys(randomUser).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) element.value = randomUser[key];
+            });
+
+            console.log('🎲 랜덤 테스트 계정 생성:', randomUser.username);
+            console.log('🎯 한글 이름으로 테스트하세요!');
+        }
+
+        // 폼 초기화
+        function clearForm() {
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginUrlDisplay').style.display = 'none';
+            console.log('🗑️ 로그인 폼 초기화 완료');
+        }
+
+        // Enter 키 이벤트
+        document.getElementById('customUrl').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                openCustomDeepLink();
+            }
+        });
+
+        // 페이지 로드 완료
+        console.log('🚀 CTI 딥링크 테스터 준비 완료!');
+        console.log('💛 카카오톡처럼 친근하고 밝은 버전!');
+        console.log('🎉 한글 완전 지원 버전으로 업데이트!');
+        console.log('😊 김개발, 박매니저 등 한글 이름으로 테스트하세요!');
+        console.log('🔧 btoa 에러 완전히 해결됨!');
+    </script>
+</body>
+
+</html>

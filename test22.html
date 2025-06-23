@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTI Deep Link Test Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+
+        .test-section h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #4299e1;
+            padding-bottom: 5px;
+        }
+
+        .test-button {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+        }
+
+        .test-button:hover {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+        }
+
+        .test-button.green {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+        }
+
+        .test-button.green:hover {
+            background: linear-gradient(135deg, #38a169, #2f855a);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .test-button.purple {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            box-shadow: 0 2px 8px rgba(159, 122, 234, 0.3);
+        }
+
+        .test-button.purple:hover {
+            background: linear-gradient(135deg, #805ad5, #6b46c1);
+            box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
+        }
+
+        .test-button.orange {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            box-shadow: 0 2px 8px rgba(237, 137, 54, 0.3);
+        }
+
+        .test-button.orange:hover {
+            background: linear-gradient(135deg, #dd6b20, #c05621);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+        }
+
+        .url-display {
+            background: #2d3748;
+            color: #68d391;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            word-break: break-all;
+            border-left: 4px solid #68d391;
+        }
+
+        .note {
+            background: #fef5e7;
+            border: 1px solid #f6ad55;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #744210;
+        }
+
+        .custom-test {
+            margin-top: 15px;
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔗 CTI Deep Link Tester</h1>
+        <p class="subtitle">CTI Task Master 딥링크 테스트 페이지</p>
+
+        <div class="note">
+            <strong>💡 사용법:</strong> 아래 버튼들을 클릭하면 CTI Task Master 앱으로 딥링크가 전송됩니다.
+            앱이 실행되어 있어야 하며, 런처나 설정 화면에서 히스토리를 확인할 수 있습니다.
+        </div>
+
+        <!-- 기본 테스트 -->
+        <div class="test-section">
+            <h2>🚀 기본 테스트</h2>
+            <a href="cti-personal://test" class="test-button">기본 테스트</a>
+            <a href="cti-personal://home" class="test-button">홈으로 이동</a>
+            <a href="cti-personal://dashboard" class="test-button">대시보드</a>
+            <button onclick="openDeepLink('cti-personal://hello')" class="test-button">JavaScript 테스트</button>
+
+            <div class="url-display">cti-personal://test</div>
+        </div>
+
+        <!-- 경로 테스트 -->
+        <div class="test-section">
+            <h2>📂 경로 테스트</h2>
+            <div class="grid">
+                <a href="cti-personal://tasks" class="test-button green">작업 목록</a>
+                <a href="cti-personal://tasks/new" class="test-button green">새 작업</a>
+                <a href="cti-personal://tasks/123" class="test-button green">작업 #123</a>
+                <a href="cti-personal://projects/work" class="test-button green">워크 프로젝트</a>
+                <a href="cti-personal://settings/theme" class="test-button green">테마 설정</a>
+                <a href="cti-personal://calendar/today" class="test-button green">오늘 일정</a>
+            </div>
+            <div class="url-display">cti-personal://tasks/new</div>
+        </div>
+
+        <!-- 파라미터 테스트 -->
+        <div class="test-section">
+            <h2>🔧 파라미터 테스트</h2>
+            <div class="grid">
+                <a href="cti-personal://search?q=회의" class="test-button purple">검색: 회의</a>
+                <a href="cti-personal://tasks?filter=today&priority=high" class="test-button purple">오늘 중요 작업</a>
+                <a href="cti-personal://create?type=task&title=새작업" class="test-button purple">작업 생성</a>
+                <a href="cti-personal://open?id=456&mode=edit" class="test-button purple">편집 모드</a>
+                <a href="cti-personal://calendar?date=2025-12-31&view=month" class="test-button purple">달력 보기</a>
+                <a href="cti-personal://import?source=excel&file=tasks.xlsx" class="test-button purple">Excel 가져오기</a>
+            </div>
+            <div class="url-display">cti-personal://tasks?filter=today&priority=high</div>
+        </div>
+
+        <!-- 복잡한 테스트 -->
+        <div class="test-section">
+            <h2>🎯 복잡한 테스트</h2>
+            <div class="grid">
+                <a href="cti-personal://api/webhook?action=create&type=task&title=긴급작업&due=2025-12-31&assignee=김개발&priority=urgent&tags=업무,긴급"
+                    class="test-button orange">
+                    복잡한 작업 생성
+                </a>
+                <a href="cti-personal://dashboard/projects/123?tab=tasks&status=active&sort=priority&limit=10"
+                    class="test-button orange">
+                    프로젝트 대시보드
+                </a>
+                <a href="cti-personal://report?start=2025-01-01&end=2025-12-31&format=pdf&include=charts"
+                    class="test-button orange">
+                    연간 리포트
+                </a>
+                <a href="cti-personal://sync?provider=google&calendar=true&tasks=true&contacts=false"
+                    class="test-button orange">
+                    Google 동기화
+                </a>
+            </div>
+            <div class="url-display">cti-personal://api/webhook?action=create&type=task&title=긴급작업&due=2025-12-31</div>
+        </div>
+
+        <!-- 커스텀 테스트 -->
+        <div class="test-section">
+            <h2>✏️ 커스텀 테스트</h2>
+            <div class="custom-test">
+                <input type="text" class="custom-input" id="customUrl"
+                    placeholder="cti-personal://custom?param1=value1&param2=value2"
+                    value="cti-personal://custom?test=true">
+                <button onclick="openCustomDeepLink()" class="test-button">커스텀 딥링크 테스트</button>
+            </div>
+        </div>
+
+        <!-- 주의사항 -->
+        <div class="test-section">
+            <h2>⚠️ 주의사항</h2>
+            <ul>
+                <li><strong>등록 확인:</strong> 딥링크 스킴이 시스템에 등록되어 있어야 합니다</li>
+                <li><strong>브라우저 팝업:</strong> 일부 브라우저에서는 앱 열기 확인 팝업이 나타날 수 있습니다</li>
+                <li><strong>히스토리 확인:</strong> 런처나 설정 화면에서 딥링크 히스토리를 확인하세요</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript로 딥링크 열기
+        function openDeepLink(url) {
+            console.log('🔗 딥링크 실행:', url);
+            window.location.href = url;
+        }
+
+        // 커스텀 딥링크 테스트
+        function openCustomDeepLink() {
+            const customUrl = document.getElementById('customUrl').value;
+            if (customUrl.trim()) {
+                console.log('🔗 커스텀 딥링크 실행:', customUrl);
+                window.location.href = customUrl;
+            } else {
+                alert('딥링크 URL을 입력해주세요!');
+            }
+        }
+
+        // Enter 키로 커스텀 딥링크 실행
+        document.getElementById('customUrl').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                openCustomDeepLink();
+            }
+        });
+
+        // 페이지 로드 시 환영 메시지
+        console.log('🚀 CTI Deep Link Tester 로드 완료!');
+        console.log('💡 버튼을 클릭해서 딥링크를 테스트하세요.');
+    </script>
+</body>
+
+</html>
