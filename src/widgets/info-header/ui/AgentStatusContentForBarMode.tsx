@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Clock, Phone, Users, FileCheck, Coffee } from 'lucide-react';
+import { Clock, Phone, Users, FileCheck, Coffee } from 'lucide-react';
 
 interface AgentStatusContentForBarModeProps {
     status: '대기' | '통화' | '정지';
@@ -13,11 +13,7 @@ interface AgentStatusContentForBarModeProps {
 
 export default function AgentStatusContentForBarMode({
     status,
-    time,
-    taskCount,
-    completedTasks,
-    efficiency,
-    callsPerHour
+
 }: AgentStatusContentForBarModeProps) {
     return (
         <>

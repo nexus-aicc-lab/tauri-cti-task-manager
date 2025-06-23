@@ -1,5 +1,4 @@
 // src/pages/BarMode/index.tsx
-import React from 'react';
 import Titlebar from '@/widgets/titlebar/ui/Titlebar';
 
 interface BarComponentProps {

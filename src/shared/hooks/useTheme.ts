@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { Theme, ThemeKey, ThemeDefinitions } from '@/shared/types/theme';
+import { ThemeKey, ThemeDefinitions } from '@/shared/types/theme';
 
 interface AppSettings {
     startup_mode: string;
@@ -100,7 +100,7 @@ const defaultThemes: ThemeDefinitions['themes'] = {
 
 export function useTheme() {
     const [currentThemeKey, setCurrentThemeKey] = useState<ThemeKey>('dark');
-    const [themes, setThemes] = useState<ThemeDefinitions['themes']>(defaultThemes);
+    const [themes, _setThemes] = useState<ThemeDefinitions['themes']>(defaultThemes);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

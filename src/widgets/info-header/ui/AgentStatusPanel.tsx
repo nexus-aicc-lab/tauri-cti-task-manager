@@ -1,6 +1,5 @@
 'use client';
 
-import { Clock, User } from 'lucide-react';
 
 interface AgentStatusPanelProps {
     status: '대기중' | '통화중' | '정지중';
@@ -12,25 +11,8 @@ interface AgentStatusPanelProps {
 }
 
 export default function AgentStatusPanel({
-    status,
-    time,
-    taskCount,
-    completedTasks,
-    efficiency,
-    callsPerHour
 }: AgentStatusPanelProps) {
-    const getStatusColor = () => {
-        switch (status) {
-            case '대기중':
-                return 'bg-amber-500';
-            case '통화중':
-                return 'bg-green-500';
-            case '정지중':
-                return 'bg-red-500';
-            default:
-                return 'bg-gray-500';
-        }
-    };
+
 
     return (
         <div className="flex flex-col gap-2 px-4 py-2 bg-slate-800 text-white rounded shadow w-full">

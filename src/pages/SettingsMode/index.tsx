@@ -135,11 +135,11 @@ const SettingsComponent: React.FC = () => {
                             ].map(theme => (
                                 <label key={theme.value} className="cursor-pointer">
                                     <div className={`border-2 rounded-lg p-3 transition-all ${settings.theme === theme.value
-                                            ? 'border-blue-500 shadow-md'
-                                            : 'border-gray-200 hover:border-gray-400'
+                                        ? 'border-blue-500 shadow-md'
+                                        : 'border-gray-200 hover:border-gray-400'
                                         }`}>
                                         {/* 테마 미리보기 */}
-                                        <div className={`h-20 rounded-md mb-2 ${themePreview[theme.value]}`}></div>
+                                        <div className={`h-20 rounded-md mb-2 ${themePreview[theme.value as keyof typeof themePreview]}`}></div>
 
                                         <div className="flex items-center space-x-2">
                                             <input

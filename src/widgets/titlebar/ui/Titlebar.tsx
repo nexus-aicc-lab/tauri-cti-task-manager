@@ -156,12 +156,11 @@ import AgentStatusContentForBarMode from '@/widgets/info-header/ui/AgentStatusCo
 import { TITLEBAR_CLASSES } from '@/config/windowConfig';
 import { MenuDropdown } from './MenuDropdown';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { saveViewMode, loadViewMode } from '../../../shared/lib/fs/viewModeStorage';
 import { emit } from '@tauri-apps/api/event';
 
 export default function Titlebar() {
-    const { viewMode, setViewMode } = useUIStore();
+    const { viewMode: _viewMode, setViewMode } = useUIStore();
     const status = useCTIStore(s => s.status);
     const time = useCTIStore(s => s.currentTime);
     const totalTasks = useCTIStore(s => s.totalTasks);
@@ -222,7 +221,7 @@ export default function Titlebar() {
 
     // 나머지 함수들...
     useEffect(() => {
-        if (!window.__TAURI__) return;
+        if (!(window as any).__TAURI__) return;
         (async () => {
             const win = getCurrentWebviewWindow();
             if (localStorage.getItem('alwaysOnTop') === 'true') {

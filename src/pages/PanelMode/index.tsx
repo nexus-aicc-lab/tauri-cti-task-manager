@@ -1,5 +1,4 @@
 // src/pages/PanelMode/index.tsx
-import React from 'react';
 
 interface PanelComponentProps {
     onBackToLauncher: () => void;

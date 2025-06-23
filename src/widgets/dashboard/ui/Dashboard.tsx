@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import {
-    Phone, Clock, User, Settings, Activity,
+    Phone, Activity,
     TrendingUp, Headphones, PhoneIncoming, PhoneOutgoing
 } from 'lucide-react';
 import { InfoHeader } from '@/widgets/info-header/ui/InfoHeader';
-import { useCTIStore } from '@/shared/store/useCTIStore';
 
 export default function Dashboard() {
     // CTIStore 대신 로컬 상태로 유지하던 값들
-    const [time, setTime] = useState('');
+    const [_time, setTime] = useState('');
     const [loginTime, setLoginTime] = useState('');
     const [sessionTime, setSessionTime] = useState('00:00:00');
     const [stats, setStats] = useState({

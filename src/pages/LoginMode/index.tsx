@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
 
             {/* 로그인 카드 */}
             <div className="relative z-10 flex items-center justify-center h-full">
-                <div className={`w-[400px] ${currentTheme.tailwind.card || 'bg-white/10'} backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl`}>
+                <div className={`w-[400px] bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl`}>
                     {/* 탭 헤더 */}
                     <div className="flex space-x-6 mb-8 border-b border-white/20">
                         <button
@@ -137,7 +137,7 @@ const LoginPage: React.FC = () => {
                                         placeholder="Enter your username"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
-                                        onKeyPress={handleKeyPress}
+                                        onKeyDown={handleKeyPress}
                                         className="bg-white/10 text-white placeholder-white/50 border-white/30 focus:border-white/50 focus:bg-white/20 h-12"
                                         disabled={isLoading}
                                     />
@@ -152,7 +152,7 @@ const LoginPage: React.FC = () => {
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        onKeyPress={handleKeyPress}
+                                        onKeyDown={handleKeyPress}
                                         className="bg-white/10 text-white placeholder-white/50 border-white/30 focus:border-white/50 focus:bg-white/20 h-12"
                                         disabled={isLoading}
                                     />
