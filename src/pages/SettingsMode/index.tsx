@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { toast, Toaster } from 'sonner';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface AppSettings {
     startup_mode: string;
@@ -58,7 +59,6 @@ const SettingsComponent: React.FC = () => {
         toast.info('설정이 초기화되었습니다. 저장 버튼을 눌러 적용하세요.');
     };
 
-    // 테마별 미리보기 색상
     const themePreview = {
         red: 'bg-gradient-to-br from-red-500 to-pink-600',
         yellow: 'bg-gradient-to-br from-yellow-400 to-orange-500',
@@ -79,11 +79,17 @@ const SettingsComponent: React.FC = () => {
 
     return (
         <div className="h-screen overflow-hidden bg-gray-100">
-            <Toaster
+            <ToastContainer
                 position="top-center"
-                richColors
-                closeButton
-                duration={2000}
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
             />
 
             <div className="h-full flex flex-col">
@@ -138,9 +144,7 @@ const SettingsComponent: React.FC = () => {
                                         ? 'border-blue-500 shadow-md'
                                         : 'border-gray-200 hover:border-gray-400'
                                         }`}>
-                                        {/* 테마 미리보기 */}
                                         <div className={`h-20 rounded-md mb-2 ${themePreview[theme.value as keyof typeof themePreview]}`}></div>
-
                                         <div className="flex items-center space-x-2">
                                             <input
                                                 type="radio"
@@ -166,7 +170,6 @@ const SettingsComponent: React.FC = () => {
                         <h3 className="font-semibold text-gray-800 mb-3">🔧 기타 설정</h3>
 
                         <div className="space-y-3">
-                            {/* 자동 로그인 */}
                             <label className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
                                 <div>
                                     <div className="font-medium text-sm">🔐 자동 로그인</div>

@@ -1,9 +1,11 @@
-// src/App.tsx (환경 설정 모드 추가)
+// src/App.tsx
 import { useState, useEffect } from 'react';
 import { emit, listen } from '@tauri-apps/api/event';
 import { Launcher } from './pages/Launcher';
 import LoginComponent from './pages/LoginMode';
 import SettingsComponent from './pages/SettingsMode';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
@@ -30,7 +32,7 @@ function App() {
     });
 
     return () => {
-      unlisten.then(fn => fn());
+      unlisten.then((fn) => fn());
     };
   }, []);
 
@@ -49,35 +51,43 @@ function App() {
   // 모드별 배경색
   const getBackgroundColor = () => {
     switch (mode) {
-      case 'launcher': return '#f3f4f6';
-      case 'bar': return '#1e40af';
-      case 'panel': return '#059669';
-      case 'login': return '#7c3aed';
-      case 'settings': return '#f59e0b';
-      default: return '#f3f4f6';
+      case 'launcher':
+        return '#f3f4f6';
+      case 'bar':
+        return '#1e40af';
+      case 'panel':
+        return '#059669';
+      case 'login':
+        return '#7c3aed';
+      case 'settings':
+        return '#f59e0b';
+      default:
+        return '#f3f4f6';
     }
   };
 
   return (
-    <div style={{
-      backgroundColor: getBackgroundColor(),
-      minHeight: '100vh',
-      width: '100%',
-      overflow: 'hidden'
-    }}>
-      {mode === 'launcher' && (
-        <Launcher onModeChange={requestModeSwitch} />
-      )}
+    <div
+      style={{
+        backgroundColor: getBackgroundColor(),
+        minHeight: '100vh',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      {mode === 'launcher' && <Launcher onModeChange={requestModeSwitch} />}
 
       {mode === 'bar' && (
-        <div style={{
-          height: '40px',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 16px',
-          backgroundColor: '#1e40af',
-          justifyContent: 'space-between'
-        }}>
+        <div
+          style={{
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 16px',
+            backgroundColor: '#1e40af',
+            justifyContent: 'space-between',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span style={{ color: 'white', marginRight: '16px', fontSize: '14px' }}>
               📊 BAR MODE
@@ -97,7 +107,7 @@ function App() {
                 padding: '4px 12px',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px'
+                fontSize: '12px',
               }}
             >
               📋 패널
@@ -112,7 +122,7 @@ function App() {
                 padding: '4px 12px',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px'
+                fontSize: '12px',
               }}
             >
               🏠 런처
@@ -133,7 +143,7 @@ function App() {
               padding: '8px 16px',
               borderRadius: '4px',
               cursor: 'pointer',
-              marginTop: '16px'
+              marginTop: '16px',
             }}
           >
             🏠 런처로 돌아가기
@@ -141,13 +151,18 @@ function App() {
         </div>
       )}
 
-      {mode === 'login' && (
-        <LoginComponent />
-      )}
+      {mode === 'login' && <LoginComponent />}
 
-      {mode === 'settings' && (
-        <SettingsComponent />
-      )}
+      {mode === 'settings' && <SettingsComponent />}
+
+      {/* ✅ Toast UI는 항상 렌더링! */}
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        closeOnClick
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }
