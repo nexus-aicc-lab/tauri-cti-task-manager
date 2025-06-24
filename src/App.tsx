@@ -6,6 +6,7 @@ import LoginComponent from './pages/LoginMode';
 import SettingsComponent from './pages/SettingsMode';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PanelMode from './pages/PanelMode';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
@@ -132,22 +133,10 @@ function App() {
       )}
 
       {mode === 'panel' && (
-        <div style={{ padding: '20px', color: 'white' }}>
-          <h1>📋 PANEL MODE</h1>
-          <button
-            onClick={() => requestModeSwitch('launcher')}
-            style={{
-              backgroundColor: '#047857',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '16px',
-            }}
-          >
-            🏠 런처로 돌아가기
-          </button>
+        <div style={{ color: 'white' }}>
+          <PanelMode onBackToLauncher={function (): void {
+            throw new Error('Function not implemented.');
+          }} />
         </div>
       )}
 

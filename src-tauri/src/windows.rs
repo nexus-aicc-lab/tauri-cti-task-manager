@@ -22,6 +22,7 @@ pub struct WindowConfig {
     pub height: f64,
     pub resizable: bool,
     pub always_on_top: bool,
+    pub decorations: bool, // 커스텀 헤더를 위한 설정 추가
 }
 
 impl WindowMode {
@@ -43,6 +44,7 @@ impl WindowMode {
                 height: 600.0,
                 resizable: false,
                 always_on_top: false,
+                decorations: true, // 런처는 기본 데코레이션 사용
             },
             WindowMode::Bar => WindowConfig {
                 url: "index.html?mode=bar".into(),
@@ -51,6 +53,7 @@ impl WindowMode {
                 height: 40.0,
                 resizable: false,
                 always_on_top: true,
+                decorations: false, // 바 모드는 커스텀 헤더
             },
             WindowMode::Panel => WindowConfig {
                 url: "index.html?mode=panel".into(),
@@ -59,6 +62,7 @@ impl WindowMode {
                 height: 800.0,
                 resizable: true,
                 always_on_top: false,
+                decorations: false, // 패널 모드는 커스텀 헤더
             },
             WindowMode::Settings => WindowConfig {
                 url: "index.html?mode=settings".into(),
@@ -67,14 +71,16 @@ impl WindowMode {
                 height: 600.0,
                 resizable: true,
                 always_on_top: false,
+                decorations: true, // 설정은 기본 데코레이션 사용
             },
             WindowMode::Login => WindowConfig {
                 url: "index.html?mode=login".into(),
                 title: "CTI Task Master - 로그인".into(),
-                width: 500.0,  // 런처와 동일한 크기로 변경
-                height: 600.0, // 런처와 동일한 크기로 변경
+                width: 500.0,
+                height: 600.0,
                 resizable: false,
-                always_on_top: true, // 로그인 창은 항상 위에
+                always_on_top: true,
+                decorations: true, // 로그인은 기본 데코레이션 사용
             },
         }
     }
@@ -96,6 +102,7 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
             .inner_size(config.width, config.height)
             .resizable(config.resizable)
             .always_on_top(config.always_on_top)
+            .decorations(config.decorations) // 커스텀 데코레이션 설정
             .visible(true);
 
     // 로그인 창일 경우, 런처 창의 위치를 찾아서 그 위에 배치
@@ -104,17 +111,12 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
         for (window_label, window) in windows.iter() {
             if window_label.starts_with("launcher_") {
                 if let Ok(position) = window.outer_position() {
-                    // 런처 창과 정확히 같은 위치에 배치
-                    let new_position = LogicalPosition::new(
-                        position.x as f64,
-                        position.y as f64, // 동일한 위치
-                    );
+                    let new_position = LogicalPosition::new(position.x as f64, position.y as f64);
                     window_builder = window_builder.position(new_position.x, new_position.y);
                     break;
                 }
             }
         }
-        // 런처 창을 찾지 못한 경우 중앙에 배치
         if !windows
             .iter()
             .any(|(label, _)| label.starts_with("launcher_"))
@@ -122,7 +124,6 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
             window_builder = window_builder.center();
         }
     } else {
-        // 다른 창들은 중앙에 배치
         window_builder = window_builder.center();
     }
 
@@ -132,14 +133,12 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
         Ok(_) => {
             println!("✅ 새 창 생성 성공: {}", label);
 
-            // 🔥 중요: 메인 윈도우일 때만 기존 메인 창들을 정리
             if mode.is_main_window() {
                 println!("🔄 메인 윈도우 모드 - 기존 메인 창 정리");
 
                 let windows = handle.webview_windows();
                 for (other_label, window) in windows.iter() {
                     if &label != other_label {
-                        // 설정이나 로그인 창은 유지
                         let should_keep = other_label.starts_with("settings_")
                             || other_label.starts_with("login_");
 
