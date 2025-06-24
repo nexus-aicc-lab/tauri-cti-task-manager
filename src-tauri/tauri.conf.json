@@ -34,7 +34,8 @@
         {
           "identifier": "window-capability",
           "windows": [
-            "*"
+            "*",
+            "window-start-dragging"
           ],
           "permissions": [
             "core:default",
@@ -46,7 +47,8 @@
             "core:window:allow-minimize",
             "core:window:allow-unmaximize",
             "core:window:allow-unminimize",
-            "core:event:default"
+            "core:event:default",
+            "core:window:allow-start-dragging"
           ]
         }
       ]
