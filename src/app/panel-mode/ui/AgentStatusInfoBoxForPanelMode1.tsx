@@ -3,10 +3,17 @@
 import React, { useState } from 'react';
 import { PauseCircle, PhoneCall, ClipboardList, Users, Phone } from 'lucide-react';
 
-const AgentStatusInfoBoxForPanelMode1 = () => {
-    const [statusIndex, setStatusIndex] = useState(0);
+interface Status {
+    label: string;
+    time: string;
+    icon: React.ReactNode;
+    color: string;
+}
 
-    const statuses = [
+const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
+    const [statusIndex, setStatusIndex] = useState<number>(0);
+
+    const statuses: Status[] = [
         {
             label: '대기중',
             time: '00:03:44',
@@ -31,14 +38,14 @@ const AgentStatusInfoBoxForPanelMode1 = () => {
     const waitQueueCount = 5;
     const waitAgentCount = 1;
 
-    const handleClick = () => {
+    const handleClick = (): void => {
         setStatusIndex((prev) => (prev + 1) % statuses.length);
     };
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 max-w-sm mx-auto">
+        <div className="h-full bg-white p-6 rounded-xl shadow-md border border-gray-200 flex flex-col">
             {/* 원형 상태 박스 */}
-            <div className="flex justify-center mb-6">
+            <div className="flex-1 flex justify-center items-center mb-6">
                 <button
                     onClick={handleClick}
                     className="relative w-48 h-48 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
