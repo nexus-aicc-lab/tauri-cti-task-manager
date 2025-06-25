@@ -14,7 +14,7 @@ interface SectionData {
     bars: BarData[];
 }
 
-const CallCenterDashboard: React.FC = () => {
+const AgentStatusInfoBoxForPanelMode3: React.FC = () => {
     const inboundData: SectionData = {
         title: '인바운드',
         icon: <Phone className="w-5 h-5" />,
@@ -83,4 +83,4 @@ const CallCenterDashboard: React.FC = () => {
     );
 };
 
-export default CallCenterDashboard;
+export default AgentStatusInfoBoxForPanelMode3;

@@ -1,5 +1,5 @@
+// AgentStatusInfoBoxForPanelMode4 (Responsive)
 import React from 'react';
-import { TrendingUp } from 'lucide-react';
 
 interface MetricItem {
     label: string;
@@ -29,37 +29,37 @@ const AgentStatusInfoBoxForPanelMode4: React.FC = () => {
     const renderMetricItem = (item: MetricItem, index: number) => (
         <div
             key={index}
-            className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg border border-gray-200"
+            className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[40px] sm:min-h-[60px]"
         >
-            <div className="flex items-center gap-2">
-                <img src="/mini_graph.png" alt="chart" className="w-4 h-4" />
+            <div className="flex items-center gap-1 sm:gap-2">
+                <img src="/mini_graph.png" alt="chart" className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="text-xs font-medium text-gray-700 whitespace-pre-line leading-tight">
                     {item.label}
                 </span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-xs sm:text-sm font-semibold text-gray-900">
                 {item.value}{item.type === 'percentage' ? '%' : ''}
             </span>
         </div>
     );
 
     return (
-        <div className="h-full bg-white p-6 rounded-xl shadow-md border border-gray-200 flex flex-col">
+        <div className="bg-white p-3 sm:p-6 rounded-xl shadow-md border border-gray-200 flex flex-col">
             {/* 상단 메트릭스 */}
-            <div className="mb-6">
-                <div className="grid grid-cols-6 gap-3">
+            <div className="mb-3 sm:mb-6">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
                     {topMetrics.map((item, idx) => renderMetricItem(item, idx))}
                 </div>
             </div>
 
             {/* 하단 그룹호 전환 통계 */}
             <div className="flex-1">
-                <div className="grid grid-cols-6 gap-3 mb-4">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 mb-3 sm:mb-4">
                     {transferStats.map((item, idx) => renderMetricItem(item, idx))}
                 </div>
 
                 {/* LogOn 정보 */}
-                <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center text-sm">
+                <div className="pt-3 sm:pt-4 border-t border-gray-200 flex justify-between items-center text-xs sm:text-sm">
                     <span className="font-medium text-gray-700">LogOn : 44:42:17</span>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
