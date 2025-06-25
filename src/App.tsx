@@ -6,7 +6,7 @@ import LoginComponent from './pages/LoginMode';
 import SettingsComponent from './pages/SettingsMode';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import PanelMode from './pages/PanelMode';
+import MainWindowWithPanelMode from './app/panel-mode/PanelModePage';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
@@ -134,9 +134,11 @@ function App() {
 
       {mode === 'panel' && (
         <div style={{ color: 'white' }}>
-          <PanelMode onBackToLauncher={function (): void {
-            throw new Error('Function not implemented.');
-          }} />
+          <MainWindowWithPanelMode
+          // onBackToLauncher={function (): void {
+          //   throw new Error('Function not implemented.');
+          // }} 
+          />
         </div>
       )}
 
