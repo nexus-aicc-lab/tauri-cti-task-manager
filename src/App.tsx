@@ -6,7 +6,7 @@ import LoginComponent from './pages/LoginMode';
 import SettingsComponent from './pages/SettingsMode';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { PanelModePage } from './app/panel-mode';
+import PanelModePage from './app/panel-mode';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
