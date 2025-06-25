@@ -1,7 +1,14 @@
-// src/app/panel-mode/ui/CustomTitlebar.tsx
+'use client';
 
 import { useEffect, useState } from 'react';
-import { Menu, Pin, Minus, Maximize2, Minimize2, X } from 'lucide-react';
+import {
+    Pin,
+    Minus,
+    Maximize2,
+    Minimize2,
+    X,
+} from 'lucide-react';
+import HamburgerButtonForSystemMenuWithDropdownStyle from './HamburgerButtonForSystemMenuWithDropdownStyle';
 
 interface Props {
     title: string;
@@ -49,13 +56,7 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
         >
             {/* 왼쪽 영역 */}
             <div className="flex items-center space-x-3">
-                <button
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-gray-800 hover:text-black hover:bg-gray-300 p-1 rounded"
-                    title="메뉴"
-                >
-                    <Menu size={16} />
-                </button>
+                <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-sm text-gray-800 flex items-center space-x-1">
                     <span>👤 홍길동(NEX1011)</span>
                     <span className="bg-blue-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-semibold">2</span>
@@ -110,3 +111,4 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
         </div>
     );
 }
+
