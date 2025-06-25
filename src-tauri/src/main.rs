@@ -20,6 +20,8 @@ use tauri_plugin_deep_link::DeepLinkExt;
 // 웹에서 deep link를 처리하기 위한 플러그인
 use tauri_plugin_deep_link;
 
+// 프로세스 관리 플러그인
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 struct AppSettings {
     startup_mode: String,
@@ -422,6 +424,7 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_process::init())
         .run(tauri::generate_context!())
         .expect("❌ Error while running Tauri application");
 }
