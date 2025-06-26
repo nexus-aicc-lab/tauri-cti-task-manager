@@ -53,11 +53,11 @@ impl WindowMode {
             WindowMode::Bar => WindowConfig {
                 url: "index.html?mode=bar".into(),
                 title: "CTI Task Master - 바 모드".into(),
-                width: 1000.0,
+                width: 1100.0,
                 height: 40.0,
                 min_width: Some(800.0),
                 min_height: Some(40.0),
-                resizable: false,
+                resizable: true,
                 always_on_top: true,
                 decorations: false,
             },
