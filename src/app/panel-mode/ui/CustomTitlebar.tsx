@@ -100,7 +100,8 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
             </div>
 
             {/* 가운데 영역 */}
-            <div className="text-center flex-1 pointer-events-none">
+            <div className="text-center flex-1 pointe
+            r-events-none">
                 <span className="text-sm font-semibold text-gray-800">{title}</span>
             </div>
 
