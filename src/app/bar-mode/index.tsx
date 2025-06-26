@@ -1,12 +1,11 @@
 // C:\tauri\cti-task-manager-tauri\src\app\bar-mode\index.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Pin, Minimize, Maximize, X } from 'lucide-react';
-import { MainSystemMenu } from '@/widgets/titlebar/ui/MainSystemMenu';
+import { Pin, PinOff, Minus, BetweenHorizontalStart, X } from 'lucide-react';
 import { useCTIStore } from '@/shared/store/useCTIStore';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { emit } from '@tauri-apps/api/event';
-import HamburgerButtonForSystemMenuWithDropdownStyle from '../panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
+import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 
 interface Props {
     onModeChange: (mode: 'launcher' | 'bar' | 'panel' | 'login' | 'settings') => Promise<void>;
@@ -23,6 +22,7 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
 
     // 윈도우 상태
     const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
 
     // 임시 상태 데이터 (실제로는 store에서 더 세분화된 데이터 필요)
     const workTime = currentTime || '00:01:53';
@@ -40,10 +40,26 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
     useEffect(() => {
         if (!(window as any).__TAURI__) return;
         (async () => {
-            const win = getCurrentWebviewWindow();
-            if (localStorage.getItem('alwaysOnTop') === 'true') {
-                await win.setAlwaysOnTop(true);
-                setAlwaysOnTop(true);
+            try {
+                const { invoke } = await import('@tauri-apps/api/core');
+                const win = getCurrentWebviewWindow();
+
+                // 핀 상태 확인
+                const pinState = await invoke('get_always_on_top_state') as boolean;
+                setAlwaysOnTop(pinState);
+
+                // 최대화 상태 확인
+                setIsMaximized(await win.isMaximized());
+
+                console.log(`📌 초기 핀 상태: ${pinState}, 최대화 상태: ${await win.isMaximized()}`);
+            } catch (error) {
+                console.error('❌ 윈도우 상태 초기화 실패:', error);
+                // fallback to localStorage
+                if (localStorage.getItem('alwaysOnTop') === 'true') {
+                    const win = getCurrentWebviewWindow();
+                    await win.setAlwaysOnTop(true);
+                    setAlwaysOnTop(true);
+                }
             }
         })();
     }, []);
@@ -57,24 +73,45 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
         }
     };
 
-    const handleToggleMax = async () => {
+    const handleToggleMaximize = async () => {
         try {
-            await getCurrentWebviewWindow().toggleMaximize();
+            const win = getCurrentWebviewWindow();
+            const currentMaxState = await win.isMaximized();
+
+            if (currentMaxState) {
+                await win.unmaximize();
+            } else {
+                await win.maximize();
+            }
+
+            setIsMaximized(!currentMaxState);
+            console.log(`📐 ${!currentMaxState ? '최대화' : '복원'} 완료`);
         } catch (error) {
-            console.error('❌ 최대화 실패:', error);
+            console.error('❌ 최대화/복원 실패:', error);
         }
     };
 
+    // 핀 모드 토글 (실제 백엔드 구현)
     const handleAlwaysOnTop = async () => {
         try {
-            const win = getCurrentWebviewWindow();
-            const next = !alwaysOnTop;
-            await win.setAlwaysOnTop(next);
-            setAlwaysOnTop(next);
-            localStorage.setItem('alwaysOnTop', String(next));
-            console.log(`📌 항상 위 고정: ${next}`);
+            const { invoke } = await import('@tauri-apps/api/core');
+            const newState = await invoke('toggle_always_on_top') as boolean;
+            setAlwaysOnTop(newState);
+
+            console.log(`📌 핀 모드 ${newState ? '활성화' : '비활성화'}`);
         } catch (error) {
-            console.error('❌ 항상 위 고정 실패:', error);
+            console.error('❌ 핀 모드 변경 실패, fallback 사용:', error);
+            // fallback implementation
+            try {
+                const win = getCurrentWebviewWindow();
+                const next = !alwaysOnTop;
+                await win.setAlwaysOnTop(next);
+                setAlwaysOnTop(next);
+                localStorage.setItem('alwaysOnTop', String(next));
+                console.log(`📌 Fallback 핀 모드: ${next}`);
+            } catch (fallbackError) {
+                console.error('❌ Fallback 핀 모드도 실패:', fallbackError);
+            }
         }
     };
 
@@ -99,61 +136,67 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
     return (
         <div
             style={{
-                height: '36px',
+                height: '100vh',
+                minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#e6f3ff',
-                border: '1px solid #b3d9f7',
-                borderRadius: '4px',
+                backgroundColor: '#f1f5f9',
+                border: 'none',
+                borderRadius: '0',
                 fontSize: '11px',
                 fontFamily: 'Arial, sans-serif',
                 color: '#333',
-                margin: '2px',
+                margin: '0',
+                padding: '0',
                 userSelect: 'none',
+                boxShadow: 'none',
+                outline: 'none',
+                width: '100%',
             }}
         >
             {/* 왼쪽: 시스템 메뉴 */}
             <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '4px' }}>
-                {/* <MainSystemMenu /> */}
-                <HamburgerButtonForSystemMenuWithDropdownStyle />
+                <MainSystemMenu />
             </div>
 
             {/* LogOff 버튼 */}
-            <div style={{ paddingLeft: '8px' }}>
+            <div style={{ paddingLeft: '6px' }}>
                 <button
                     style={{
                         padding: '2px 6px',
-                        backgroundColor: '#f5f5f5',
-                        border: '1px solid #ccc',
-                        borderRadius: '2px',
+                        backgroundColor: '#e2e8f0',
+                        border: '1px solid #94a3b8',
+                        borderRadius: '3px',
                         fontSize: '10px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '2px'
+                        gap: '3px',
+                        height: '20px'
                     }}
                 >
-                    <span>📤</span>
+                    <span style={{ fontSize: '9px' }}>📤</span>
                     <span>LogOff</span>
-                    <span style={{ fontSize: '9px', color: '#666' }}>00:00:00</span>
+                    <span style={{ fontSize: '9px', color: '#64748b' }}>00:00:00</span>
                 </button>
             </div>
 
             {/* 현재 상태 */}
-            <div style={{ paddingLeft: '8px' }}>
+            <div style={{ paddingLeft: '6px' }}>
                 <span
                     style={{
                         padding: '2px 8px',
-                        backgroundColor: '#4285f4',
+                        backgroundColor: '#3b82f6',
                         color: 'white',
                         borderRadius: '12px',
                         fontSize: '10px',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '2px'
+                        gap: '3px',
+                        height: '20px'
                     }}
                 >
-                    <span>▶</span>
+                    <span style={{ fontSize: '9px' }}>▶</span>
                     <span>{status || '대기중'}</span>
                     <span>{workTime}</span>
                 </span>
@@ -173,26 +216,26 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
             >
                 {/* 대기 시간 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <img src="/모래시계.png" alt="대기" style={{ width: '14px', height: '14px' }} />
-                    <span>{waitTime}({waitCount})</span>
+                    <span style={{ fontSize: '11px' }}>⏳</span>
+                    <span style={{ fontSize: '10px' }}>{waitTime}({waitCount})</span>
                 </div>
 
                 {/* 통화 시간 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <img src="/head_phone.png" alt="통화" style={{ width: '14px', height: '14px' }} />
-                    <span>{callTime}({callCount})</span>
+                    <span style={{ fontSize: '11px' }}>🎧</span>
+                    <span style={{ fontSize: '10px' }}>{callTime}({callCount})</span>
                 </div>
 
                 {/* 일시정지 시간 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <img src="/pause.png" alt="일시정지" style={{ width: '14px', height: '14px' }} />
-                    <span>{pauseTime}({pauseCount})</span>
+                    <span style={{ fontSize: '11px' }}>⏸️</span>
+                    <span style={{ fontSize: '10px' }}>{pauseTime}({pauseCount})</span>
                 </div>
 
                 {/* 휴식 시간 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <img src="/커피_아이콘.png" alt="휴식" style={{ width: '14px', height: '14px' }} />
-                    <span>{restTime}({restCount})</span>
+                    <span style={{ fontSize: '11px' }}>☕</span>
+                    <span style={{ fontSize: '10px' }}>{restTime}({restCount})</span>
                 </div>
 
                 {/* 작업 수량 */}
@@ -200,12 +243,13 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '2px',
-                    backgroundColor: '#e3f2fd',
+                    backgroundColor: '#dbeafe',
                     padding: '2px 4px',
-                    borderRadius: '2px'
+                    borderRadius: '3px',
+                    border: '1px solid #93c5fd'
                 }}>
-                    <img src="/mini_graph.png" alt="작업" style={{ width: '14px', height: '14px' }} />
-                    <span style={{ color: '#1976d2', fontWeight: 'bold' }}>{totalTasks || 10}</span>
+                    <span style={{ fontSize: '11px' }}>📊</span>
+                    <span style={{ color: '#1d4ed8', fontWeight: 'bold', fontSize: '10px' }}>{totalTasks || 10}</span>
                 </div>
 
                 {/* 오류 수량 */}
@@ -213,12 +257,13 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '2px',
-                    backgroundColor: '#ffebee',
+                    backgroundColor: '#fecaca',
                     padding: '2px 4px',
-                    borderRadius: '2px'
+                    borderRadius: '3px',
+                    border: '1px solid #f87171'
                 }}>
-                    <span style={{ color: '#d32f2f', fontSize: '12px' }}>❌</span>
-                    <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>{errorCount}</span>
+                    <span style={{ color: '#dc2626', fontSize: '11px' }}>❌</span>
+                    <span style={{ color: '#dc2626', fontWeight: 'bold', fontSize: '10px' }}>{errorCount}</span>
                 </div>
             </div>
 
@@ -226,21 +271,26 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '1px',
+                gap: '2px',
                 paddingRight: '4px'
             }}>
-                <button
+                {/* <button
                     onClick={handleBackToLauncher}
                     style={{
-                        padding: '4px',
+                        padding: '2px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        fontSize: '12px',
-                        borderRadius: '2px',
+                        fontSize: '10px',
+                        borderRadius: '1px',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#d1ecf1';
+                        e.currentTarget.style.backgroundColor = '#e2e8f0';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
@@ -248,107 +298,111 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                     title="런처로 돌아가기"
                 >
                     🏠
-                </button>
+                </button> */}
 
+                {/* 패널 모드 전환 버튼 */}
                 <button
                     onClick={() => onModeChange('panel')}
                     style={{
-                        padding: '4px',
+                        padding: '2px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        fontSize: '12px',
-                        borderRadius: '2px',
+                        borderRadius: '1px',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#d1ecf1';
+                        e.currentTarget.style.backgroundColor = '#e2e8f0';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                     title="패널 모드로 전환"
                 >
-                    📋
+                    <BetweenHorizontalStart size={10} />
                 </button>
 
+                {/* 핀 버튼 (실제 기능) */}
                 <button
                     onClick={handleAlwaysOnTop}
                     style={{
-                        padding: '4px',
+                        padding: '2px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '2px',
+                        borderRadius: '1px',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: alwaysOnTop ? '#16a34a' : '#64748b'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#d1ecf1';
+                        e.currentTarget.style.backgroundColor = alwaysOnTop ? '#dcfce7' : '#e2e8f0';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                     }}
-                    title="항상 위에 고정"
+                    title={alwaysOnTop ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    <Pin size={12} className={alwaysOnTop ? 'rotate-45' : ''} />
+                    {alwaysOnTop ? <Pin size={10} /> : <PinOff size={10} />}
                 </button>
 
+                {/* 최소화 버튼 */}
                 <button
                     onClick={handleMinimize}
                     style={{
-                        padding: '4px',
+                        padding: '2px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '2px',
+                        borderRadius: '1px',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#d1ecf1';
+                        e.currentTarget.style.backgroundColor = '#e2e8f0';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                     title="최소화"
                 >
-                    <Minimize size={12} />
+                    <Minus size={10} />
                 </button>
 
-                <button
-                    onClick={handleToggleMax}
-                    style={{
-                        padding: '4px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        borderRadius: '2px',
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#d1ecf1';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                    title="최대화"
-                >
-                    <Maximize size={12} />
-                </button>
-
+                {/* 닫기 버튼 */}
                 <button
                     onClick={handleClose}
                     style={{
-                        padding: '4px',
+                        padding: '2px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '2px',
+                        borderRadius: '1px',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#ffcdd2';
+                        e.currentTarget.style.backgroundColor = '#fecaca';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                     title="닫기"
                 >
-                    <X size={12} style={{ color: '#d32f2f' }} />
+                    <X size={10} style={{ color: '#dc2626' }} />
                 </button>
             </div>
         </div>
