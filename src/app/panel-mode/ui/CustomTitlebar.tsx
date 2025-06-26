@@ -89,10 +89,9 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
         <div
             className="h-10 bg-gray-200 flex items-center justify-between px-4 select-none border-b border-gray-300"
             data-tauri-drag-region
-            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
         >
             {/* 왼쪽 영역 */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-sm text-gray-800 flex items-center space-x-1">
                     <span>👤 이재명(NEX1011)</span>
@@ -100,13 +99,12 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
             </div>
 
             {/* 가운데 영역 */}
-            <div className="text-center flex-1 pointe
-            r-events-none">
+            <div className="text-center flex-1 pointer-events-none">
                 <span className="text-sm font-semibold text-gray-800">{title}</span>
             </div>
 
             {/* 오른쪽 영역 */}
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 {/* 핀 버튼 (항상 위에 보이기) */}
                 <button
                     onClick={(e) => {
@@ -114,12 +112,12 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
                         changeToggleMode();
                     }}
                     className={`p-1 rounded transition-colors ${isPinned
-                        ? 'text-green-600  hover:bg-green-200'
-                        : 'text-red-600  hover:bg-red-200'
+                            ? 'text-green-600 bg-green-100 hover:bg-green-200'
+                            : 'text-red-600 bg-red-100 hover:bg-red-200'
                         }`}
                     title={isPinned ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    {isPinned ? <Pin size={14} color='black' /> : <PinOff size={14} color='black' />}
+                    {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
                 </button>
 
                 {/* 바 모드 전환 버튼 */}

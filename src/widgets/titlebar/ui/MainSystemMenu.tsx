@@ -1,10 +1,11 @@
+// C:\tauri\cti-task-manager-tauri\src\widgets\titlebar\ui\MainSystemMenu.tsx
 'use client';
 
 import { useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { getPopupPosition } from '@/shared/lib/tauri/getPopupPosition';
 
-export function MenuDropdown() {
+export function MainSystemMenu() {
     const buttonRef = useRef<HTMLButtonElement>(null);
 
     const onClickMenu = async () => {
