@@ -1,13 +1,13 @@
 // src/App.tsx
 import { useState, useEffect } from 'react';
 import { emit, listen } from '@tauri-apps/api/event';
-import { Launcher } from './pages/Launcher';
 import LoginComponent from './pages/LoginMode';
 import SettingsComponent from './pages/SettingsMode';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PanelModePage from './app/panel-mode';
 import BarModePage from './app/bar-mode';
+import { Launcher } from './app/launcher';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
