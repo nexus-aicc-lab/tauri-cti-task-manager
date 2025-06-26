@@ -21,18 +21,35 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
 
-    // pin 상태 변경 함수
-    const changeToggleMode = () => {
-        setIsPinned((prev) => !prev);
-        console.log(isPinned ? '📌 핀 해제됨' : '📌 핀 설정됨');
-    };
+    // 핀 상태 변경 함수 (백엔드 명령어 사용)
+    const changeToggleMode = async () => {
+        try {
+            const { invoke } = await import('@tauri-apps/api/core');
+            const newState = await invoke('toggle_always_on_top') as boolean;
+            setIsPinned(newState);
 
+            console.log(newState ? '📌 항상 위에 보이기 활성화' : '📌 항상 위에 보이기 비활성화');
+        } catch (error) {
+            console.error('❌ 핀 모드 변경 실패:', error);
+        }
+    };
 
     useEffect(() => {
         (async () => {
-            const { getCurrentWindow } = await import('@tauri-apps/api/window');
-            const win = getCurrentWindow();
-            setIsMaximized(await win.isMaximized());
+            try {
+                const { invoke } = await import('@tauri-apps/api/core');
+                const { getCurrentWindow } = await import('@tauri-apps/api/window');
+                const win = getCurrentWindow();
+
+                // 현재 창 상태 동기화
+                setIsMaximized(await win.isMaximized());
+
+                // 백엔드에서 핀 상태 확인
+                const pinState = await invoke('get_always_on_top_state') as boolean;
+                setIsPinned(pinState);
+            } catch (error) {
+                console.error('❌ 창 상태 확인 실패:', error);
+            }
         })();
     }, []);
 
@@ -79,7 +96,6 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
                 <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-sm text-gray-800 flex items-center space-x-1">
                     <span>👤 이재명(NEX1011)</span>
-                    {/* <span className="bg-blue-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-semibold">2</span> */}
                 </div>
             </div>
 
@@ -90,23 +106,21 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
 
             {/* 오른쪽 영역 */}
             <div className="flex items-center space-x-1">
+                {/* 핀 버튼 (항상 위에 보이기) */}
                 <button
-                    onClick={
-                        // 핀 상태 변경, with chage toggle mode
-                        (e) => {
-                            e.stopPropagation();
-                            changeToggleMode();
-                        }
-
-                    }
-                    className="text-gray-800 hover:text-black hover:bg-gray-300 p-1 rounded"
-                    title="핀 고정"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        changeToggleMode();
+                    }}
+                    className={`p-1 rounded transition-colors ${isPinned
+                        ? 'text-green-600  hover:bg-green-200'
+                        : 'text-red-600  hover:bg-red-200'
+                        }`}
+                    title={isPinned ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    {/* <Pin size={14} /> */}
-                    {isPinned ?
-                        <Pin size={14} color='green' /> : <PinOff size={14} color='red' />
-                    }
+                    {isPinned ? <Pin size={14} color='black' /> : <PinOff size={14} color='black' />}
                 </button>
+
                 {/* 바 모드 전환 버튼 */}
                 <button
                     onClick={(e) => {
@@ -118,6 +132,7 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
                 >
                     <BetweenHorizontalEnd size={14} />
                 </button>
+
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -128,6 +143,7 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
                 >
                     <Minus size={14} />
                 </button>
+
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -138,6 +154,7 @@ export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
                 >
                     {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
                 </button>
+
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

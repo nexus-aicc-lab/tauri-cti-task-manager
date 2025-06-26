@@ -160,9 +160,43 @@ async fn get_deep_link_history() -> Result<String, String> {
 }
 
 // 🔧 개발자 도구 제어 명령어들 수정 (Tauri v2 방식)
+// #[tauri::command]
+// fn open_devtools(app: tauri::AppHandle) -> Result<(), String> {
+//     if let Some(window) = app.get_webview_window("main") {
+//         window.open_devtools();
+//         println!("🔧 개발자 도구 열기");
+//         Ok(())
+//     } else {
+//         Err("메인 창을 찾을 수 없습니다".to_string())
+//     }
+// }
+
+// #[tauri::command]
+// fn close_devtools(app: tauri::AppHandle) -> Result<(), String> {
+//     if let Some(window) = app.get_webview_window("main") {
+//         window.close_devtools();
+//         println!("🔧 개발자 도구 닫기");
+//         Ok(())
+//     } else {
+//         Err("메인 창을 찾을 수 없습니다".to_string())
+//     }
+// }
+
+// 🔧 개발자 도구 제어 명령어들 수정 (동적 창 라벨 지원)
 #[tauri::command]
 fn open_devtools(app: tauri::AppHandle) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("main") {
+    let windows = app.webview_windows();
+
+    let main_window = windows
+        .iter()
+        .find(|(label, _)| {
+            label.starts_with("launcher_")
+                || label.starts_with("bar_")
+                || label.starts_with("panel_")
+        })
+        .map(|(_, window)| window);
+
+    if let Some(window) = main_window {
         window.open_devtools();
         println!("🔧 개발자 도구 열기");
         Ok(())
@@ -173,10 +207,82 @@ fn open_devtools(app: tauri::AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 fn close_devtools(app: tauri::AppHandle) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("main") {
+    let windows = app.webview_windows();
+
+    let main_window = windows
+        .iter()
+        .find(|(label, _)| {
+            label.starts_with("launcher_")
+                || label.starts_with("bar_")
+                || label.starts_with("panel_")
+        })
+        .map(|(_, window)| window);
+
+    if let Some(window) = main_window {
         window.close_devtools();
         println!("🔧 개발자 도구 닫기");
         Ok(())
+    } else {
+        Err("메인 창을 찾을 수 없습니다".to_string())
+    }
+}
+
+// 🆕 핀 기능 함수들 추가
+#[tauri::command]
+fn toggle_always_on_top(app: tauri::AppHandle) -> Result<bool, String> {
+    let windows = app.webview_windows();
+
+    let main_window = windows
+        .iter()
+        .find(|(label, _)| {
+            label.starts_with("launcher_")
+                || label.starts_with("bar_")
+                || label.starts_with("panel_")
+        })
+        .map(|(_, window)| window);
+
+    if let Some(window) = main_window {
+        let current_state = window
+            .is_always_on_top()
+            .map_err(|e| format!("상태 확인 실패: {}", e))?;
+
+        let new_state = !current_state;
+
+        window
+            .set_always_on_top(new_state)
+            .map_err(|e| format!("항상 위에 보이기 설정 실패: {}", e))?;
+
+        println!(
+            "📌 항상 위에 보이기: {}",
+            if new_state {
+                "활성화"
+            } else {
+                "비활성화"
+            }
+        );
+        Ok(new_state)
+    } else {
+        Err("메인 창을 찾을 수 없습니다".to_string())
+    }
+}
+
+#[tauri::command]
+fn get_always_on_top_state(app: tauri::AppHandle) -> Result<bool, String> {
+    let windows = app.webview_windows();
+
+    let main_window = windows
+        .iter()
+        .find(|(label, _)| {
+            label.starts_with("launcher_")
+                || label.starts_with("bar_")
+                || label.starts_with("panel_")
+        })
+        .map(|(_, window)| window);
+
+    if let Some(window) = main_window {
+        window
+            .is_always_on_top()
+            .map_err(|e| format!("상태 확인 실패: {}", e))
     } else {
         Err("메인 창을 찾을 수 없습니다".to_string())
     }
@@ -418,7 +524,9 @@ fn main() {
             open_devtools,
             close_devtools,
             manual_deep_link_test, // 수동 테스트 명령어
-            clear_login_data       // 🆕 로그인 데이터 삭제 명령어 추가
+            clear_login_data,      // 🆕 로그인 데이터 삭제 명령어 추가
+            toggle_always_on_top,
+            get_always_on_top_state
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
