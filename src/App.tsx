@@ -120,7 +120,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import PanelModePage from './app/panel-mode';
 import BarModePage from './app/bar-mode';
 import { Launcher } from './app/launcher';
-import SettingsComponent from './app/settings-mode';
 import SystemSettingWindow from './app/system-setting-window';  // 새로 추가
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';

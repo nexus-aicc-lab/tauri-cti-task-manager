@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Pin, PinOff, Minus, BetweenHorizontalStart, X } from 'lucide-react';
 import { useCTIStore } from '@/shared/store/useCTIStore';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { emit } from '@tauri-apps/api/event';
 import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 import AgentCallStatusBadge from './ui/AgentCallStatusBedge';
 
@@ -14,14 +13,11 @@ interface Props {
 
 const BarModePage: React.FC<Props> = ({ onModeChange }) => {
     // CTI Store에서 상태 가져오기
-    const status = useCTIStore(s => s.status);
     const currentTime = useCTIStore(s => s.currentTime);
     const totalTasks = useCTIStore(s => s.totalTasks);
-    const efficiency = useCTIStore(s => s.efficiency);
 
     // 윈도우 상태
     const [alwaysOnTop, setAlwaysOnTop] = useState(false);
-    const [isMaximized, setIsMaximized] = useState(false);
 
     // 임시 데이터
     const workTime = currentTime || '00:01:53';
@@ -37,16 +33,16 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
         (async () => {
             try {
                 const { invoke } = await import('@tauri-apps/api/core');
-                const win = getCurrentWebviewWindow();
+                // const win = getCurrentWebviewWindow();
                 const pinState = (await invoke('get_always_on_top_state')) as boolean;
                 setAlwaysOnTop(pinState);
-                setIsMaximized(await win.isMaximized());
-            } catch {
                 if (localStorage.getItem('alwaysOnTop') === 'true') {
                     const win = getCurrentWebviewWindow();
                     await win.setAlwaysOnTop(true);
                     setAlwaysOnTop(true);
                 }
+            } catch (error) {
+                console.error('Error setting initial window state:', error);
             }
         })();
     }, []);
@@ -55,12 +51,13 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
     const handleMinimize = async () => {
         await getCurrentWebviewWindow().minimize();
     };
-    const handleToggleMaximize = async () => {
-        const win = getCurrentWebviewWindow();
-        const maximized = await win.isMaximized();
-        maximized ? await win.unmaximize() : await win.maximize();
-        setIsMaximized(!maximized);
-    };
+
+    // const handleToggleMaximize = async () => {
+    //     const win = getCurrentWebviewWindow();
+    //     const maximized = await win.isMaximized();
+    //     maximized ? await win.unmaximize() : await win.maximize();
+    // };
+
     const handleAlwaysOnTop = async () => {
         try {
             const { invoke } = await import('@tauri-apps/api/core');
@@ -75,12 +72,14 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
             localStorage.setItem('alwaysOnTop', String(next));
         }
     };
+
     const handleClose = async () => {
         await getCurrentWebviewWindow().close();
     };
-    const handleBackToLauncher = async () => {
-        await emit('back-to-launcher', 'bar');
-    };
+
+    // const handleBackToLauncher = async () => {
+    //     await emit('back-to-launcher', 'bar');
+    // };
 
     return (
         <div
