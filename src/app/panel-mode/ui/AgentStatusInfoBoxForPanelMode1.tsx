@@ -541,23 +541,23 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                 }
                 
                 .green-bg {
-                    background: linear-gradient(135deg, #047857, #10b981, #34d399, #059669);
-                    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+                    background: linear-gradient(135deg, #064e3b, #047857, #059669, #065f46);
+                    box-shadow: 0 0 30px rgba(6, 95, 70, 0.5), inset 0 0 15px rgba(6, 78, 59, 0.3);
                 }
                 
                 .blue-bg {
-                    background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa, #2563eb);
-                    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+                    background: linear-gradient(135deg, #1e3a8a, #1e40af, #2563eb, #1d4ed8);
+                    box-shadow: 0 0 30px rgba(30, 58, 138, 0.5), inset 0 0 15px rgba(23, 37, 84, 0.3);
                 }
                 
                 .orange-bg {
-                    background: linear-gradient(135deg, #c2410c, #f97316, #fb923c, #ea580c);
-                    box-shadow: 0 0 25px rgba(249, 115, 22, 0.4);
+                    background: linear-gradient(135deg, #9a3412, #c2410c, #ea580c, #b45309);
+                    box-shadow: 0 0 30px rgba(154, 52, 18, 0.5), inset 0 0 15px rgba(124, 45, 18, 0.3);
                 }
                 
                 .purple-bg {
-                    background: linear-gradient(135deg, #6d28d9, #8b5cf6, #a78bfa, #7c3aed);
-                    box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+                    background: linear-gradient(135deg, #581c87, #6d28d9, #7c3aed, #6b21a8);
+                    box-shadow: 0 0 30px rgba(88, 28, 135, 0.5), inset 0 0 15px rgba(55, 16, 107, 0.3);
                 }
                 
                 .radar-sweep {
@@ -587,17 +587,17 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 0deg,
                         transparent 0%,
                         transparent 55%,
-                        rgba(34, 197, 94, 0.4) 58%,
-                        rgba(22, 163, 74, 0.5) 62%,
-                        rgba(16, 185, 129, 0.6) 66%,
-                        rgba(5, 150, 105, 0.7) 70%,
-                        rgba(4, 120, 87, 0.8) 74%,
-                        rgba(6, 78, 59, 0.85) 78%,
-                        rgba(4, 120, 87, 0.75) 82%,
-                        rgba(5, 150, 105, 0.65) 86%,
-                        rgba(16, 185, 129, 0.55) 90%,
-                        rgba(22, 163, 74, 0.45) 94%,
-                        rgba(34, 197, 94, 0.35) 97%,
+                        rgba(22, 163, 74, 0.4) 58%,
+                        rgba(15, 118, 110, 0.5) 62%,
+                        rgba(6, 95, 70, 0.6) 66%,
+                        rgba(4, 120, 87, 0.7) 70%,
+                        rgba(6, 78, 59, 0.8) 74%,
+                        rgba(5, 46, 22, 0.85) 78%,
+                        rgba(6, 78, 59, 0.75) 82%,
+                        rgba(4, 120, 87, 0.65) 86%,
+                        rgba(6, 95, 70, 0.55) 90%,
+                        rgba(15, 118, 110, 0.45) 94%,
+                        rgba(22, 163, 74, 0.35) 97%,
                         transparent 100%
                     );
                 }
@@ -607,15 +607,15 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 60deg,
                         transparent 0%,
                         transparent 50%,
-                        rgba(22, 163, 74, 0.3) 55%,
-                        rgba(16, 185, 129, 0.4) 60%,
-                        rgba(5, 150, 105, 0.5) 65%,
-                        rgba(4, 120, 87, 0.6) 70%,
-                        rgba(6, 78, 59, 0.65) 75%,
-                        rgba(4, 120, 87, 0.55) 80%,
-                        rgba(5, 150, 105, 0.45) 85%,
-                        rgba(16, 185, 129, 0.35) 90%,
-                        rgba(22, 163, 74, 0.25) 95%,
+                        rgba(15, 118, 110, 0.3) 55%,
+                        rgba(6, 95, 70, 0.4) 60%,
+                        rgba(4, 120, 87, 0.5) 65%,
+                        rgba(6, 78, 59, 0.6) 70%,
+                        rgba(5, 46, 22, 0.65) 75%,
+                        rgba(6, 78, 59, 0.55) 80%,
+                        rgba(4, 120, 87, 0.45) 85%,
+                        rgba(6, 95, 70, 0.35) 90%,
+                        rgba(15, 118, 110, 0.25) 95%,
                         transparent 100%
                     );
                 }
@@ -625,17 +625,17 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 0deg,
                         transparent 0%,
                         transparent 55%,
-                        rgba(59, 130, 246, 0.4) 58%,
-                        rgba(37, 99, 235, 0.5) 62%,
-                        rgba(29, 78, 216, 0.6) 66%,
-                        rgba(30, 64, 175, 0.7) 70%,
-                        rgba(30, 58, 138, 0.8) 74%,
-                        rgba(23, 37, 84, 0.85) 78%,
-                        rgba(30, 58, 138, 0.75) 82%,
-                        rgba(30, 64, 175, 0.65) 86%,
-                        rgba(29, 78, 216, 0.55) 90%,
-                        rgba(37, 99, 235, 0.45) 94%,
-                        rgba(59, 130, 246, 0.35) 97%,
+                        rgba(37, 99, 235, 0.4) 58%,
+                        rgba(29, 78, 216, 0.5) 62%,
+                        rgba(30, 64, 175, 0.6) 66%,
+                        rgba(30, 58, 138, 0.7) 70%,
+                        rgba(23, 37, 84, 0.8) 74%,
+                        rgba(15, 23, 42, 0.85) 78%,
+                        rgba(23, 37, 84, 0.75) 82%,
+                        rgba(30, 58, 138, 0.65) 86%,
+                        rgba(30, 64, 175, 0.55) 90%,
+                        rgba(29, 78, 216, 0.45) 94%,
+                        rgba(37, 99, 235, 0.35) 97%,
                         transparent 100%
                     );
                 }
@@ -645,15 +645,15 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 60deg,
                         transparent 0%,
                         transparent 50%,
-                        rgba(37, 99, 235, 0.3) 55%,
-                        rgba(29, 78, 216, 0.4) 60%,
-                        rgba(30, 64, 175, 0.5) 65%,
-                        rgba(30, 58, 138, 0.6) 70%,
-                        rgba(23, 37, 84, 0.65) 75%,
-                        rgba(30, 58, 138, 0.55) 80%,
-                        rgba(30, 64, 175, 0.45) 85%,
-                        rgba(29, 78, 216, 0.35) 90%,
-                        rgba(37, 99, 235, 0.25) 95%,
+                        rgba(29, 78, 216, 0.3) 55%,
+                        rgba(30, 64, 175, 0.4) 60%,
+                        rgba(30, 58, 138, 0.5) 65%,
+                        rgba(23, 37, 84, 0.6) 70%,
+                        rgba(15, 23, 42, 0.65) 75%,
+                        rgba(23, 37, 84, 0.55) 80%,
+                        rgba(30, 58, 138, 0.45) 85%,
+                        rgba(30, 64, 175, 0.35) 90%,
+                        rgba(29, 78, 216, 0.25) 95%,
                         transparent 100%
                     );
                 }
@@ -663,17 +663,17 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 0deg,
                         transparent 0%,
                         transparent 55%,
-                        rgba(249, 115, 22, 0.4) 58%,
-                        rgba(234, 88, 12, 0.5) 62%,
-                        rgba(194, 65, 12, 0.6) 66%,
-                        rgba(154, 52, 18, 0.7) 70%,
-                        rgba(124, 45, 18, 0.8) 74%,
-                        rgba(92, 25, 2, 0.85) 78%,
-                        rgba(124, 45, 18, 0.75) 82%,
-                        rgba(154, 52, 18, 0.65) 86%,
-                        rgba(194, 65, 12, 0.55) 90%,
-                        rgba(234, 88, 12, 0.45) 94%,
-                        rgba(249, 115, 22, 0.35) 97%,
+                        rgba(234, 88, 12, 0.4) 58%,
+                        rgba(194, 65, 12, 0.5) 62%,
+                        rgba(154, 52, 18, 0.6) 66%,
+                        rgba(124, 45, 18, 0.7) 70%,
+                        rgba(92, 25, 2, 0.8) 74%,
+                        rgba(69, 10, 10, 0.85) 78%,
+                        rgba(92, 25, 2, 0.75) 82%,
+                        rgba(124, 45, 18, 0.65) 86%,
+                        rgba(154, 52, 18, 0.55) 90%,
+                        rgba(194, 65, 12, 0.45) 94%,
+                        rgba(234, 88, 12, 0.35) 97%,
                         transparent 100%
                     );
                 }
@@ -683,15 +683,15 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 60deg,
                         transparent 0%,
                         transparent 50%,
-                        rgba(234, 88, 12, 0.3) 55%,
-                        rgba(194, 65, 12, 0.4) 60%,
-                        rgba(154, 52, 18, 0.5) 65%,
-                        rgba(124, 45, 18, 0.6) 70%,
-                        rgba(92, 25, 2, 0.65) 75%,
-                        rgba(124, 45, 18, 0.55) 80%,
-                        rgba(154, 52, 18, 0.45) 85%,
-                        rgba(194, 65, 12, 0.35) 90%,
-                        rgba(234, 88, 12, 0.25) 95%,
+                        rgba(194, 65, 12, 0.3) 55%,
+                        rgba(154, 52, 18, 0.4) 60%,
+                        rgba(124, 45, 18, 0.5) 65%,
+                        rgba(92, 25, 2, 0.6) 70%,
+                        rgba(69, 10, 10, 0.65) 75%,
+                        rgba(92, 25, 2, 0.55) 80%,
+                        rgba(124, 45, 18, 0.45) 85%,
+                        rgba(154, 52, 18, 0.35) 90%,
+                        rgba(194, 65, 12, 0.25) 95%,
                         transparent 100%
                     );
                 }
@@ -701,17 +701,17 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 0deg,
                         transparent 0%,
                         transparent 55%,
-                        rgba(139, 92, 246, 0.4) 58%,
-                        rgba(124, 58, 237, 0.5) 62%,
-                        rgba(109, 40, 217, 0.6) 66%,
-                        rgba(88, 28, 135, 0.7) 70%,
-                        rgba(76, 29, 149, 0.8) 74%,
-                        rgba(55, 16, 107, 0.85) 78%,
-                        rgba(76, 29, 149, 0.75) 82%,
-                        rgba(88, 28, 135, 0.65) 86%,
-                        rgba(109, 40, 217, 0.55) 90%,
-                        rgba(124, 58, 237, 0.45) 94%,
-                        rgba(139, 92, 246, 0.35) 97%,
+                        rgba(124, 58, 237, 0.4) 58%,
+                        rgba(109, 40, 217, 0.5) 62%,
+                        rgba(88, 28, 135, 0.6) 66%,
+                        rgba(76, 29, 149, 0.7) 70%,
+                        rgba(55, 16, 107, 0.8) 74%,
+                        rgba(36, 7, 59, 0.85) 78%,
+                        rgba(55, 16, 107, 0.75) 82%,
+                        rgba(76, 29, 149, 0.65) 86%,
+                        rgba(88, 28, 135, 0.55) 90%,
+                        rgba(109, 40, 217, 0.45) 94%,
+                        rgba(124, 58, 237, 0.35) 97%,
                         transparent 100%
                     );
                 }
@@ -721,15 +721,15 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         from 60deg,
                         transparent 0%,
                         transparent 50%,
-                        rgba(124, 58, 237, 0.3) 55%,
-                        rgba(109, 40, 217, 0.4) 60%,
-                        rgba(88, 28, 135, 0.5) 65%,
-                        rgba(76, 29, 149, 0.6) 70%,
-                        rgba(55, 16, 107, 0.65) 75%,
-                        rgba(76, 29, 149, 0.55) 80%,
-                        rgba(88, 28, 135, 0.45) 85%,
-                        rgba(109, 40, 217, 0.35) 90%,
-                        rgba(124, 58, 237, 0.25) 95%,
+                        rgba(109, 40, 217, 0.3) 55%,
+                        rgba(88, 28, 135, 0.4) 60%,
+                        rgba(76, 29, 149, 0.5) 65%,
+                        rgba(55, 16, 107, 0.6) 70%,
+                        rgba(36, 7, 59, 0.65) 75%,
+                        rgba(55, 16, 107, 0.55) 80%,
+                        rgba(76, 29, 149, 0.45) 85%,
+                        rgba(88, 28, 135, 0.35) 90%,
+                        rgba(109, 40, 217, 0.25) 95%,
                         transparent 100%
                     );
                 }
