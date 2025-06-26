@@ -3,7 +3,8 @@
 
 import { useRef } from 'react';
 import { Menu } from 'lucide-react';
-import { exit, relaunch } from '@tauri-apps/plugin-process';
+// relaunch
+import { exit } from '@tauri-apps/plugin-process';
 import { emit } from '@tauri-apps/api/event';
 
 export default function MainSystemMenu() {

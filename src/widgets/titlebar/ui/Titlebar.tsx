@@ -9,10 +9,10 @@ import { useUIStore } from '@/shared/store/useUIStore';
 import { useCTIStore } from '@/shared/store/useCTIStore';
 import AgentStatusContentForBarMode from '@/widgets/info-header/ui/AgentStatusContentForBarMode';
 import { TITLEBAR_CLASSES } from '@/config/windowConfig';
-import { MainSystemMenu } from './MainSystemMenu';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { saveViewMode, loadViewMode } from '../../../shared/lib/fs/viewModeStorage';
 import { emit } from '@tauri-apps/api/event';
+import MainSystemMenu from './MainSystemMenu';
 
 
 export default function Titlebar() {
