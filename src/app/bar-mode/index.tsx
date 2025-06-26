@@ -140,66 +140,78 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#ffffff',
                 border: 'none',
                 borderRadius: '0',
-                fontSize: '11px',
-                fontFamily: 'Arial, sans-serif',
-                color: '#333',
+                fontSize: '12px',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                color: '#374151',
                 margin: '0',
-                padding: '0',
+                padding: '0 12px',
                 userSelect: 'none',
                 boxShadow: 'none',
                 outline: 'none',
                 width: '100%',
+                boxSizing: 'border-box',
             }}
         >
             {/* 왼쪽: 시스템 메뉴 */}
-            <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
                 <MainSystemMenu />
             </div>
 
             {/* LogOff 버튼 */}
-            <div style={{ paddingLeft: '6px' }}>
+            <div style={{ marginLeft: '12px' }}>
                 <button
                     style={{
-                        padding: '2px 6px',
-                        backgroundColor: '#e2e8f0',
-                        border: '1px solid #94a3b8',
-                        borderRadius: '3px',
-                        fontSize: '10px',
+                        padding: '4px 10px',
+                        backgroundColor: '#f3f4f6',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '11px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '3px',
-                        height: '20px'
+                        gap: '4px',
+                        height: '24px',
+                        color: '#6b7280',
+                        fontWeight: '500',
+                        transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#e5e7eb';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
                     }}
                 >
-                    <span style={{ fontSize: '9px' }}>📤</span>
+                    <span style={{ fontSize: '10px' }}>📤</span>
                     <span>LogOff</span>
-                    <span style={{ fontSize: '9px', color: '#64748b' }}>00:00:00</span>
+                    <span style={{ fontSize: '10px', color: '#9ca3af' }}>00:00:00</span>
                 </button>
             </div>
 
             {/* 현재 상태 */}
-            <div style={{ paddingLeft: '6px' }}>
-                <span
+            <div style={{ marginLeft: '12px' }}>
+                <div
                     style={{
-                        padding: '2px 8px',
+                        padding: '4px 12px',
                         backgroundColor: '#3b82f6',
                         color: 'white',
-                        borderRadius: '12px',
-                        fontSize: '10px',
-                        display: 'inline-flex',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: '3px',
-                        height: '20px'
+                        gap: '4px',
+                        height: '24px',
+                        fontWeight: '500',
+                        boxShadow: '0 1px 3px rgba(59, 130, 246, 0.3)'
                     }}
                 >
-                    <span style={{ fontSize: '9px' }}>▶</span>
+                    <span style={{ fontSize: '10px' }}>▶</span>
                     <span>{status || '대기중'}</span>
                     <span>{workTime}</span>
-                </span>
+                </div>
             </div>
 
             {/* 드래그 가능한 중앙 영역 */}
@@ -207,63 +219,95 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    paddingLeft: '8px',
+                    gap: '16px',
+                    marginLeft: '16px',
                     flex: 1,
                     cursor: 'move'
                 }}
                 data-tauri-drag-region
             >
                 {/* 대기 시간 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <span style={{ fontSize: '11px' }}>⏳</span>
-                    <span style={{ fontSize: '10px' }}>{waitTime}({waitCount})</span>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: '#fafafa'
+                }}>
+                    <span style={{ fontSize: '12px' }}>⏳</span>
+                    <span style={{ fontSize: '11px', fontWeight: '500' }}>{waitTime}</span>
+                    <span style={{ fontSize: '10px', color: '#6b7280' }}>({waitCount})</span>
                 </div>
 
                 {/* 통화 시간 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <span style={{ fontSize: '11px' }}>🎧</span>
-                    <span style={{ fontSize: '10px' }}>{callTime}({callCount})</span>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: '#fafafa'
+                }}>
+                    <span style={{ fontSize: '12px' }}>🎧</span>
+                    <span style={{ fontSize: '11px', fontWeight: '500' }}>{callTime}</span>
+                    <span style={{ fontSize: '10px', color: '#6b7280' }}>({callCount})</span>
                 </div>
 
                 {/* 일시정지 시간 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <span style={{ fontSize: '11px' }}>⏸️</span>
-                    <span style={{ fontSize: '10px' }}>{pauseTime}({pauseCount})</span>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: '#fafafa'
+                }}>
+                    <span style={{ fontSize: '12px' }}>⏸️</span>
+                    <span style={{ fontSize: '11px', fontWeight: '500' }}>{pauseTime}</span>
+                    <span style={{ fontSize: '10px', color: '#6b7280' }}>({pauseCount})</span>
                 </div>
 
                 {/* 휴식 시간 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <span style={{ fontSize: '11px' }}>☕</span>
-                    <span style={{ fontSize: '10px' }}>{restTime}({restCount})</span>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: '#fafafa'
+                }}>
+                    <span style={{ fontSize: '12px' }}>☕</span>
+                    <span style={{ fontSize: '11px', fontWeight: '500' }}>{restTime}</span>
+                    <span style={{ fontSize: '10px', color: '#6b7280' }}>({restCount})</span>
                 </div>
 
                 {/* 작업 수량 */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '2px',
-                    backgroundColor: '#dbeafe',
-                    padding: '2px 4px',
-                    borderRadius: '3px',
-                    border: '1px solid #93c5fd'
+                    gap: '4px',
+                    backgroundColor: '#eff6ff',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #dbeafe'
                 }}>
-                    <span style={{ fontSize: '11px' }}>📊</span>
-                    <span style={{ color: '#1d4ed8', fontWeight: 'bold', fontSize: '10px' }}>{totalTasks || 10}</span>
+                    <span style={{ fontSize: '12px' }}>📊</span>
+                    <span style={{ color: '#2563eb', fontWeight: '600', fontSize: '11px' }}>{totalTasks || 10}</span>
                 </div>
 
                 {/* 오류 수량 */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '2px',
-                    backgroundColor: '#fecaca',
-                    padding: '2px 4px',
-                    borderRadius: '3px',
-                    border: '1px solid #f87171'
+                    gap: '4px',
+                    backgroundColor: '#fef2f2',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #fecaca'
                 }}>
-                    <span style={{ color: '#dc2626', fontSize: '11px' }}>❌</span>
-                    <span style={{ color: '#dc2626', fontWeight: 'bold', fontSize: '10px' }}>{errorCount}</span>
+                    <span style={{ color: '#dc2626', fontSize: '12px' }}>❌</span>
+                    <span style={{ color: '#dc2626', fontWeight: '600', fontSize: '11px' }}>{errorCount}</span>
                 </div>
             </div>
 
@@ -271,138 +315,124 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '2px',
-                paddingRight: '4px'
+                gap: '4px'
             }}>
-                {/* <button
-                    onClick={handleBackToLauncher}
-                    style={{
-                        padding: '2px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '10px',
-                        borderRadius: '1px',
-                        width: '20px',
-                        height: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#e2e8f0';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                    title="런처로 돌아가기"
-                >
-                    🏠
-                </button> */}
-
                 {/* 패널 모드 전환 버튼 */}
                 <button
                     onClick={() => onModeChange('panel')}
                     style={{
-                        padding: '2px',
+                        padding: '6px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '1px',
-                        width: '20px',
-                        height: '20px',
+                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: '#6b7280',
+                        transition: 'all 0.15s ease'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#e2e8f0';
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                        e.currentTarget.style.color = '#374151';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                     title="패널 모드로 전환"
                 >
-                    <BetweenHorizontalStart size={10} />
+                    <BetweenHorizontalStart size={14} />
                 </button>
 
                 {/* 핀 버튼 (실제 기능) */}
                 <button
                     onClick={handleAlwaysOnTop}
                     style={{
-                        padding: '2px',
+                        padding: '6px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '1px',
-                        width: '20px',
-                        height: '20px',
+                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: alwaysOnTop ? '#16a34a' : '#64748b'
+                        color: alwaysOnTop ? '#059669' : '#6b7280',
+                        transition: 'all 0.15s ease'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = alwaysOnTop ? '#dcfce7' : '#e2e8f0';
+                        e.currentTarget.style.backgroundColor = alwaysOnTop ? '#ecfdf5' : '#f3f4f6';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                     title={alwaysOnTop ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    {alwaysOnTop ? <Pin size={10} /> : <PinOff size={10} />}
+                    {alwaysOnTop ? <Pin size={14} /> : <PinOff size={14} />}
                 </button>
 
                 {/* 최소화 버튼 */}
                 <button
                     onClick={handleMinimize}
                     style={{
-                        padding: '2px',
+                        padding: '6px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '1px',
-                        width: '20px',
-                        height: '20px',
+                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: '#6b7280',
+                        transition: 'all 0.15s ease'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#e2e8f0';
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                        e.currentTarget.style.color = '#374151';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                     title="최소화"
                 >
-                    <Minus size={10} />
+                    <Minus size={14} />
                 </button>
 
                 {/* 닫기 버튼 */}
                 <button
                     onClick={handleClose}
                     style={{
-                        padding: '2px',
+                        padding: '6px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '1px',
-                        width: '20px',
-                        height: '20px',
+                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: '#6b7280',
+                        transition: 'all 0.15s ease'
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#fecaca';
+                        e.currentTarget.style.backgroundColor = '#fee2e2';
+                        e.currentTarget.style.color = '#dc2626';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                     title="닫기"
                 >
-                    <X size={10} style={{ color: '#dc2626' }} />
+                    <X size={14} />
                 </button>
             </div>
         </div>
