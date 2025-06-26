@@ -96,7 +96,7 @@ const SettingsComponent: React.FC = () => {
                 {/* 헤더 */}
                 <div className="bg-white shadow-sm p-4 border-b">
                     <h1 className="text-xl font-bold text-gray-800 text-center">
-                        ⚙️ 환경 설정
+                        ⚙️ 환경 설정 ?
                     </h1>
                 </div>
 
