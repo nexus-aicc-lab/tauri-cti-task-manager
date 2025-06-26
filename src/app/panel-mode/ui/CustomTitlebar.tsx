@@ -190,7 +190,7 @@ interface Props {
     onBackToLauncher: () => void;
 }
 
-export default function CustomTitlebar({ title, onBackToLauncher }: Props) {
+export default function CustomTitlebar({ title }: Props) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
 
