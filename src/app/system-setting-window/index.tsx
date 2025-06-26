@@ -1,6 +1,5 @@
 // src/app/system-setting-window/index.tsx
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 // Extend CSS properties to include webkit-app-region

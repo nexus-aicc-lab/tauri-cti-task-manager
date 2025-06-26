@@ -45,7 +45,7 @@
 
 // 📄 src/route.tsx (수정된 디버그 버전)
 import { createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router'
-import { Launcher } from './pages/Launcher'  // 기존 런처 유지
+import { Launcher } from './app/launcher';
 
 // 간단한 바 모드 테스트
 const SimpleBar = () => {
