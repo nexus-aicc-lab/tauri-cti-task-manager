@@ -4,6 +4,7 @@
 import { useRef } from 'react';
 import { Menu } from 'lucide-react';
 import { exit, relaunch } from '@tauri-apps/plugin-process';
+import { emit } from '@tauri-apps/api/event';
 
 export default function MainSystemMenu() {
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -14,7 +15,6 @@ export default function MainSystemMenu() {
         try {
             const { Menu: TauriMenu, MenuItem } = await import('@tauri-apps/api/menu');
             const { LogicalPosition } = await import('@tauri-apps/api/window');
-            const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
 
             // 멀티계정정보
             const multiAccountItem = await MenuItem.new({
@@ -36,7 +36,7 @@ export default function MainSystemMenu() {
                 },
             });
 
-            // 환경설정
+            // 환경설정 (시스템 설정 창 열기)
             const settingsItem = await MenuItem.new({
                 id: 'settings',
                 text: '환경설정',
@@ -44,20 +44,11 @@ export default function MainSystemMenu() {
                     console.log("⚙️ 환경설정 클릭됨!");
 
                     try {
-                        const win = new WebviewWindow('settings', {
-                            url: '/settings',
-                            title: '환경설정',
-                            width: 600,
-                            height: 400,
-                            resizable: true,
-                            decorations: true,
-                            center: true,
-                        });
-
-                        win.once('tauri://created', () => console.log('✅ 설정 창 생성 완료'));
-                        win.once('tauri://error', (e) => console.error('❌ 설정 창 생성 실패:', e));
+                        // Rust 백엔드에 설정 창 열기 요청
+                        await emit('switch-mode', 'settings');
+                        console.log('✅ 설정 창 열기 요청 전송');
                     } catch (error) {
-                        console.error('❌ 환경설정 창 열기 실패:', error);
+                        console.error('❌ 설정 창 열기 실패:', error);
                     }
                 },
             });
@@ -69,21 +60,16 @@ export default function MainSystemMenu() {
                 action: async () => {
                     console.log("ℹ️ 버전정보 클릭됨!");
 
+                    // 간단한 버전 정보 알림 표시
                     try {
-                        const win = new WebviewWindow('version', {
-                            url: '/version',
-                            title: '버전정보',
-                            width: 400,
-                            height: 300,
-                            resizable: false,
-                            decorations: true,
-                            center: true,
+                        const { confirm } = await import('@tauri-apps/plugin-dialog');
+                        await confirm('CTI Task Manager v1.0.0\n\n제작: CTI Task Manager Team\n빌드: 2024-01-01', {
+                            title: '버전 정보',
+                            kind: 'info'
                         });
-
-                        win.once('tauri://created', () => console.log('✅ 버전정보 창 생성 완료'));
-                        win.once('tauri://error', (e) => console.error('❌ 버전정보 창 생성 실패:', e));
                     } catch (error) {
-                        console.error('❌ 버전정보 창 열기 실패:', error);
+                        console.error('❌ 버전 정보 표시 실패:', error);
+                        alert('CTI Task Manager v1.0.0');
                     }
                 },
             });
@@ -94,10 +80,22 @@ export default function MainSystemMenu() {
                 text: '종료',
                 action: async () => {
                     console.log("🚪 종료 클릭됨!");
+
                     try {
-                        await exit(0);
+                        // 종료 확인 대화상자
+                        const { confirm } = await import('@tauri-apps/plugin-dialog');
+                        const shouldExit = await confirm('정말로 프로그램을 종료하시겠습니까?', {
+                            title: '종료 확인',
+                            kind: 'warning'
+                        });
+
+                        if (shouldExit) {
+                            await exit(0);
+                        }
                     } catch (error) {
                         console.error('❌ 종료 실패:', error);
+                        // fallback: 강제 종료
+                        await exit(0);
                     }
                 },
             });
@@ -143,7 +141,8 @@ export default function MainSystemMenu() {
                 justifyContent: 'center',
                 width: '28px',
                 height: '28px',
-                backgroundColor: 'transparent'
+                backgroundColor: 'transparent',
+                marginRight: '12px'  // 🆕 오른쪽 여백 추가
             }}
         >
             <Menu size={16} />

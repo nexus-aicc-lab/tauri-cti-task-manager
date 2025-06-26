@@ -256,8 +256,8 @@ impl WindowMode {
             WindowMode::Settings => WindowConfig {
                 url: "index.html?mode=settings".into(),
                 title: "CTI Task Master - 환경 설정".into(),
-                width: 600.0,  // 환경 설정에 적절한 크기
-                height: 500.0, // 환경 설정에 적절한 크기
+                width: 900.0,  // 환경 설정에 적절한 크기
+                height: 700.0, // 환경 설정에 적절한 크기
                 min_width: Some(550.0),
                 min_height: Some(450.0),
                 resizable: true, // 크기 조절 가능
