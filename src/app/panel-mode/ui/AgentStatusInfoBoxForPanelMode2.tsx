@@ -18,8 +18,8 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
             label: '대기',
             time: formatTime(12, 0, 34),
             count: 15,
-            bg: 'bg-blue-100',
-            textColor: 'text-blue-600',
+            bg: '#EAF3FF',
+            textColor: '#2563eb', // blue-600
         },
         {
             icon: (
@@ -33,8 +33,8 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
             label: '통화',
             time: formatTime(12, 50, 20),
             count: 12,
-            bg: 'bg-teal-100',
-            textColor: 'text-teal-600',
+            bg: '#ECF9FA',
+            textColor: '#14b8a6', // teal-600
         },
         {
             icon: (
@@ -48,8 +48,8 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
             label: '후처리',
             time: formatTime(0, 34, 20),
             count: 15,
-            bg: 'bg-orange-100',
-            textColor: 'text-orange-600',
+            bg: '#FFEFDE',
+            textColor: '#f97316', // orange-600
         },
         {
             icon: (
@@ -63,8 +63,8 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
             label: '휴식',
             time: formatTime(0, 0, 0),
             count: 0,
-            bg: 'bg-purple-100',
-            textColor: 'text-purple-600',
+            bg: '#F4ECFA',
+            textColor: '#8b5cf6', // purple-600
         },
     ];
 
@@ -74,7 +74,10 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
                 {items.map((item, idx) => (
                     <div
                         key={idx}
-                        className={`${item.bg} rounded-lg p-3 flex flex-col items-center justify-between shadow-sm`}
+                        style={{
+                            backgroundColor: item.bg,
+                        }}
+                        className="rounded-lg p-3 flex flex-col items-center justify-between shadow-sm"
                     >
                         {/* 아이콘만 출력, 배경색 없음 */}
                         <div className="mb-2 flex items-center justify-center">
@@ -84,11 +87,19 @@ const AgentStatusInfoBoxForPanelMode2: React.FC = () => {
                             <div className="text-xs font-medium text-gray-800 mb-1">
                                 {item.label}
                             </div>
-                            <div className={`text-sm font-bold ${item.textColor} mb-1`}>
-                                {item.time}
-                            </div>
-                            <div className={`text-xs font-semibold ${item.textColor}`}>
-                                ({item.count})
+                            <div className="flex items-center justify-center gap-1 mb-1">
+                                <span
+                                    className="text-sm font-bold"
+                                    style={{ color: item.textColor }}
+                                >
+                                    {item.time}
+                                </span>
+                                <span
+                                    className="text-xs font-semibold"
+                                    style={{ color: item.textColor }}
+                                >
+                                    ({item.count})
+                                </span>
                             </div>
                         </div>
                     </div>
