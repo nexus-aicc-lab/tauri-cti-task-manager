@@ -1,9 +1,8 @@
 
-
 'use client';
 
 import React, { useState } from 'react';
-import { PhoneCall, ClipboardList, Users, Phone, Coffee, Clock } from 'lucide-react';
+import { Phone, Edit, Users, Hourglass, Coffee, Clock } from 'lucide-react';
 
 interface Status {
     label: string;
@@ -19,19 +18,19 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
         {
             label: '통화중',
             time: '00:03:45',
-            icon: <PhoneCall className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
+            icon: <Phone className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
             color: '#059669'
         },
         {
             label: '대기중',
             time: '12:03:45',
-            icon: <Clock className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
+            icon: <Hourglass className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
             color: '#3b82f6'
         },
         {
             label: '후처리',
             time: '00:34:20',
-            icon: <ClipboardList className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
+            icon: <Edit className="w-6 sm:w-8 h-6 sm:h-8 text-white" />,
             color: '#f97316'
         },
         {
@@ -414,9 +413,9 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                             }}
                         >
                             <div className="mb-1 sm:mb-3">
-                                {statusIndex === 0 ? <PhoneCall className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
-                                    statusIndex === 1 ? <Clock className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
-                                        statusIndex === 2 ? <ClipboardList className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
+                                {statusIndex === 0 ? <Phone className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
+                                    statusIndex === 1 ? <Hourglass className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
+                                        statusIndex === 2 ? <Edit className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" /> :
                                             <Coffee className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" />}
                             </div>
                             <div className="text-sm sm:text-lg lg:text-xl font-bold mb-1 text-gray-800">
@@ -439,7 +438,7 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                             </div>
                             <div className="min-w-0">
                                 <div className="text-xs sm:text-sm text-gray-500 font-medium">대기호</div>
-                                <div className="text-lg sm:text-2xl font-bold text-gray-800">
+                                <div className="text-lg sm:text-2xl font-bold text-red-600">
                                     {waitQueueCount}
                                 </div>
                             </div>

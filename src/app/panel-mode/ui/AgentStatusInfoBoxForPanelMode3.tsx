@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Phone, PhoneIncoming } from 'lucide-react';
 
@@ -15,29 +17,30 @@ interface SectionData {
 }
 
 const AgentStatusInfoBoxForPanelMode3: React.FC = () => {
+    // 최대값 (차트 높이 계산용)
+    const maxValue = 15;
+
     const inboundData: SectionData = {
         title: '인바운드',
-        icon: <Phone className="w-5 h-5" />,
+        icon: <Phone className="w-5 h-5 text-gray-600" />,
         bars: [
-            { label: '그룹', value: 8, color: 'bg-green-500', time: '05:53:44(8)' },
-            { label: '개인', value: 5, color: 'bg-blue-500', time: '03:53:44(5)' },
-            { label: '팀', value: 7, color: 'bg-purple-500', time: '04:53:44(7)' }
-        ]
+            { label: '개인', value: 15, color: 'bg-pink-400', time: '03:12:44(15)' },
+            { label: '그룹', value: 1, color: 'bg-teal-400', time: '01:10:44(1)' },
+            { label: '팀', value: 1, color: 'bg-sky-400', time: '04:10:44(1)' },
+        ],
     };
 
     const outboundData: SectionData = {
         title: '아웃바운드',
-        icon: <PhoneIncoming className="w-5 h-5" />,
+        icon: <PhoneIncoming className="w-5 h-5 text-gray-600" />,
         bars: [
-            { label: '그룹', value: 8, color: 'bg-green-500', time: '05:53:44(8)' },
-            { label: '개인', value: 5, color: 'bg-blue-500', time: '03:53:44(5)' },
-            { label: '팀', value: 7, color: 'bg-purple-500', time: '04:53:44(7)' }
-        ]
+            { label: '개인', value: 15, color: 'bg-pink-400', time: '03:12:44(15)' },
+            { label: '그룹', value: 1, color: 'bg-teal-400', time: '01:10:44(1)' },
+            { label: '팀', value: 1, color: 'bg-sky-400', time: '04:10:44(1)' },
+        ],
     };
 
-    const maxValue: number = 10;
-
-    const renderSection = (data: SectionData): JSX.Element => (
+    const renderSection = (data: SectionData) => (
         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-4">
             <div className="flex items-center gap-2 mb-4">
                 {data.icon}
@@ -45,13 +48,15 @@ const AgentStatusInfoBoxForPanelMode3: React.FC = () => {
             </div>
 
             <div className="flex gap-6">
-                {/* Chart */}
+                {/* Bar Chart */}
                 <div className="flex items-end gap-2">
-                    {data.bars.map((bar: BarData, idx: number) => (
+                    {data.bars.map((bar, idx) => (
                         <div key={idx} className="flex flex-col items-center">
                             <div
                                 className={`${bar.color} rounded-t-md flex items-end justify-center text-white font-bold text-lg w-12`}
-                                style={{ height: `${(bar.value / maxValue) * 80 + 20}px` }}
+                                style={{
+                                    height: `${(bar.value / maxValue) * 80 + 20}px`,
+                                }}
                             >
                                 {bar.value}
                             </div>
@@ -61,7 +66,7 @@ const AgentStatusInfoBoxForPanelMode3: React.FC = () => {
 
                 {/* Legend */}
                 <div className="flex-1 space-y-2">
-                    {data.bars.map((bar: BarData, idx: number) => (
+                    {data.bars.map((bar, idx) => (
                         <div key={idx} className="flex items-center justify-between py-1">
                             <div className="flex items-center gap-2">
                                 <div className={`w-3 h-3 ${bar.color} rounded`}></div>
