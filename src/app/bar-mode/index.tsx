@@ -748,6 +748,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pin, PinOff, Minus, BetweenHorizontalStart, X, Menu, LogOut } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 
 interface Props {
     onModeChange: (mode: 'launcher' | 'bar' | 'panel' | 'login' | 'settings') => Promise<void>;
@@ -822,28 +823,7 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
         >
             {/* 좌측 시스템 메뉴 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-                <button
-                    style={{
-                        WebkitAppRegion: 'no-drag',
-                        padding: '4px 6px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        borderRadius: 6,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#6b7280',
-                        transition: 'all 0.15s ease',
-                    } as React.CSSProperties}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f3f4f6';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                >
-                    <Menu size={14} />
-                </button>
+                <MainSystemMenu />
 
                 {/* LogOff 버튼 */}
                 <div
@@ -1109,16 +1089,16 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#7dd3fc',
+                        color: '#6b7280',
                         transition: 'all 0.15s ease',
                     } as React.CSSProperties}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f0f9ff';
-                        e.currentTarget.style.color = '#0ea5e9';
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                        e.currentTarget.style.color = '#374151';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#7dd3fc';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                 >
                     <BetweenHorizontalStart size={14} />
@@ -1139,19 +1119,19 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: alwaysOnTop ? '#059669' : '#7dd3fc',
+                        color: alwaysOnTop ? '#059669' : '#6b7280',
                         transition: 'all 0.15s ease',
                     } as React.CSSProperties}
                     onMouseEnter={(e) => {
                         if (!alwaysOnTop) {
-                            e.currentTarget.style.backgroundColor = '#f0f9ff';
-                            e.currentTarget.style.color = '#0ea5e9';
+                            e.currentTarget.style.backgroundColor = '#f3f4f6';
+                            e.currentTarget.style.color = '#374151';
                         }
                     }}
                     onMouseLeave={(e) => {
                         if (!alwaysOnTop) {
                             e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.color = '#7dd3fc';
+                            e.currentTarget.style.color = '#6b7280';
                         }
                     }}
                 >
@@ -1173,16 +1153,16 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#7dd3fc',
+                        color: '#6b7280',
                         transition: 'all 0.15s ease',
                     } as React.CSSProperties}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f0f9ff';
-                        e.currentTarget.style.color = '#0ea5e9';
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                        e.currentTarget.style.color = '#374151';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#7dd3fc';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                 >
                     <Minus size={14} />
@@ -1203,7 +1183,7 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#7dd3fc',
+                        color: '#6b7280',
                         transition: 'all 0.15s ease',
                     } as React.CSSProperties}
                     onMouseEnter={(e) => {
@@ -1212,7 +1192,7 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#7dd3fc';
+                        e.currentTarget.style.color = '#6b7280';
                     }}
                 >
                     <X size={14} />
