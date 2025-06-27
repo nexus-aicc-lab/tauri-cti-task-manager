@@ -1,6 +1,13 @@
 // src/app/system-setting-window/index.tsx
 import React, { useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import GeneralSettings from './ui/GeneralSettings';
+import PersonalSettings from './ui/PersonalSettings';
+import CommunicationSettings from './ui/CommunicationSettings';
+import CallSettings from './ui/CallSettings';
+import MinimapSettings from './ui/MinimapSettings';
+import InfoSettings from './ui/InfoSettings';
+import PanelModeSetting from './ui/PanelModeSetting';
 
 // Extend CSS properties to include webkit-app-region
 interface ExtendedCSSProperties extends React.CSSProperties {
@@ -25,6 +32,9 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
         minimapPosition: 'right',
         version: '1.0.0',
         buildDate: '2024-01-01',
+        panelMode: 'floating',
+        panelSize: 'medium',
+        panelTransparency: 100,
     });
 
     const categories = [
@@ -32,6 +42,7 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
         { name: '개인', icon: '👤' },
         { name: '통신설정', icon: '🌐' },
         { name: '통화설정', icon: '📞' },
+        { name: '패널설정', icon: '🖥️' },
         { name: '미니맵', icon: '🗺️' },
         { name: '정보', icon: 'ℹ️' },
     ];
@@ -59,45 +70,23 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
     };
 
     const renderContent = () => {
+        const componentProps = { settings, updateSetting };
+
         switch (selectedCategory) {
             case '일반':
-                return (
-                    <div className="space-y-4" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="startup"
-                                checked={settings.startupWithWindows}
-                                onChange={e => updateSetting('startupWithWindows', e.target.checked)}
-                                className="mr-3"
-                                style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}
-                            />
-                            <label htmlFor="startup" className="text-sm" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-                                윈도우 시작시 프로그램
-                            </label>
-                        </div>
-                    </div>
-                );
-
+                return <GeneralSettings {...componentProps} />;
             case '개인':
-                return (
-                    <div className="space-y-4" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-                        <label className="block text-sm font-medium mb-2" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-                            개인 정보 수정
-                        </label>
-                        <select
-                            value={settings.language}
-                            onChange={e => updateSetting('language', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 text-sm"
-                            style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}
-                        >
-                            <option value="한국어(KO-KR)">한국어(KO-KR)</option>
-                            <option value="English(EN-US)">English(EN-US)</option>
-                        </select>
-                    </div>
-                );
-
-            // 생략: 나머지 카테고리도 동일하게 WebkitAppRegion 스타일 적용
+                return <PersonalSettings {...componentProps} />;
+            case '통신설정':
+                return <CommunicationSettings {...componentProps} />;
+            case '통화설정':
+                return <CallSettings {...componentProps} />;
+            case '패널설정':
+                return <PanelModeSetting {...componentProps} />;
+            case '미니맵':
+                return <MinimapSettings {...componentProps} />;
+            case '정보':
+                return <InfoSettings {...componentProps} />;
             default:
                 return null;
         }
