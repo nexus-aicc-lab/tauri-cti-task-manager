@@ -35,15 +35,31 @@
     "fs:default",
     "fs:read-all",
     "fs:write-all",
+    "fs:read-dirs",
+    "fs:read-files",
+    "fs:write-files",
+    "fs:read-meta",
     "fs:allow-rename",
     "fs:allow-mkdir",
     "fs:allow-exists",
     "fs:allow-watch",
-    "fs:read-dirs",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    "fs:allow-appdata-read",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-meta",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appdata-meta-recursive",
+    "fs:read-app-specific-dirs-recursive",
     {
       "identifier": "fs:scope",
       "allow": [
-        "**/*"
+        "**/*",
+        "$APPDATA/**/*",
+        "$APPDATA/panel_metrics_config.json"
       ]
     },
     "deep-link:default"

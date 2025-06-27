@@ -1,6 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod windows;
+mod commands;
+mod windows; // 🆕 이 줄 추가
+
+use commands::*; // 🆕 이 줄 추가
 
 use serde::{Deserialize, Serialize};
 use std::{
@@ -526,7 +529,14 @@ fn main() {
             manual_deep_link_test, // 수동 테스트 명령어
             clear_login_data,      // 🆕 로그인 데이터 삭제 명령어 추가
             toggle_always_on_top,
-            get_always_on_top_state
+            get_always_on_top_state,
+            // 🆕 패널 설정 명령어들 추가
+            load_panel_settings,
+            save_panel_settings,
+            toggle_metric_visibility,
+            toggle_all_metrics,
+            reset_panel_settings,
+            get_active_metrics_count
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
