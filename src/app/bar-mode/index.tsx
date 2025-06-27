@@ -458,7 +458,7 @@
 // export default BarModePage;
 
 import React, { useState, useEffect } from 'react';
-import { Pin, PinOff, Minus, BetweenHorizontalStart, X, Menu, LogOut } from 'lucide-react';
+import { Pin, PinOff, Minus, BetweenHorizontalStart, X, LogOut } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 

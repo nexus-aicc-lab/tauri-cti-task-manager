@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, Edit, Users, Hourglass, Coffee, Clock } from 'lucide-react';
+import { Phone, Edit, Users, Hourglass, Coffee } from 'lucide-react';
 
 interface Status {
     label: string;
