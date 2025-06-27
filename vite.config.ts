@@ -67,6 +67,7 @@ export default defineConfig(async () => ({
         protocol: "ws",
         host,
         port: 1421,
+        overlay: false, // ← 이 한 줄이면 됩니다!
       }
       : undefined,
     watch: {

@@ -253,6 +253,7 @@ impl WindowMode {
                 always_on_top: false,
                 decorations: false,
             },
+
             WindowMode::Settings => WindowConfig {
                 url: "index.html?mode=settings".into(),
                 title: "CTI Task Master - 환경 설정".into(),
