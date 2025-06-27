@@ -245,10 +245,10 @@ impl WindowMode {
             WindowMode::Panel => WindowConfig {
                 url: "index.html?mode=panel".into(),
                 title: "CTI Task Master - 패널 모드".into(),
-                width: 1200.0,
-                height: 800.0,
-                min_width: Some(1300.0), // 최소 900px로 레이아웃 보장
-                min_height: Some(830.0), // 최소 600px로 높이 보장
+                width: 1000.0,
+                height: 500.0,
+                min_width: Some(1000.0), // 최소 900px로 레이아웃 보장
+                min_height: Some(500.0), // 최소 600px로 높이 보장
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
