@@ -1,337 +1,710 @@
-import React, { useEffect, useState } from 'react';
+// import React, { useEffect, useState, useCallback } from 'react';
+
+// interface ExtendedCSSProperties extends React.CSSProperties {
+//     WebkitAppRegion?: 'drag' | 'no-drag';
+// }
+
+// interface Region4Components {
+//     customerInfo: boolean;
+//     callHistory: boolean;
+//     notes: boolean;
+//     toolbar: boolean;
+//     script: boolean;
+//     transfer: boolean;
+//     dialpad: boolean;
+//     recording: boolean;
+//     monitoring: boolean;
+//     reporting: boolean;
+//     contacts: boolean;
+//     calendar: boolean;
+// }
+
+// interface PanelConfig {
+//     region1Enabled: boolean;
+//     region2Enabled: boolean;
+//     region3Enabled: boolean;
+//     region4Enabled: boolean;
+//     region5Enabled: boolean;
+//     region4Components: Region4Components;
+//     totalWidth: number;
+//     totalHeight: number;
+// }
+
+// const FiveRegionPanelSettings: React.FC = () => {
+//     const FIXED_SIZES = {
+//         region1Width: 260,
+//         region2Width: 360,
+//         region3Width: 220,
+//         topRegionHeight: 130,
+//         region4Height: 40,
+//         region5Height: 25,
+//         padding: 20,
+//         spacing: 10,
+//         minWidth: 400,
+//         minHeight: 300,
+//     };
+
+//     const [config, setConfig] = useState<PanelConfig>({
+//         region1Enabled: true,
+//         region2Enabled: true,
+//         region3Enabled: true,
+//         region4Enabled: true,
+//         region5Enabled: true,
+//         region4Components: {
+//             customerInfo: true,
+//             callHistory: true,
+//             notes: true,
+//             toolbar: true,
+//             script: true,
+//             transfer: true,
+//             dialpad: true,
+//             recording: true,
+//             monitoring: true,
+//             reporting: false,
+//             contacts: false,
+//             calendar: false,
+//         },
+//         totalWidth: 1000,
+//         totalHeight: 500,
+//     });
+
+//     const [notification, setNotification] = useState<string | null>(null);
+
+//     const getActiveRegion4ComponentsCount = useCallback(
+//         () => Object.values(config.region4Components).filter(Boolean).length,
+//         [config.region4Components]
+//     );
+
+//     // Mapping explicit Tailwind classes for each color to ensure proper JIT generation
+//     const region4ColorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string; iconBorder: string }> = {
+//         orange: { bg: 'bg-orange-100', border: 'border-orange-500', text: 'text-orange-700', iconBg: 'bg-orange-500', iconBorder: 'border-orange-600' },
+//         green: { bg: 'bg-green-100', border: 'border-green-500', text: 'text-green-700', iconBg: 'bg-green-500', iconBorder: 'border-green-600' },
+//         yellow: { bg: 'bg-yellow-100', border: 'border-yellow-500', text: 'text-yellow-700', iconBg: 'bg-yellow-500', iconBorder: 'border-yellow-600' },
+//         indigo: { bg: 'bg-indigo-100', border: 'border-indigo-500', text: 'text-indigo-700', iconBg: 'bg-indigo-500', iconBorder: 'border-indigo-600' },
+//         blue: { bg: 'bg-blue-100', border: 'border-blue-500', text: 'text-blue-700', iconBg: 'bg-blue-500', iconBorder: 'border-blue-600' },
+//         red: { bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-700', iconBg: 'bg-red-500', iconBorder: 'border-red-600' },
+//         cyan: { bg: 'bg-cyan-100', border: 'border-cyan-500', text: 'text-cyan-700', iconBg: 'bg-cyan-500', iconBorder: 'border-cyan-600' },
+//         rose: { bg: 'bg-rose-100', border: 'border-rose-500', text: 'text-rose-700', iconBg: 'bg-rose-500', iconBorder: 'border-rose-600' },
+//         teal: { bg: 'bg-teal-100', border: 'border-teal-500', text: 'text-teal-700', iconBg: 'bg-teal-500', iconBorder: 'border-teal-600' },
+//         violet: { bg: 'bg-violet-100', border: 'border-violet-500', text: 'text-violet-700', iconBg: 'bg-violet-500', iconBorder: 'border-violet-600' },
+//         lime: { bg: 'bg-lime-100', border: 'border-lime-500', text: 'text-lime-700', iconBg: 'bg-lime-500', iconBorder: 'border-lime-600' },
+//         amber: { bg: 'bg-amber-100', border: 'border-amber-500', text: 'text-amber-700', iconBg: 'bg-amber-500', iconBorder: 'border-amber-600' },
+//     };
+
+//     useEffect(() => {
+//         const { padding, region1Width, region2Width, region3Width, spacing, minWidth, topRegionHeight, region4Height, region5Height, minHeight } = FIXED_SIZES;
+//         let calculatedWidth = padding * 2;
+//         let activeTopRegions = 0;
+
+//         if (config.region1Enabled) { calculatedWidth += region1Width; activeTopRegions++; }
+//         if (config.region2Enabled) { calculatedWidth += region2Width; activeTopRegions++; }
+//         if (config.region3Enabled) { calculatedWidth += region3Width; activeTopRegions++; }
+//         if (activeTopRegions > 1) { calculatedWidth += spacing * (activeTopRegions - 1); }
+//         calculatedWidth = Math.max(calculatedWidth, minWidth);
+
+//         let calculatedHeight = padding * 2;
+//         let activeVerticalRegions = 0;
+
+//         if (config.region1Enabled || config.region2Enabled || config.region3Enabled) { calculatedHeight += topRegionHeight; activeVerticalRegions++; }
+//         if (config.region4Enabled) {
+//             const count4 = getActiveRegion4ComponentsCount();
+//             calculatedHeight += count4 > 8 ? region4Height * 2 : region4Height;
+//             activeVerticalRegions++;
+//         }
+//         if (config.region5Enabled) { calculatedHeight += region5Height; activeVerticalRegions++; }
+//         if (activeVerticalRegions > 1) { calculatedHeight += spacing * (activeVerticalRegions - 1); }
+//         calculatedHeight = Math.max(calculatedHeight, minHeight);
+
+//         setConfig(prev => ({ ...prev, totalWidth: calculatedWidth, totalHeight: calculatedHeight }));
+//     }, [
+//         config.region1Enabled,
+//         config.region2Enabled,
+//         config.region3Enabled,
+//         config.region4Enabled,
+//         config.region5Enabled,
+//         getActiveRegion4ComponentsCount,
+//         FIXED_SIZES,
+//     ]);
+
+//     const toggleRegion = (key: keyof PanelConfig) => {
+//         setConfig(prev => ({ ...prev, [key]: !prev[key] }));
+//     };
+
+//     const toggleRegion4Component = (key: keyof Region4Components) => {
+//         setConfig(prev => ({
+//             ...prev,
+//             region4Components: {
+//                 ...prev.region4Components,
+//                 [key]: !prev.region4Components[key],
+//             },
+//         }));
+//     };
+
+//     const showNotification = (msg: string) => {
+//         setNotification(msg);
+//         setTimeout(() => setNotification(null), 3000);
+//     };
+
+//     const getActiveRegionCount = () =>
+//         [config.region1Enabled, config.region2Enabled, config.region3Enabled, config.region4Enabled, config.region5Enabled].filter(Boolean).length;
+
+//     const hasAnyTopRegion = config.region1Enabled || config.region2Enabled || config.region3Enabled;
+
+//     const region4ComponentsData = [
+//         { key: 'customerInfo', name: '고객정보', icon: '👤', color: 'orange' },
+//         { key: 'callHistory', name: '통화이력', icon: '📞', color: 'green' },
+//         { key: 'notes', name: '메모', icon: '📝', color: 'yellow' },
+//         { key: 'toolbar', name: '툴바', icon: '🔧', color: 'indigo' },
+//         { key: 'script', name: '스크립트', icon: '📜', color: 'blue' },
+//         { key: 'transfer', name: '호전환', icon: '🔄', color: 'red' },
+//         { key: 'dialpad', name: '다이얼패드', icon: '🔢', color: 'cyan' },
+//         { key: 'recording', name: '녹음제어', icon: '🎙️', color: 'rose' },
+//         { key: 'monitoring', name: '모니터링', icon: '👁️', color: 'teal' },
+//         { key: 'reporting', name: '실시간통계', icon: '📊', color: 'violet' },
+//         { key: 'contacts', name: '연락처', icon: '📇', color: 'lime' },
+//         { key: 'calendar', name: '일정관리', icon: '📅', color: 'amber' },
+//     ];
+
+//     return (
+//         <div className="w-full h-screen bg-gray-50 flex flex-col overflow-hidden" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
+//             {notification && (
+//                 <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-3 py-2 rounded-lg shadow-lg text-sm">
+//                     <div className="flex items-center gap-2">
+//                         <span>✅</span>
+//                         <span>{notification}</span>
+//                         <button onClick={() => setNotification(null)} className="ml-2 hover:text-gray-200">✕</button>
+//                     </div>
+//                 </div>
+//             )}
+
+//             <div className="bg-white border-b px-4 py-2">
+//                 <h1 className="text-lg font-bold text-gray-800 text-center">CTI Task Master - 패널 설정</h1>
+//             </div>
+
+//             <div className="p-3" style={{ height: '55vh', maxHeight: '55vh' }}>
+//                 <div className="h-full grid grid-cols-12 gap-3">
+//                     {/* Left Preview Panel */}
+//                     <div className="col-span-5">
+//                         <div className="bg-white rounded-lg shadow-md h-full p-3">
+//                             <div className="border-2 border-gray-300 bg-gray-50 rounded-lg p-3 relative h-full">
+//                                 <div className="absolute top-1 right-1 text-xs bg-black text-white px-2 py-1 rounded z-10 font-bold">
+//                                     {config.totalWidth} × {config.totalHeight}px
+//                                 </div>
+//                                 <div className="h-full flex flex-col gap-2">
+//                                     {hasAnyTopRegion && (
+//                                         <div className="flex gap-2" style={{ height: '70%' }}>
+//                                             {config.region1Enabled && (
+//                                                 <div
+//                                                     className="rounded-lg border-2 border-teal-500 bg-teal-50 p-3 flex flex-col cursor-pointer transition-all duration-200 hover:scale-105"
+//                                                     style={{
+//                                                         flex: `0 0 ${(FIXED_SIZES.region1Width /
+//                                                             ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) +
+//                                                                 (config.region2Enabled ? FIXED_SIZES.region2Width : 0) +
+//                                                                 (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%`,
+//                                                     }}
+//                                                     onClick={() => toggleRegion('region1Enabled')}
+//                                                 >
+//                                                     <div className="flex items-center justify-center flex-1 mb-2">
+//                                                         <div className="w-16 h-16 bg-teal-400 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">통화중</div>
+//                                                     </div>
+//                                                     <div className="grid grid-cols-2 gap-2">
+//                                                         <div className="bg-white rounded text-center py-2 text-xs border">
+//                                                             <div className="text-gray-500 mb-1">대기</div>
+//                                                             <div className="font-bold text-lg">5</div>
+//                                                         </div>
+//                                                         <div className="bg-white rounded text-center py-2 text-xs border">
+//                                                             <div className="text-gray-500 mb-1">상담</div>
+//                                                             <div className="font-bold text-lg">1</div>
+//                                                         </div>
+//                                                     </div>
+//                                                 </div>
+//                                             )}
+//                                             {config.region2Enabled && (
+//                                                 <div
+//                                                     className="grid grid-cols-2 gap-2 border-2 border-blue-500 bg-blue-50 rounded-lg p-3 cursor-pointer transition-all duration-200 hover:scale-105"
+//                                                     style={{
+//                                                         flex: `0 0 ${(FIXED_SIZES.region2Width /
+//                                                             ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) +
+//                                                                 (config.region2Enabled ? FIXED_SIZES.region2Width : 0) +
+//                                                                 (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%`,
+//                                                     }}
+//                                                     onClick={() => toggleRegion('region2Enabled')}
+//                                                 >
+//                                                     <div className="bg-blue-300 rounded flex items-center justify-center text-sm font-medium py-3">대기</div>
+//                                                     <div className="bg-teal-300 rounded flex items-center justify-center text-sm font-medium py-3">통화</div>
+//                                                     <div className="bg-orange-300 rounded flex items-center justify-center text-sm font-medium py-3">후처리</div>
+//                                                     <div className="bg-purple-300 rounded flex items-center justify-center text-sm font-medium py-3">휴식</div>
+//                                                 </div>
+//                                             )}
+//                                             {config.region3Enabled && (
+//                                                 <div
+//                                                     className="flex flex-col gap-2 border-2 border-pink-500 bg-pink-50 rounded-lg p-3 cursor-pointer transition-all duration-200 hover:scale-105"
+//                                                     style={{
+//                                                         flex: `0 0 ${(FIXED_SIZES.region3Width /
+//                                                             ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) +
+//                                                                 (config.region2Enabled ? FIXED_SIZES.region2Width : 0) +
+//                                                                 (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%`,
+//                                                     }}
+//                                                     onClick={() => toggleRegion('region3Enabled')}
+//                                                 >
+//                                                     <div className="flex-1 bg-pink-300 rounded flex items-center justify-center text-sm font-medium">일반폰드</div>
+//                                                     <div className="flex-1 bg-pink-300 rounded flex items-center justify-center text-sm font-medium">아웃바운드</div>
+//                                                 </div>
+//                                             )}
+//                                         </div>
+//                                     )}
+
+//                                     {/* Updated Region4 Preview: dynamic flex-wrap */}
+//                                     {config.region4Enabled && (
+//                                         <div
+//                                             className="rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 border-2 bg-purple-100 border-purple-500 p-2 flex flex-col justify-center"
+//                                             style={{ height: getActiveRegion4ComponentsCount() > 8 ? '25%' : '15%' }}
+//                                             onClick={() => toggleRegion('region4Enabled')}
+//                                         >
+//                                             {
+//                                                 getActiveRegion4ComponentsCount() === 0 ? (
+//                                                     <div className="text-gray-500 text-xs text-center">구성요소 없음</div>
+//                                                 ) : (
+//                                                     <div className="flex flex-wrap gap-1 justify-center">
+//                                                         {region4ComponentsData.filter(({ key }) => config.region4Components[key as keyof Region4Components]).map(({ key, name, icon }) => (
+//                                                             <div key={key} className="bg-purple-300 text-xs px-1 py-0.5 rounded flex items-center gap-1">
+//                                                                 <span>{icon}</span>
+//                                                                 <span>{name}</span>
+//                                                             </div>
+//                                                         ))}
+//                                                     </div>
+//                                                 )
+//                                             }
+//                                         </div>
+//                                     )}
+
+//                                     {config.region5Enabled && (
+//                                         <div
+//                                             className="rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 flex items-center justify-between px-3 text-sm border-2 bg-gray-200 border-gray-600"
+//                                             style={{ height: '10%' }}
+//                                             onClick={() => toggleRegion('region5Enabled')}
+//                                         >
+//                                             <span className="font-medium text-sm">LogOn: 44:42:17</span>
+//                                             <span className="text-green-600 font-bold text-sm">● 온라인</span>
+//                                         </div>
+//                                     )}
+
+//                                     {getActiveRegionCount() === 0 && (
+//                                         <div className="h-full flex items-center justify-center text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
+//                                             <div className="text-center">
+//                                                 <div className="text-2xl mb-1">📋</div>
+//                                                 <div className="text-xs">영역을 선택하세요</div>
+//                                             </div>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                             </div>
+//                         </div>
+//                     </div>
+
+//                     {/* Center Controls */}
+//                     <div className="col-span-4">
+//                         <div className="bg-white rounded-lg shadow-md h-full p-3 flex flex-col">
+//                             <h3 className="text-md font-bold text-gray-800 mb-2 text-center">영역 선택</h3>
+//                             <div className="space-y-2 flex-1 overflow-y-auto">
+//                                 {[
+//                                     { key: 'region1Enabled', name: '📞 통화중 박스', color: 'teal', num: '1' },
+//                                     { key: 'region2Enabled', name: '📊 상태 박스', color: 'blue', num: '2' },
+//                                     { key: 'region3Enabled', name: '📋 폰드 정보', color: 'pink', num: '3' },
+//                                     { key: 'region4Enabled', name: '📄 하단 정보', color: 'purple', num: '4' },
+//                                     { key: 'region5Enabled', name: '👤 로그온 정보', color: 'gray', num: '5' },
+//                                 ].map(({ key, name, color, num }) => (
+//                                     <div
+//                                         key={key}
+//                                         className={`p-2 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${config[key as keyof PanelConfig] ? `bg-${color}-100 border-${color}-500 shadow-md` : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`}
+//                                         onClick={() => toggleRegion(key as keyof PanelConfig)}
+//                                     >
+//                                         <div className="flex items-center gap-2">
+//                                             <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border-2 ${config[key as keyof PanelConfig] ? `bg-${color}-500 text-white border-${color}-600` : 'bg-gray-200 text-gray-500 border-gray-300'}`}>{num}</div>
+//                                             <div className="flex-1 min-w-0">
+//                                                 <div className={`font-bold text-xs ${config[key as keyof PanelConfig] ? `text-${color}-700` : 'text-gray-600'}`}>{name}</div>
+//                                             </div>
+//                                             <div className={`text-sm ${config[key as keyof PanelConfig] ? `text-${color}-500` : 'text-gray-400'}`}>{config[key as keyof PanelConfig] ? '✓' : '○'}</div>
+//                                         </div>
+//                                     </div>
+//                                 ))}
+//                             </div>
+//                             <div className="mt-1 p-2 bg-blue-50 rounded-lg text-center">
+//                                 <div className="text-blue-800 font-bold text-xs">선택: {getActiveRegionCount()}/5개</div>
+//                                 <div className="text-blue-600 text-xs mt-1">{config.totalWidth} × {config.totalHeight}px</div>
+//                             </div>
+//                             <div className="mt-1 bg-green-100 rounded-lg p-2">
+//                                 <div className="text-green-800 font-bold text-center text-xs">🎯 Native 창 크기</div>
+//                                 <div className="text-green-700 text-sm font-bold text-center">{config.totalWidth} × {config.totalHeight}px</div>
+//                                 <div className="text-green-600 text-xs text-center">DPI 자동 적용</div>
+//                             </div>
+//                         </div>
+//                     </div>
+
+//                     {/* Right Region4 Components Controls */}
+//                     <div className="col-span-3">
+//                         <div className="bg-white rounded-lg shadow-md h-full p-3 flex flex-col">
+//                             <h3 className="text-md font-bold text-purple-800 mb-2 text-center">4영역 구성요소</h3>
+//                             {!config.region4Enabled ? (
+//                                 <div className="flex-1 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg p-2">
+//                                     <div className="text-center">
+//                                         <div className="text-lg mb-1">🔒</div>
+//                                         <div className="text-xs">4영역 활성화 필요</div>
+//                                     </div>
+//                                 </div>
+//                             ) : (
+//                                 <>
+//                                     <div className="grid grid-cols-2 gap-1 flex-1 overflow-y-auto">
+//                                         {region4ComponentsData.map(({ key, name, icon, color }) => {
+//                                             const classes = region4ColorClasses[color];
+//                                             const isActive = config.region4Components[key as keyof Region4Components];
+//                                             return (
+//                                                 <div
+//                                                     key={key}
+//                                                     className={`${isActive ? `${classes.bg} ${classes.border} shadow-md` : 'bg-gray-50 border-gray-300 hover:border-gray-400'} p-1 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105`}
+//                                                     onClick={() => toggleRegion4Component(key as keyof Region4Components)}
+//                                                 >
+//                                                     <div className="flex items-center gap-1">
+//                                                         <div
+//                                                             className={`${isActive ? `${classes.iconBg} text-white ${classes.iconBorder}` : 'bg-gray-200 text-gray-500 border-gray-300'} w-4 h-4 rounded-full flex items-center justify-center text-xs`}
+//                                                         >
+//                                                             {icon}
+//                                                         </div>
+//                                                         <div className={`flex-1 min-w-0 font-bold text-xs ${isActive ? classes.text : 'text-gray-600'}`}>{name}</div>
+//                                                         <div className={`text-sm font-bold ${isActive ? classes.text : 'text-gray-400'}`}>{isActive ? '✓' : '○'}</div>
+//                                                     </div>
+//                                                 </div>
+//                                             );
+//                                         })}
+//                                     </div>
+//                                     <div className="mt-1 p-1 bg-purple-50 rounded-lg text-center">
+//                                         <div className="text-purple-800 font-bold text-xs">구성요소: {getActiveRegion4ComponentsCount()}/12개</div>
+//                                         {getActiveRegion4ComponentsCount() > 8 && (
+//                                             <div className="text-purple-600 text-xs">높이 2배 적용</div>
+//                                         )}
+//                                     </div>
+//                                 </>
+//                             )}
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             {/* Footer Buttons */}
+//             <div className="bg-white border-t p-2">
+//                 <div className="flex gap-2 justify-center">
+//                     <button
+//                         onClick={() => {
+//                             setConfig(prev => {
+//                                 const allEnabledComponents = (Object.keys(prev.region4Components) as (keyof Region4Components)[]).reduce((acc, key) => {
+//                                     acc[key] = true;
+//                                     return acc;
+//                                 }, {} as Region4Components);
+//                                 return { ...prev, region1Enabled: true, region2Enabled: true, region3Enabled: true, region4Enabled: true, region5Enabled: true, region4Components: allEnabledComponents };
+//                             });
+//                             showNotification('모든 영역과 구성요소가 활성화되었습니다!');
+//                         }}
+//                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm"
+//                     >🔛 전체 활성화</button>
+//                     <button
+//                         onClick={() => { console.log('Tauri Native 설정:', { ...config, fixedSizes: FIXED_SIZES }); showNotification(`Native: ${config.totalWidth}×${config.totalHeight}px`); }}
+//                         className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium text-sm"
+//                     >✅ 설정 적용</button>
+//                     <button
+//                         onClick={() => {
+//                             setConfig({
+//                                 region1Enabled: true,
+//                                 region2Enabled: true,
+//                                 region3Enabled: true,
+//                                 region4Enabled: true,
+//                                 region5Enabled: true,
+//                                 region4Components: {
+//                                     customerInfo: true,
+//                                     callHistory: true,
+//                                     notes: false,
+//                                     toolbar: true,
+//                                     script: false,
+//                                     transfer: false,
+//                                     dialpad: false,
+//                                     recording: false,
+//                                     monitoring: false,
+//                                     reporting: false,
+//                                     contacts: false,
+//                                     calendar: false,
+//                                 },
+//                                 totalWidth: 1000,
+//                                 totalHeight: 500,
+//                             });
+//                             showNotification('기본값으로 초기화되었습니다!');
+//                         }}
+//                         className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm"
+//                     >🔄 초기화</button>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default FiveRegionPanelSettings;
+
+import React, { useEffect, useState, useCallback } from 'react';
+import { getCurrentWindow, PhysicalSize } from '@tauri-apps/api/window';
 
 interface ExtendedCSSProperties extends React.CSSProperties {
     WebkitAppRegion?: 'drag' | 'no-drag';
 }
 
-interface PanelConfig {
-    // 영역 활성화 상태
-    region1Enabled: boolean; // 상단 3개 박스 영역
-    region2Enabled: boolean; // 하단 정보 영역
-    region3Enabled: boolean; // 로그온 정보 영역
-
-    // 각 영역별 높이
-    region1Height: number;
-    region2Height: number;
-    region3Height: number;
-
-    // 전체 크기 설정
-    totalWidth: number;
-    totalHeight: number;
-    padding: number;
-    spacing: number;
+interface Region4Components {
+    customerInfo: boolean;
+    callHistory: boolean;
+    notes: boolean;
+    toolbar: boolean;
+    script: boolean;
+    transfer: boolean;
+    dialpad: boolean;
+    recording: boolean;
+    monitoring: boolean;
+    reporting: boolean;
+    contacts: boolean;
+    calendar: boolean;
 }
 
-const ThreeRegionPanelSettings: React.FC = () => {
+interface PanelConfig {
+    region1Enabled: boolean;
+    region2Enabled: boolean;
+    region3Enabled: boolean;
+    region4Enabled: boolean;
+    region5Enabled: boolean;
+    region4Components: Region4Components;
+    totalWidth: number;
+    totalHeight: number;
+}
+
+const FiveRegionPanelSettings: React.FC = () => {
+    const FIXED_SIZES = {
+        region1Width: 260,
+        region2Width: 360,
+        region3Width: 220,
+        topRegionHeight: 130,
+        region4Height: 40,
+        region5Height: 25,
+        padding: 20,
+        spacing: 10,
+        minWidth: 400,
+        minHeight: 300,
+    };
+
     const [config, setConfig] = useState<PanelConfig>({
         region1Enabled: true,
         region2Enabled: true,
         region3Enabled: true,
-        region1Height: 150,
-        region2Height: 40,
-        region3Height: 25,
+        region4Enabled: true,
+        region5Enabled: true,
+        region4Components: {
+            customerInfo: true,
+            callHistory: true,
+            notes: true,
+            toolbar: true,
+            script: true,
+            transfer: true,
+            dialpad: true,
+            recording: true,
+            monitoring: true,
+            reporting: false,
+            contacts: false,
+            calendar: false,
+        },
         totalWidth: 1000,
-        totalHeight: 0,
-        padding: 15, // 기본값으로 유지 (표시용)
-        spacing: 8,  // 기본값으로 유지 (표시용)
+        totalHeight: 500,
     });
 
-    // 자동 높이 계산
+    const [notification, setNotification] = useState<string | null>(null);
+
+    const getActiveRegion4ComponentsCount = useCallback(
+        () => Object.values(config.region4Components).filter(Boolean).length,
+        [config.region4Components]
+    );
+
     useEffect(() => {
-        let calculatedHeight = 30; // 기본 패딩 (고정)
-        let activeRegions = 0;
+        const { padding, region1Width, region2Width, region3Width, spacing, minWidth, topRegionHeight, region4Height, region5Height, minHeight } = FIXED_SIZES;
+        let calculatedWidth = padding * 2;
+        let activeTopRegions = 0;
 
-        if (config.region1Enabled) { calculatedHeight += config.region1Height; activeRegions++; }
-        if (config.region2Enabled) { calculatedHeight += config.region2Height; activeRegions++; }
-        if (config.region3Enabled) { calculatedHeight += config.region3Height; activeRegions++; }
+        if (config.region1Enabled) { calculatedWidth += region1Width; activeTopRegions++; }
+        if (config.region2Enabled) { calculatedWidth += region2Width; activeTopRegions++; }
+        if (config.region3Enabled) { calculatedWidth += region3Width; activeTopRegions++; }
+        if (activeTopRegions > 1) { calculatedWidth += spacing * (activeTopRegions - 1); }
+        calculatedWidth = Math.max(calculatedWidth, minWidth);
 
-        // 영역간 간격 추가 (고정값)
-        if (activeRegions > 1) {
-            calculatedHeight += 10 * (activeRegions - 1);
+        let calculatedHeight = padding * 2;
+        let activeVerticalRegions = 0;
+
+        if (config.region1Enabled || config.region2Enabled || config.region3Enabled) {
+            calculatedHeight += topRegionHeight;
+            activeVerticalRegions++;
         }
+        if (config.region4Enabled) {
+            const count4 = getActiveRegion4ComponentsCount();
+            calculatedHeight += count4 >= 7 ? region4Height * 2 : region4Height;
+            activeVerticalRegions++;
+        }
+        if (config.region5Enabled) {
+            calculatedHeight += region5Height;
+            activeVerticalRegions++;
+        }
+        if (activeVerticalRegions > 1) {
+            calculatedHeight += spacing * (activeVerticalRegions - 1);
+        }
+        calculatedHeight = Math.max(calculatedHeight, minHeight);
 
-        setConfig(prev => ({ ...prev, totalHeight: calculatedHeight }));
-    }, [config.region1Enabled, config.region2Enabled, config.region3Enabled,
-    config.region1Height, config.region2Height, config.region3Height]);
+        setConfig(prev => ({ ...prev, totalWidth: calculatedWidth, totalHeight: calculatedHeight }));
 
-    // 영역 토글
-    const toggleRegion = (regionKey: keyof PanelConfig) => {
-        setConfig(prev => ({ ...prev, [regionKey]: !prev[regionKey] }));
-    };
+        // 실제 창 크기 조절
+        const resizeWindow = async () => {
+            try {
+                const window = getCurrentWindow();
+                await window.setSize(new PhysicalSize(calculatedWidth, calculatedHeight));
+            } catch (e) {
+                console.error("Window resize failed. Are you in a Tauri environment?", e);
+            }
+        };
+        resizeWindow();
 
-    // 높이 변경
-    const updateHeight = (regionKey: keyof PanelConfig, value: number) => {
-        setConfig(prev => ({ ...prev, [regionKey]: value }));
-    };
+    }, [
+        config.region1Enabled, config.region2Enabled, config.region3Enabled, config.region4Enabled, config.region5Enabled,
+        getActiveRegion4ComponentsCount,
+        FIXED_SIZES,
+    ]);
 
-    // 영역 정보
-    const regions = [
-        { key: 'region1', title: '영역 1 - 상단 3개 박스', height: config.region1Height },
-        { key: 'region2', title: '영역 2 - 하단 정보', height: config.region2Height },
-        { key: 'region3', title: '영역 3 - 로그온 정보', height: config.region3Height },
+
+    const toggleRegion = (key: keyof PanelConfig) => { setConfig(prev => ({ ...prev, [key]: !prev[key] })); };
+    const toggleRegion4Component = (key: keyof Region4Components) => { setConfig(prev => ({ ...prev, region4Components: { ...prev.region4Components, [key]: !prev.region4Components[key] } })); };
+    const showNotification = (msg: string) => { setNotification(msg); setTimeout(() => setNotification(null), 3000); };
+    const getActiveRegionCount = () => [config.region1Enabled, config.region2Enabled, config.region3Enabled, config.region4Enabled, config.region5Enabled].filter(Boolean).length;
+    const hasAnyTopRegion = config.region1Enabled || config.region2Enabled || config.region3Enabled;
+
+    const region4ComponentsData = [
+        { key: 'customerInfo', name: '고객정보', icon: '👤', color: 'orange' }, { key: 'callHistory', name: '통화이력', icon: '📞', color: 'green' }, { key: 'notes', name: '메모', icon: '📝', color: 'yellow' },
+        { key: 'toolbar', name: '툴바', icon: '🔧', color: 'indigo' }, { key: 'script', name: '스크립트', icon: '📜', color: 'blue' }, { key: 'transfer', name: '호전환', icon: '🔄', color: 'red' },
+        { key: 'dialpad', name: '다이얼패드', icon: '🔢', color: 'cyan' }, { key: 'recording', name: '녹음제어', icon: '🎙️', color: 'rose' }, { key: 'monitoring', name: '모니터링', icon: '👁️', color: 'teal' },
+        { key: 'reporting', name: '실시간통계', icon: '📊', color: 'violet' }, { key: 'contacts', name: '연락처', icon: '📇', color: 'lime' }, { key: 'calendar', name: '일정관리', icon: '📅', color: 'amber' },
     ];
 
     return (
-        <div className="p-6 max-w-5xl mx-auto" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-            {/* 제목 */}
-            <div className="text-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">패널 영역 시각적 설정</h1>
-                <p className="text-gray-600">3개 영역 구성: 상단 3개 박스 + 하단정보 + 로그온</p>
-            </div>
+        <div className="w-full h-screen bg-gray-50 flex flex-col overflow-hidden" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
+            {notification && (
+                <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-3 py-2 rounded-lg shadow-lg text-sm">
+                    <div className="flex items-center gap-2"><span>✅</span><span>{notification}</span><button onClick={() => setNotification(null)} className="ml-2 hover:text-gray-200">✕</button></div>
+                </div>
+            )}
 
-            {/* 미리보기 박스 */}
-            <div className="mb-6">
-                <h2 className="text-lg font-semibold mb-4">📱 미리보기</h2>
+            <div className="bg-white border-b px-4 py-2"><h1 className="text-lg font-bold text-gray-800 text-center">CTI Task Master - 패널 설정</h1></div>
 
-                <div className="flex justify-center">
-                    <div
-                        className="border-2 border-gray-400 bg-white rounded-lg p-2 relative"
-                        style={{
-                            width: '600px',
-                            height: '450px'
-                        }}
-                    >
-                        {/* 크기 표시 */}
-                        <div className="absolute top-2 right-2 text-xs bg-black text-white px-2 py-1 rounded z-10">
-                            {config.totalWidth} × {config.totalHeight}px
+            <div className="flex-1 p-3 overflow-y-auto">
+                <div className="grid grid-cols-12 gap-3">
+                    {/* 미리보기 패널 */}
+                    <div className="col-span-5">
+                        <div className="bg-white rounded-lg shadow-md h-full p-3">
+                            <div className="border-2 border-gray-300 bg-gray-50 rounded-lg p-3 relative h-full">
+                                <div className="absolute top-1 right-1 text-xs bg-black text-white px-2 py-1 rounded z-10">{config.totalWidth} × {config.totalHeight}px</div>
+                                <div className="h-full flex flex-col gap-2">
+                                    {hasAnyTopRegion && (
+                                        <div className="flex gap-2" style={{ height: '70%' }}>
+                                            {config.region1Enabled && <div className="rounded-lg border-2 border-teal-500 bg-teal-50 p-3 flex flex-col cursor-pointer" style={{ flexBasis: `${(FIXED_SIZES.region1Width / ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) + (config.region2Enabled ? FIXED_SIZES.region2Width : 0) + (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%` }} onClick={() => toggleRegion('region1Enabled')}><div className="flex items-center justify-center flex-1 mb-2"><div className="w-16 h-16 bg-teal-400 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">통화중</div></div><div className="grid grid-cols-2 gap-2"><div className="bg-white rounded text-center py-2 text-xs border"><div className="text-gray-500 mb-1">대기</div><div className="font-bold text-lg">5</div></div><div className="bg-white rounded text-center py-2 text-xs border"><div className="text-gray-500 mb-1">상담</div><div className="font-bold text-lg">1</div></div></div></div>}
+                                            {config.region2Enabled && <div className="grid grid-cols-2 gap-2 border-2 border-blue-500 bg-blue-50 rounded-lg p-3 cursor-pointer" style={{ flexBasis: `${(FIXED_SIZES.region2Width / ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) + (config.region2Enabled ? FIXED_SIZES.region2Width : 0) + (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%` }} onClick={() => toggleRegion('region2Enabled')}><div className="bg-blue-300 rounded flex items-center justify-center text-sm font-medium">대기</div><div className="bg-teal-300 rounded flex items-center justify-center text-sm font-medium">통화</div><div className="bg-orange-300 rounded flex items-center justify-center text-sm font-medium">후처리</div><div className="bg-purple-300 rounded flex items-center justify-center text-sm font-medium">휴식</div></div>}
+                                            {config.region3Enabled && <div className="flex flex-col gap-2 border-2 border-pink-500 bg-pink-50 rounded-lg p-3 cursor-pointer" style={{ flexBasis: `${(FIXED_SIZES.region3Width / ((config.region1Enabled ? FIXED_SIZES.region1Width : 0) + (config.region2Enabled ? FIXED_SIZES.region2Width : 0) + (config.region3Enabled ? FIXED_SIZES.region3Width : 0))) * 100}%` }} onClick={() => toggleRegion('region3Enabled')}><div className="flex-1 bg-pink-300 rounded flex items-center justify-center text-sm font-medium">일반폰드</div><div className="flex-1 bg-pink-300 rounded flex items-center justify-center text-sm font-medium">아웃바운드</div></div>}
+                                        </div>
+                                    )}
+                                    {config.region4Enabled && (
+                                        <div className="rounded-lg cursor-pointer border-2 bg-purple-100 border-purple-500 p-2 flex flex-col justify-center" style={{ minHeight: getActiveRegion4ComponentsCount() >= 7 ? '25%' : '15%' }} onClick={() => toggleRegion('region4Enabled')}>
+                                            {getActiveRegion4ComponentsCount() > 0 ? (
+                                                <div className="grid grid-cols-6 gap-1">
+                                                    {region4ComponentsData.filter(({ key }) => config.region4Components[key as keyof Region4Components]).map(({ key, name, icon }) => (
+                                                        <div key={key} className="bg-purple-200 text-xs px-1 py-0.5 rounded flex items-center gap-0.5 justify-center" title={name}>
+                                                            <span>{icon}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-gray-500 text-xs text-center">구성요소 없음</div>
+                                            )}
+                                        </div>
+                                    )}
+                                    {config.region5Enabled && <div className="rounded-lg cursor-pointer flex items-center justify-between px-3 text-sm border-2 bg-gray-200 border-gray-600" style={{ height: '10%' }} onClick={() => toggleRegion('region5Enabled')}><span className="font-medium text-sm">LogOn: 44:42:17</span><span className="text-green-600 font-bold text-sm">● 온라인</span></div>}
+                                    {getActiveRegionCount() === 0 && <div className="h-full flex items-center justify-center text-gray-500 border-2 border-dashed border-gray-300 rounded-lg"><div className="text-center"><div className="text-2xl mb-1">📋</div><div className="text-xs">영역을 선택하세요</div></div></div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 제어 패널 */}
+                    <div className="col-span-7 grid grid-cols-2 gap-3">
+                        <div className="col-span-1">
+                            <div className="bg-white rounded-lg shadow-md h-full p-3 flex flex-col">
+                                <h3 className="text-md font-bold text-gray-800 mb-2 text-center">영역 선택</h3>
+                                <div className="space-y-2 flex-1">
+                                    {[
+                                        { key: 'region1Enabled', name: '📞 통화중 박스', color: 'teal', num: '1' }, { key: 'region2Enabled', name: '📊 상태 박스', color: 'blue', num: '2' },
+                                        { key: 'region3Enabled', name: '📋 폰드 정보', color: 'pink', num: '3' }, { key: 'region4Enabled', name: '📄 하단 정보', color: 'purple', num: '4' },
+                                        { key: 'region5Enabled', name: '👤 로그온 정보', color: 'gray', num: '5' },
+                                    ].map(({ key, name, color, num }) => (
+                                        <div key={key} className={`p-2 rounded-lg border-2 cursor-pointer transition-all duration-200 ${config[key as keyof PanelConfig] ? `bg-${color}-100 border-${color}-500 shadow-md` : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`} onClick={() => toggleRegion(key as keyof PanelConfig)}>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border-2 ${config[key as keyof PanelConfig] ? `bg-${color}-500 text-white border-${color}-600` : 'bg-gray-200 text-gray-500 border-gray-300'}`}>{num}</div>
+                                                <div className="flex-1 min-w-0"><div className={`font-bold text-xs ${config[key as keyof PanelConfig] ? `text-${color}-700` : 'text-gray-600'}`}>{name}</div></div>
+                                                <div className={`text-sm font-bold ${config[key as keyof PanelConfig] ? 'text-gray-800' : 'text-gray-400'}`}>{config[key as keyof PanelConfig] ? '✓' : '○'}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* 3개 영역 */}
-                        <div className="h-full flex flex-col gap-2">
-
-                            {/* 영역 1: 상단 3개 박스 (가로 배치) */}
-                            <div
-                                className={`flex gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.01] border-4 rounded-lg p-2 ${config.region1Enabled
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-300 bg-gray-100 opacity-60'
-                                    }`}
-                                style={{ height: '75%' }}
-                                onClick={() => toggleRegion('region1Enabled')}
-                                title="영역 1 - 상단 3개 박스"
-                            >
-                                {/* 왼쪽: 통화중 + 하단 데이터 (개선된 레이아웃) */}
-                                <div className={`w-1/3 rounded-lg border-2 p-3 flex flex-col ${config.region1Enabled
-                                        ? 'bg-teal-100 border-teal-400'
-                                        : 'bg-gray-200 border-gray-400'
-                                    }`}>
-                                    {/* 통화중 원형 (크기 증가) */}
-                                    <div className="flex items-center justify-center flex-1 mb-3">
-                                        <div className="w-20 h-20 bg-teal-400 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
-                                            통화중
+                        <div className="col-span-1">
+                            <div className="bg-white rounded-lg shadow-md h-full p-3 flex flex-col">
+                                <h3 className="text-md font-bold text-purple-800 mb-2 text-center">4영역 구성요소</h3>
+                                {!config.region4Enabled ? (
+                                    <div className="flex-1 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg p-2"><div className="text-center"><div className="text-lg mb-1">🔒</div><div className="text-xs">4영역 활성화 필요</div></div></div>
+                                ) : (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-2 flex-1">
+                                            {region4ComponentsData.map(({ key, name, icon, color }) => (
+                                                <div key={key} className={`p-1 rounded-lg border-2 cursor-pointer transition-all duration-200 ${config.region4Components[key as keyof Region4Components] ? `bg-${color}-100 border-${color}-500 shadow-md` : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`} onClick={() => toggleRegion4Component(key as keyof Region4Components)}>
+                                                    <div className="flex items-center gap-1">
+                                                        <div className={`w-4 h-4 rounded-full flex items-center justify-center text-xs border-2 ${config.region4Components[key as keyof Region4Components] ? `bg-${color}-500 text-white border-${color}-600` : 'bg-gray-200 text-gray-500 border-gray-300'}`}>{icon}</div>
+                                                        <div className="flex-1 min-w-0"><div className={`font-bold text-xs ${config.region4Components[key as keyof Region4Components] ? `text-${color}-700` : 'text-gray-600'}`}>{name}</div></div>
+                                                        <div className={`text-sm font-bold ${config.region4Components[key as keyof Region4Components] ? 'text-gray-800' : 'text-gray-400'}`}>{config.region4Components[key as keyof Region4Components] ? '✓' : '○'}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </div>
-
-                                    {/* 하단 2개 데이터 박스 (개선된 레이아웃) */}
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="bg-white rounded-lg text-center py-2 shadow-sm border">
-                                            <div className="text-xs text-gray-500 mb-1">대기호수</div>
-                                            <div className="text-lg font-bold text-gray-800">5</div>
+                                        <div className="mt-2 p-1 bg-purple-50 rounded-lg text-center">
+                                            <div className="text-purple-800 font-bold text-xs">구성요소: {getActiveRegion4ComponentsCount()}/12개</div>
+                                            {getActiveRegion4ComponentsCount() >= 7 && (<div className="text-purple-600 text-xs">높이 2배 적용</div>)}
                                         </div>
-                                        <div className="bg-white rounded-lg text-center py-2 shadow-sm border">
-                                            <div className="text-xs text-gray-500 mb-1">대기상담수</div>
-                                            <div className="text-lg font-bold text-gray-800">1</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 가운데: 4개 상태 박스 */}
-                                <div className={`flex-1 grid grid-cols-2 gap-2 border-2 rounded-lg p-2 ${config.region1Enabled
-                                        ? 'bg-blue-100 border-blue-300'
-                                        : 'bg-gray-200 border-gray-400'
-                                    }`}>
-                                    <div className="bg-blue-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        대기
-                                    </div>
-                                    <div className="bg-teal-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        통화
-                                    </div>
-                                    <div className="bg-orange-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        후처리
-                                    </div>
-                                    <div className="bg-purple-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        휴식
-                                    </div>
-                                </div>
-
-                                {/* 오른쪽: 폰드 정보 */}
-                                <div className={`w-1/4 flex flex-col gap-2 border-2 rounded-lg p-2 ${config.region1Enabled
-                                        ? 'bg-pink-100 border-pink-300'
-                                        : 'bg-gray-200 border-gray-400'
-                                    }`}>
-                                    <div className="flex-1 bg-pink-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        일반폰드
-                                    </div>
-                                    <div className="flex-1 bg-pink-300 rounded-lg flex items-center justify-center text-sm font-medium">
-                                        아웃바운드
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 영역 2: 하단 정보 */}
-                            <div
-                                className={`rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.01] flex items-center justify-center text-sm font-medium border-4 ${config.region2Enabled
-                                        ? 'bg-purple-200 border-purple-500'
-                                        : 'bg-gray-200 border-gray-300 opacity-60'
-                                    }`}
-                                style={{ height: '15%' }}
-                                onClick={() => toggleRegion('region2Enabled')}
-                                title="영역 2 - 하단 정보"
-                            >
-                                영역 2 - 하단 정보
-                            </div>
-
-                            {/* 영역 3: 로그온 정보 */}
-                            <div
-                                className={`rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.01] flex items-center justify-between px-4 text-sm border-4 ${config.region3Enabled
-                                        ? 'bg-gray-300 border-gray-600'
-                                        : 'bg-gray-200 border-gray-300 opacity-60'
-                                    }`}
-                                style={{ height: '10%' }}
-                                onClick={() => toggleRegion('region3Enabled')}
-                                title="영역 3 - 로그온 정보"
-                            >
-                                <span className="font-medium">LogOn: 44:42:17</span>
-                                <span className="text-green-600 font-bold">● 온라인</span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 크기 설정 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* 전체 크기 설정 (간소화) */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium mb-3">🎛️ 전체 크기 설정</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">전체 너비</label>
-                            <input
-                                type="number"
-                                value={config.totalWidth}
-                                onChange={(e) => setConfig(prev => ({ ...prev, totalWidth: parseInt(e.target.value) || 0 }))}
-                                className="w-full p-2 border rounded text-sm"
-                                min="500"
-                                max="2000"
-                                step="50"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">전체 높이 (자동)</label>
-                            <input
-                                type="number"
-                                value={config.totalHeight}
-                                readOnly
-                                className="w-full p-2 border rounded text-sm bg-green-100 font-bold"
-                            />
-                        </div>
-                    </div>
+            {/* 하단 요약 및 버튼 */}
+            <div className="bg-white border-t p-2">
+                <div className="flex justify-center items-center gap-4 text-xs mb-2">
+                    <div><span className="font-bold">활성 영역:</span> <span className="text-blue-600">{getActiveRegionCount()}/5개</span></div>
+                    <div><span className="font-bold">4영역 구성:</span> <span className="text-purple-600">{getActiveRegion4ComponentsCount()}/12개</span></div>
+                    <div><span className="font-bold">계산된 크기:</span> <span className="text-green-600">{config.totalWidth} × {config.totalHeight}px</span></div>
                 </div>
-
-                {/* 영역별 높이 설정 */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium mb-3">📏 영역별 높이 설정</h3>
-                    <div className="space-y-3">
-                        {regions.map((region, index) => {
-                            const isEnabled = config[`${region.key}Enabled` as keyof PanelConfig] as boolean;
-                            const colors = ['bg-blue-400', 'bg-purple-400', 'bg-gray-500'];
-                            return (
-                                <div key={region.key} className="flex items-center gap-3">
-                                    <div className={`w-5 h-5 rounded border-2 ${isEnabled ? `${colors[index]} border-gray-600` : 'bg-gray-300 border-gray-400'
-                                        }`}></div>
-                                    <span className={`text-sm flex-1 font-medium ${!isEnabled ? 'opacity-50' : ''}`}>
-                                        {region.title}
-                                    </span>
-                                    <input
-                                        type="number"
-                                        value={region.height}
-                                        onChange={(e) => updateHeight(`${region.key}Height` as keyof PanelConfig, parseInt(e.target.value) || 0)}
-                                        disabled={!isEnabled}
-                                        className="w-20 p-2 border rounded text-sm"
-                                        min="10"
-                                        max="300"
-                                    />
-                                    <span className="text-sm text-gray-500">px</span>
-                                </div>
-                            );
-                        })}
-                    </div>
+                <div className="flex gap-2 justify-center">
+                    <button onClick={() => { setConfig(prev => { const allEnabledComponents = (Object.keys(prev.region4Components) as (keyof Region4Components)[]).reduce((acc, key) => { acc[key] = true; return acc; }, {} as Region4Components); return { ...prev, region1Enabled: true, region2Enabled: true, region3Enabled: true, region4Enabled: true, region5Enabled: true, region4Components: allEnabledComponents }; }); showNotification('모든 영역과 구성요소가 활성화되었습니다!'); }} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm">🔛 전체 활성화</button>
+                    <button onClick={() => { console.log('Tauri Native 설정:', { ...config, fixedSizes: FIXED_SIZES }); showNotification(`Native 창 크기 ${config.totalWidth}×${config.totalHeight}px 적용됨`); }} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium text-sm">✅ 설정 적용</button>
+                    <button onClick={() => { setConfig({ region1Enabled: true, region2Enabled: true, region3Enabled: true, region4Enabled: true, region5Enabled: true, region4Components: { customerInfo: true, callHistory: true, notes: false, toolbar: true, script: false, transfer: false, dialpad: false, recording: false, monitoring: false, reporting: false, contacts: false, calendar: false, }, totalWidth: 1000, totalHeight: 500 }); showNotification('기본값으로 초기화되었습니다!'); }} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm">🔄 초기화</button>
                 </div>
-            </div>
-
-            {/* 계산 결과 요약 */}
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <h3 className="font-medium text-blue-800 mb-2">📋 크기 계산 결과</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-blue-700">
-                    <div>
-                        <strong>활성 영역:</strong><br />
-                        {[
-                            config.region1Enabled && '상단3박스',
-                            config.region2Enabled && '하단정보',
-                            config.region3Enabled && '로그온',
-                        ].filter(Boolean).length}/3개
-                    </div>
-                    <div>
-                        <strong>전체 크기:</strong><br />
-                        {config.totalWidth} × {config.totalHeight}px
-                    </div>
-                    <div>
-                        <strong>콘텐츠 높이:</strong><br />
-                        {
-                            (config.region1Enabled ? config.region1Height : 0) +
-                            (config.region2Enabled ? config.region2Height : 0) +
-                            (config.region3Enabled ? config.region3Height : 0)
-                        }px
-                    </div>
-                </div>
-            </div>
-
-            {/* 액션 버튼 */}
-            <div className="flex gap-3 justify-center">
-                <button
-                    onClick={() => {
-                        setConfig(prev => ({
-                            ...prev,
-                            region1Enabled: true,
-                            region2Enabled: true,
-                            region3Enabled: true,
-                        }));
-                    }}
-                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                    🔛 전체 활성화
-                </button>
-                <button
-                    onClick={() => {
-                        console.log('패널 설정 적용:', config);
-                        alert(`패널 크기가 ${config.totalWidth}×${config.totalHeight}px로 적용되었습니다!`);
-                    }}
-                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                    ✅ 설정 적용
-                </button>
-                <button
-                    onClick={() => {
-                        setConfig({
-                            region1Enabled: true,
-                            region2Enabled: true,
-                            region3Enabled: true,
-                            region1Height: 150,
-                            region2Height: 40,
-                            region3Height: 25,
-                            totalWidth: 1000,
-                            totalHeight: 0,
-                            padding: 15,
-                            spacing: 8,
-                        });
-                    }}
-                    className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                    🔄 초기화
-                </button>
             </div>
         </div>
     );
 };
 
-export default ThreeRegionPanelSettings;
+export default FiveRegionPanelSettings;
