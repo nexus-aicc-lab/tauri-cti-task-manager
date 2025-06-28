@@ -231,4 +231,141 @@ mod tests {
         assert_eq!(settings.service_level, deserialized.service_level);
         assert_eq!(settings.response_rate, deserialized.response_rate);
     }
+    // panel.rs 파일 끝에 추가
+
+    use tauri::{Manager, PhysicalSize};
+
+    /// 메트릭 개수에 따른 최적 윈도우 크기 계산
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    pub struct WindowSize {
+        pub width: f64,
+        pub height: f64,
+    }
+
+    /// 활성화된 메트릭 개수에 따라 최적 윈도우 크기를 계산합니다
+    #[tauri::command]
+    pub async fn calculate_optimal_window_size() -> Result<WindowSize, String> {
+        let settings = load_panel_settings().await?;
+
+        // 활성화된 메트릭 개수 계산
+        let top_metrics_count = [
+            settings.service_level,
+            settings.response_rate,
+            settings.real_incoming_calls,
+            settings.answered_calls,
+            settings.abandoned_calls,
+            settings.unanswered_calls,
+        ]
+        .iter()
+        .filter(|&&x| x)
+        .count();
+
+        let transfer_metrics_count = [
+            settings.transfer_incoming,
+            settings.transfer_answered,
+            settings.transfer_distributed,
+            settings.transfer_turn_service,
+            settings.transfer_failed,
+            settings.transfer_regular,
+        ]
+        .iter()
+        .filter(|&&x| x)
+        .count();
+
+        // 크기 계산 로직
+        let base_width = 800.0;
+        let base_height = 200.0;
+
+        let top_height = if top_metrics_count > 0 {
+            let rows = ((top_metrics_count as f64) / 6.0).ceil();
+            rows * 40.0 + 20.0
+        } else {
+            0.0
+        };
+
+        let transfer_height = if transfer_metrics_count > 0 {
+            let rows = ((transfer_metrics_count as f64) / 6.0).ceil();
+            rows * 40.0 + 20.0
+        } else {
+            0.0
+        };
+
+        let empty_height = if top_metrics_count == 0 && transfer_metrics_count == 0 {
+            100.0
+        } else {
+            0.0
+        };
+
+        let total_height = base_height + top_height + transfer_height + empty_height;
+        let width = base_width.max(600.0).min(1400.0);
+        let height = total_height.max(250.0).min(800.0);
+
+        Ok(WindowSize { width, height })
+    }
+
+    /// 현재 패널 윈도우 크기를 동적으로 조절합니다
+    #[tauri::command]
+    pub async fn resize_panel_window(app_handle: tauri::AppHandle) -> Result<(), String> {
+        let optimal_size = calculate_optimal_window_size().await?;
+
+        let windows = app_handle.webview_windows();
+        let panel_window = windows
+            .iter()
+            .find(|(label, _)| label.starts_with("panel_"))
+            .map(|(_, window)| window);
+
+        if let Some(window) = panel_window {
+            let new_size = PhysicalSize::new(optimal_size.width as u32, optimal_size.height as u32);
+            window
+                .set_size(tauri::Size::Physical(new_size))
+                .map_err(|e| format!("윈도우 크기 변경 실패: {}", e))?;
+
+            println!(
+                "✅ 패널 윈도우 크기 변경: {}x{}",
+                optimal_size.width, optimal_size.height
+            );
+            Ok(())
+        } else {
+            Err("패널 윈도우를 찾을 수 없습니다".to_string())
+        }
+    }
+
+    /// 메트릭 개수 정보와 함께 윈도우 크기 정보를 반환합니다
+    #[tauri::command]
+    pub async fn get_panel_metrics_info() -> Result<serde_json::Value, String> {
+        let settings = load_panel_settings().await?;
+        let optimal_size = calculate_optimal_window_size().await?;
+
+        let top_count = [
+            settings.service_level,
+            settings.response_rate,
+            settings.real_incoming_calls,
+            settings.answered_calls,
+            settings.abandoned_calls,
+            settings.unanswered_calls,
+        ]
+        .iter()
+        .filter(|&&x| x)
+        .count();
+
+        let transfer_count = [
+            settings.transfer_incoming,
+            settings.transfer_answered,
+            settings.transfer_distributed,
+            settings.transfer_turn_service,
+            settings.transfer_failed,
+            settings.transfer_regular,
+        ]
+        .iter()
+        .filter(|&&x| x)
+        .count();
+
+        Ok(serde_json::json!({
+            "top_metrics_count": top_count,
+            "transfer_metrics_count": transfer_count,
+            "total_count": top_count + transfer_count,
+            "optimal_width": optimal_size.width,
+            "optimal_height": optimal_size.height
+        }))
+    }
 }
