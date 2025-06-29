@@ -44,9 +44,9 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
         { name: '개인', icon: '👤' },
         { name: '통신설정', icon: '🌐' },
         { name: '통화설정', icon: '📞' },
-        { name: '패널설정', icon: '🖥️' },
         { name: '미니맵', icon: '🗺️' },
         { name: '정보', icon: 'ℹ️' },
+        { name: '패널설정', icon: '🖥️' },
     ];
 
     const handleClose = async () => {
@@ -129,7 +129,7 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
 
                 {/* 설정 내용 */}
                 <div className="flex-1 flex flex-col">
-                    <div className="flex-1 p-4 bg-gray-50 overflow-auto" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
+                    <div className="flex-1 p-0 bg-gray-50 overflow-auto" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
                         {/* <h3 className="text-lg font-medium mb-4">{selectedCategory}</h3> */}
                         {renderContent()}
                     </div>
