@@ -25,6 +25,7 @@ pub struct WindowConfig {
     pub resizable: bool,
     pub always_on_top: bool,
     pub decorations: bool,
+    pub max_width: Option<f64>, // 최대 너비 추가
 }
 
 impl WindowMode {
@@ -46,6 +47,7 @@ impl WindowMode {
                 height: 600.0,
                 min_width: Some(400.0),
                 min_height: Some(500.0),
+                max_width: Some(600.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: false,
                 decorations: true,
@@ -57,6 +59,7 @@ impl WindowMode {
                 height: 40.0,
                 min_width: Some(800.0),
                 min_height: Some(40.0),
+                max_width: Some(1500.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: true,
                 decorations: false,
@@ -68,6 +71,7 @@ impl WindowMode {
                 height: 350.0,           // 기본 크기를 약간 줄임
                 min_width: Some(600.0),  // 🔥 최소 너비 제한 추가 (반응형 대응)
                 min_height: Some(200.0), // 🔥 최소 높이 제한 추가 (반응형 대응)
+                max_width: Some(900.0),  // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
@@ -79,6 +83,7 @@ impl WindowMode {
                 height: 700.0,
                 min_width: Some(550.0),
                 min_height: Some(450.0),
+                max_width: Some(1200.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
@@ -90,6 +95,7 @@ impl WindowMode {
                 height: 600.0,
                 min_width: Some(400.0),
                 min_height: Some(500.0),
+                max_width: Some(600.0), // 🔥 최대 너비 제한 추가
                 resizable: false,
                 always_on_top: true,
                 decorations: true,

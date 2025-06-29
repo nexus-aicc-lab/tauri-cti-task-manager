@@ -13,16 +13,29 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
     const [hasAppliedSize, setHasAppliedSize] = useState(false);
     const [initialSizeSet, setInitialSizeSet] = useState(false);
 
+    // 🎯 최대 크기 제한 상수
+    const MAX_WIDTH = 900;
+    const MAX_HEIGHT = 800; // 필요시 높이도 제한 가능
+
     // 🎯 크기 적용 함수
     const applyWindowSize = useCallback(async (size: { width: number; height: number }) => {
         try {
-            console.log(`🔄 윈도우 크기 적용: ${size.width}x${size.height}`);
+            // 🚨 최대 크기 제한 적용
+            const limitedSize = {
+                width: Math.min(size.width, MAX_WIDTH),
+                height: Math.min(size.height, MAX_HEIGHT)
+            };
+
+            console.log(`🔄 윈도우 크기 적용 (제한 적용): ${limitedSize.width}x${limitedSize.height}`);
+            if (size.width > MAX_WIDTH || size.height > MAX_HEIGHT) {
+                console.log(`⚠️ 크기 제한 적용됨 - 원본: ${size.width}x${size.height}, 제한 후: ${limitedSize.width}x${limitedSize.height}`);
+            }
 
             // 백엔드 저장 시도
             try {
                 await invoke('save_window_size', {
-                    width: size.width,
-                    height: size.height
+                    width: limitedSize.width,
+                    height: limitedSize.height
                 });
                 console.log('💾 크기 저장 완료');
             } catch (saveError) {
@@ -32,8 +45,8 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
             // 백엔드 적용 시도
             try {
                 await invoke('apply_window_size', {
-                    width: size.width,
-                    height: size.height
+                    width: limitedSize.width,
+                    height: limitedSize.height
                 });
                 console.log('🎯 크기 적용 완료');
             } catch (applyError) {
@@ -41,29 +54,35 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
             }
 
             setHasAppliedSize(true);
-            console.log(`✅ 크기 처리 완료: ${size.width}x${size.height}`);
+            console.log(`✅ 크기 처리 완료: ${limitedSize.width}x${limitedSize.height}`);
 
         } catch (error) {
             console.error("❌ 윈도우 크기 처리 실패:", error);
         }
-    }, []);
+    }, [MAX_WIDTH, MAX_HEIGHT]);
 
     // 🎯 PanelModeContent에서 계산된 크기 받기
     const handleSizeCalculated = useCallback((size: { width: number; height: number }) => {
         console.log(`📐 새 크기 수신: ${size.width}x${size.height}`);
 
-        setCurrentSize(size);
+        // 🚨 최대 크기 제한 미리 적용
+        const limitedSize = {
+            width: Math.min(size.width, MAX_WIDTH),
+            height: Math.min(size.height, MAX_HEIGHT)
+        };
+
+        setCurrentSize(limitedSize);
 
         // 초기 설정이 완료되었거나, 크기가 현재와 다른 경우에만 적용
         if (!initialSizeSet ||
-            Math.abs(size.width - currentSize.width) > 10 ||
-            Math.abs(size.height - currentSize.height) > 10) {
+            Math.abs(limitedSize.width - currentSize.width) > 10 ||
+            Math.abs(limitedSize.height - currentSize.height) > 10) {
 
             console.log('📏 크기 변화 감지 - 적용 시작');
             setInitialSizeSet(true);
-            applyWindowSize(size);
+            applyWindowSize(limitedSize);
         }
-    }, [currentSize, initialSizeSet, applyWindowSize]);
+    }, [currentSize, initialSizeSet, applyWindowSize, MAX_WIDTH, MAX_HEIGHT]);
 
     // 📱 수동 크기 맞춤 함수
     const manualResize = useCallback(async () => {
@@ -107,7 +126,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
                 // 💡 새로고침 시 최소 크기로 먼저 설정하여 스크롤 방지
                 try {
-                    const INITIAL_WIDTH = 900;
+                    const INITIAL_WIDTH = Math.min(900, MAX_WIDTH); // 최대 크기 제한 적용
                     const INITIAL_HEIGHT = 500;
 
                     console.log(`🎯 초기 최소 크기 설정: ${INITIAL_WIDTH}x${INITIAL_HEIGHT}`);
@@ -137,7 +156,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
         const timer = setTimeout(initializePanel, 100);
         return () => clearTimeout(timer);
-    }, []);
+    }, [MAX_WIDTH]);
 
     if (!isInitialized) {
         return (
@@ -174,13 +193,14 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
                     <div className="space-y-1">
                         <div>현재 크기: {currentSize.width}×{currentSize.height}</div>
+                        <div>최대 제한: {MAX_WIDTH}×{MAX_HEIGHT}</div>
                         <div>적용 상태: {hasAppliedSize ? '✅ 완료' : '⏸️ 대기'}</div>
                         <div>초기 설정: {initialSizeSet ? '✅ 완료' : '⏸️ 대기'}</div>
                     </div>
 
                     <div className="text-xs mt-2 pt-2 border-t border-gray-600">
                         <div>단축키: Ctrl+R, F5 (강제 리사이즈)</div>
-                        <div className="text-yellow-400">스크롤 방지 모드</div>
+                        <div className="text-yellow-400">최대 넓이 제한 모드</div>
                     </div>
                 </div>
             )} */}
