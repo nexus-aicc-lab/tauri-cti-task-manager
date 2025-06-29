@@ -1,3 +1,4 @@
+// CustomTitlebar.tsx
 
 'use client';
 
@@ -16,9 +17,10 @@ import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 interface Props {
     title: string;
     onBackToLauncher: () => void;
+    currentSize?: { width: number; height: number }; // 🆕 크기 정보 prop
 }
 
-export default function CustomTitlebar({ title }: Props) {
+export default function CustomTitlebar({ title, currentSize }: Props) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
 
@@ -34,25 +36,6 @@ export default function CustomTitlebar({ title }: Props) {
             console.error('❌ 핀 모드 변경 실패:', error);
         }
     };
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const { invoke } = await import('@tauri-apps/api/core');
-                const { getCurrentWindow } = await import('@tauri-apps/api/window');
-                const win = getCurrentWindow();
-
-                // 현재 창 상태 동기화
-                setIsMaximized(await win.isMaximized());
-
-                // 백엔드에서 핀 상태 확인
-                const pinState = await invoke('get_always_on_top_state') as boolean;
-                setIsPinned(pinState);
-            } catch (error) {
-                console.error('❌ 창 상태 확인 실패:', error);
-            }
-        })();
-    }, []);
 
     const minimize = async () => {
         const { getCurrentWindow } = await import('@tauri-apps/api/window');
@@ -86,17 +69,42 @@ export default function CustomTitlebar({ title }: Props) {
         }
     };
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const { invoke } = await import('@tauri-apps/api/core');
+                const { getCurrentWindow } = await import('@tauri-apps/api/window');
+                const win = getCurrentWindow();
+
+                // 현재 창 상태 동기화
+                setIsMaximized(await win.isMaximized());
+
+                // 백엔드에서 핀 상태 확인
+                const pinState = await invoke('get_always_on_top_state') as boolean;
+                setIsPinned(pinState);
+            } catch (error) {
+                console.error('❌ 창 상태 확인 실패:', error);
+            }
+        })();
+    }, []);
+
     return (
         <div
             className="h-10 bg-gray-200 flex items-center justify-between px-4 select-none border-b border-gray-300"
             data-tauri-drag-region
         >
-            {/* 🆕 After: 왼쪽 영역 - 간격 대폭 증가 */}
+            {/* 왼쪽 영역 */}
             <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 <MainSystemMenu />
                 <div className="text-sm text-gray-800 flex items-center space-x-1 pl-4">
                     <span>👤 이재명(NEX1011)</span>
                 </div>
+                {/* 🆕 크기 정보 표시 */}
+                {currentSize && (
+                    <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                        📏 {currentSize.width} × {currentSize.height}px
+                    </div>
+                )}
             </div>
 
             {/* 가운데 영역 */}
@@ -169,10 +177,3 @@ export default function CustomTitlebar({ title }: Props) {
         </div>
     );
 }
-
-/*
-🆕 주요 변경사항:
-1. space-x-3 → space-x-6 (12px → 24px)
-2. pl-4 추가로 사용자 정보에 16px 추가 패딩
-3. 총 간격: 12px + 24px + 16px = 52px
-*/

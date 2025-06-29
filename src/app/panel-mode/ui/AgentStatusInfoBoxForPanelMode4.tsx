@@ -236,17 +236,6 @@ const AgentStatusInfoBoxForPanelMode4: React.FC = () => {
                 )}
             </div>
 
-            {/* 하단 상태 표시 */}
-            <div className="flex justify-between items-center text-xs text-gray-400 mt-1">
-                <span>🚀 네이티브 저장소</span>
-                <button
-                    onClick={loadConfig}
-                    className="hover:text-blue-500 transition-colors"
-                    title="설정 새로고침"
-                >
-                    🔄
-                </button>
-            </div>
         </div>
     );
 };

@@ -65,9 +65,9 @@ impl WindowMode {
                 url: "index.html?mode=panel".into(),
                 title: "CTI Task Master - 패널 모드".into(),
                 width: 1000.0,
-                height: 500.0,
-                min_width: Some(1000.0), // 최소 900px로 레이아웃 보장
-                min_height: Some(500.0), // 최소 600px로 높이 보장
+                height: 470.0,
+                min_width: None,  // 🔥 최소 너비 제한 없음
+                min_height: None, // 🔥 최소 높이 제한 없음
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
