@@ -172,7 +172,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
     return (
         <div className="flex flex-col bg-white min-h-screen">
             <CustomTitlebar
-                title="CTI Task Master - 패널 모드"
+                title="U PERSONAL"
                 onBackToLauncher={onBackToLauncher || (() => { })}
                 currentSize={currentSize}
             />

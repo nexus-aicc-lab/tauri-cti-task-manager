@@ -117,19 +117,6 @@ const AgentStatusInfoBoxForPanelMode4: React.FC = () => {
 
     return (
         <div className="h-full bg-white p-2 rounded-lg shadow-md border border-gray-200">
-            {/* 개발 모드에서 하드코딩 상태 표시 */}
-            {import.meta.env.MODE === 'development' && (
-                <div className="mb-1 text-xs text-green-600 flex items-center gap-1 flex-wrap">
-                    <span>🎯 반응형 그리드 모드</span>
-                    <span className="text-gray-500">
-                        ({visibleMetrics.length}개 메트릭)
-                    </span>
-                    <span className="text-blue-500 text-xs">
-                        3→4→5→6열 반응형
-                    </span>
-                </div>
-            )}
-
             {/* 🎯 모든 메트릭을 반응형 그리드로 표시 */}
             {visibleMetrics.length > 0 ? (
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 transition-all duration-300">
