@@ -9,7 +9,7 @@ pub enum WindowMode {
     Launcher,
     Bar,
     Panel,
-    Settings, // 시스템 환경 설정 추가
+    Settings,
     Login,
 }
 
@@ -64,25 +64,24 @@ impl WindowMode {
             WindowMode::Panel => WindowConfig {
                 url: "index.html?mode=panel".into(),
                 title: "CTI Task Master - 패널 모드".into(),
-                width: 1000.0,
-                height: 470.0,
-                min_width: None,  // 🔥 최소 너비 제한 없음
-                min_height: None, // 🔥 최소 높이 제한 없음
+                width: 900.0,            // 기본 크기를 약간 줄임
+                height: 350.0,           // 기본 크기를 약간 줄임
+                min_width: Some(600.0),  // 🔥 최소 너비 제한 추가 (반응형 대응)
+                min_height: Some(200.0), // 🔥 최소 높이 제한 추가 (반응형 대응)
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
             },
-
             WindowMode::Settings => WindowConfig {
                 url: "index.html?mode=settings".into(),
                 title: "CTI Task Master - 환경 설정".into(),
-                width: 900.0,  // 환경 설정에 적절한 크기
-                height: 700.0, // 환경 설정에 적절한 크기
+                width: 900.0,
+                height: 700.0,
                 min_width: Some(550.0),
                 min_height: Some(450.0),
-                resizable: true, // 크기 조절 가능
+                resizable: true,
                 always_on_top: false,
-                decorations: false, // 커스텀 타이틀바 사용
+                decorations: false,
             },
             WindowMode::Login => WindowConfig {
                 url: "index.html?mode=login".into(),
@@ -122,24 +121,22 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
     if config.resizable {
         if let (Some(min_width), Some(min_height)) = (config.min_width, config.min_height) {
             window_builder = window_builder.min_inner_size(min_width, min_height);
+            println!("🔧 최소 크기 설정: {}x{}", min_width, min_height);
         }
     }
 
     // 설정 창일 경우, 부모 창 중앙에 배치
     if matches!(mode, WindowMode::Settings) {
-        // 현재 활성 창 찾기
         let windows = handle.webview_windows();
         let mut parent_found = false;
 
         for (window_label, window) in windows.iter() {
-            // 바 모드나 패널 모드에서 설정 창을 열었을 경우
             if window_label.starts_with("bar_")
                 || window_label.starts_with("panel_")
                 || window_label.starts_with("launcher_")
             {
                 if let Ok(position) = window.outer_position() {
                     if let Ok(size) = window.outer_size() {
-                        // 부모 창 중앙에 위치 계산
                         let center_x =
                             position.x + (size.width as i32 / 2) - (config.width as i32 / 2);
                         let center_y =
@@ -153,7 +150,6 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
             }
         }
 
-        // 부모 창을 찾지 못했으면 화면 중앙에
         if !parent_found {
             window_builder = window_builder.center();
         }
@@ -183,8 +179,35 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
     let window_result = window_builder.build();
 
     match window_result {
-        Ok(_) => {
+        Ok(window) => {
             println!("✅ 새 창 생성 성공: {}", label);
+
+            // 패널 모드의 경우 추가 설정
+            if matches!(mode, WindowMode::Panel) {
+                println!("🎯 패널 모드 창 추가 설정");
+
+                // 윈도우가 생성된 후 약간의 지연을 두고 초기 크기 조정
+                let window_clone = window.clone();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+                    // 초기 크기가 예상과 다를 경우를 대비한 보정
+                    if let Ok(current_size) = window_clone.inner_size() {
+                        println!(
+                            "📏 패널 창 현재 크기: {}x{}",
+                            current_size.width, current_size.height
+                        );
+
+                        // 너무 크거나 작으면 기본값으로 재조정
+                        if current_size.width > 1500 || current_size.height > 800 {
+                            let _ = window_clone.set_size(tauri::Size::Physical(
+                                tauri::PhysicalSize::new(900, 350),
+                            ));
+                            println!("🔧 패널 크기 자동 보정 완료");
+                        }
+                    }
+                });
+            }
 
             if mode.is_main_window() {
                 println!("🔄 메인 윈도우 모드 - 기존 메인 창 정리");
@@ -192,7 +215,6 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) {
                 let windows = handle.webview_windows();
                 for (other_label, window) in windows.iter() {
                     if &label != other_label {
-                        // 설정 창과 로그인 창은 유지
                         let should_keep = other_label.starts_with("settings_")
                             || other_label.starts_with("login_");
 

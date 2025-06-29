@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
 
 interface MetricItem {
     label: string;
@@ -24,24 +23,9 @@ interface MetricVisibility {
     transferRegular: boolean;
 }
 
-// Rust 구조체 (snake_case)
-interface RustMetricVisibility {
-    service_level: boolean;
-    response_rate: boolean;
-    real_incoming_calls: boolean;
-    answered_calls: boolean;
-    abandoned_calls: boolean;
-    unanswered_calls: boolean;
-    transfer_incoming: boolean;
-    transfer_answered: boolean;
-    transfer_distributed: boolean;
-    transfer_turn_service: boolean;
-    transfer_failed: boolean;
-    transfer_regular: boolean;
-}
-
 const AgentStatusInfoBoxForPanelMode4: React.FC = () => {
-    const [metricVisibility, setMetricVisibility] = useState<MetricVisibility>({
+    // 🎯 하드코딩된 설정 - 모든 메트릭 표시
+    const [metricVisibility] = useState<MetricVisibility>({
         serviceLevel: true,
         responseRate: true,
         realIncomingCalls: true,
@@ -57,185 +41,112 @@ const AgentStatusInfoBoxForPanelMode4: React.FC = () => {
     });
 
     const [isLoading, setIsLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-    // 키 변환 함수
-    const fromRustFormat = (rustFormat: RustMetricVisibility): MetricVisibility => ({
-        serviceLevel: rustFormat.service_level,
-        responseRate: rustFormat.response_rate,
-        realIncomingCalls: rustFormat.real_incoming_calls,
-        answeredCalls: rustFormat.answered_calls,
-        abandonedCalls: rustFormat.abandoned_calls,
-        unansweredCalls: rustFormat.unanswered_calls,
-        transferIncoming: rustFormat.transfer_incoming,
-        transferAnswered: rustFormat.transfer_answered,
-        transferDistributed: rustFormat.transfer_distributed,
-        transferTurnService: rustFormat.transfer_turn_service,
-        transferFailed: rustFormat.transfer_failed,
-        transferRegular: rustFormat.transfer_regular,
-    });
-
-    // 설정 로드
+    // 🚀 즉시 로딩 완료
     useEffect(() => {
-        loadConfig();
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+            console.log('✅ 하드코딩 모드: 패널 메트릭 표시 준비 완료');
+        }, 100);
 
-        // 환경설정에서 변경된 설정 감지
+        // 환경설정에서 변경된 설정 감지 (이벤트 리스너는 유지)
         const handleSettingsUpdate = (event: CustomEvent) => {
             console.log('📡 패널 설정 업데이트 이벤트 감지:', event.detail);
-            setMetricVisibility(event.detail);
-            setLastUpdated(new Date());
+            // 필요하면 여기서 metricVisibility 업데이트
         };
 
         window.addEventListener('panel-settings-updated', handleSettingsUpdate as EventListener);
 
-        // 주기적으로 설정 확인 (5초마다)
-        const interval = setInterval(() => {
-            loadConfig();
-        }, 5000);
-
         return () => {
+            clearTimeout(timer);
             window.removeEventListener('panel-settings-updated', handleSettingsUpdate as EventListener);
-            clearInterval(interval);
         };
     }, []);
 
-    const loadConfig = async () => {
-        try {
-            console.log('🔄 패널에서 설정 로드');
-
-            const rustSettings = await invoke<RustMetricVisibility>('load_panel_settings');
-            const jsSettings = fromRustFormat(rustSettings);
-
-            console.log('📖 패널 로드된 설정:', jsSettings);
-            setMetricVisibility(jsSettings);
-            setLastUpdated(new Date());
-        } catch (error) {
-            console.error('❌ 패널 설정 로드 실패:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 전체 메트릭 데이터 (실제 데이터는 API에서 가져와야 함)
-    const allTopMetrics: MetricItem[] = [
+    // 🎯 모든 메트릭을 하나의 배열로 통합 (순서대로)
+    const allMetrics: MetricItem[] = [
+        // 첫 번째 줄 (기본 메트릭)
         { key: 'serviceLevel', label: '서비스레벨', value: 58, type: 'percentage' },
-        { key: 'responseRate', label: '응답률', value: 58, type: 'percentage' },
-        { key: 'realIncomingCalls', label: '실인입호수', value: 58, type: 'percentage' },
+        { key: 'responseRate', label: '응답률', value: 89, type: 'percentage' },
+        { key: 'realIncomingCalls', label: '실인입호수', value: 82, type: 'percentage' },
         { key: 'answeredCalls', label: '응답호수', value: 50, type: 'count' },
         { key: 'abandonedCalls', label: '포기호수', value: 8, type: 'count' },
-        { key: 'unansweredCalls', label: '난서비스호수', value: 8, type: 'count' },
-    ];
+        { key: 'unansweredCalls', label: '난서비스호수', value: 0, type: 'count' },
 
-    const allTransferStats: MetricItem[] = [
-        { key: 'transferIncoming', label: '그룹호전환\n(인입)', value: 5, type: 'count' },
-        { key: 'transferAnswered', label: '그룹호전환\n(응답)', value: 5, type: 'count' },
-        { key: 'transferDistributed', label: '그룹호전환\n(분배)', value: 5, type: 'count' },
-        { key: 'transferTurnService', label: '그룹호전환\n(턴서비스)', value: 5, type: 'count' },
-        { key: 'transferFailed', label: '그룹호전환\n(실패)', value: 5, type: 'count' },
-        { key: 'transferRegular', label: '그룹호전환\n(규전환)', value: 5, type: 'count' },
+        // 두 번째 줄 (그룹호 전환 통계) - 더 짧은 라벨 사용
+        { key: 'transferIncoming', label: '전환(인입)', value: 0, type: 'count' },
+        { key: 'transferAnswered', label: '전환(응답)', value: 0, type: 'count' },
+        { key: 'transferDistributed', label: '전환(분배)', value: 0, type: 'count' },
+        { key: 'transferTurnService', label: '전환(턴서비스)', value: 0, type: 'count' },
+        { key: 'transferFailed', label: '전환(실패)', value: 0, type: 'count' },
+        { key: 'transferRegular', label: '전환(규전환)', value: 0, type: 'count' },
     ];
 
     // 설정에 따라 필터링된 메트릭
-    const visibleTopMetrics = allTopMetrics.filter(item =>
-        metricVisibility[item.key as keyof MetricVisibility]
-    );
-
-    const visibleTransferStats = allTransferStats.filter(item =>
+    const visibleMetrics = allMetrics.filter(item =>
         metricVisibility[item.key as keyof MetricVisibility]
     );
 
     const renderMetricItem = (item: MetricItem, index: number) => (
         <div
             key={`${item.key}-${index}`}
-            className="flex items-center justify-between px-2 py-2 bg-gray-50 rounded-md border border-gray-200 min-h-[32px] transition-all duration-200 hover:bg-gray-100"
+            className="flex items-center justify-between px-1.5 py-1.5 bg-gray-50 rounded-md border border-gray-200 min-h-[28px] transition-all duration-200 hover:bg-gray-100 min-w-0"
         >
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 min-w-0 flex-1">
                 <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <span className="text-xs font-medium text-gray-700 whitespace-pre-line leading-tight">
+                <span className="text-xs font-medium text-gray-700 leading-tight truncate" title={item.label}>
                     {item.label}
                 </span>
             </div>
-            <span className="text-xs font-semibold text-gray-900 flex-shrink-0">
+            <span className="text-xs font-semibold text-gray-900 flex-shrink-0 ml-1">
                 {item.value}{item.type === 'percentage' ? '%' : ''}
             </span>
         </div>
     );
 
-    // 동적 그리드 컬럼 계산
-    const getGridCols = (itemCount: number) => {
-        if (itemCount === 0) return 'grid-cols-1';
-        if (itemCount <= 2) return `grid-cols-${itemCount}`;
-        if (itemCount <= 3) return 'grid-cols-3';
-        if (itemCount <= 4) return 'grid-cols-4';
-        if (itemCount <= 5) return 'grid-cols-5';
-        return 'grid-cols-6';
-    };
-
-    // 활성화된 메트릭 개수
-    const activeMetricsCount = visibleTopMetrics.length + visibleTransferStats.length;
-
     if (isLoading) {
         return (
             <div className="h-full bg-white p-2 rounded-lg shadow-md border border-gray-200 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                    <span className="text-sm text-gray-600">설정 로딩 중...</span>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-1"></div>
+                    <span className="text-xs text-gray-600">초기화 중...</span>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="h-full bg-white p-2 rounded-lg shadow-md border border-gray-200 flex flex-col">
-
-            {/* 상단 메트릭스 */}
-            {visibleTopMetrics.length > 0 && (
-                <div className="mb-2">
-                    <div className={`grid ${getGridCols(visibleTopMetrics.length)} gap-1 transition-all duration-300`}>
-                        {visibleTopMetrics.map((item, idx) => renderMetricItem(item, idx))}
-                    </div>
+        <div className="h-full bg-white p-2 rounded-lg shadow-md border border-gray-200">
+            {/* 개발 모드에서 하드코딩 상태 표시 */}
+            {import.meta.env.MODE === 'development' && (
+                <div className="mb-1 text-xs text-green-600 flex items-center gap-1 flex-wrap">
+                    <span>🎯 반응형 그리드 모드</span>
+                    <span className="text-gray-500">
+                        ({visibleMetrics.length}개 메트릭)
+                    </span>
+                    <span className="text-blue-500 text-xs">
+                        3→4→5→6열 반응형
+                    </span>
                 </div>
             )}
 
-            {/* 하단 그룹호 전환 통계 */}
-            <div className="flex-1">
-                {visibleTransferStats.length > 0 && (
-                    <div className={`grid ${getGridCols(visibleTransferStats.length)} gap-1 mb-2 transition-all duration-300`}>
-                        {visibleTransferStats.map((item, idx) => renderMetricItem(item, idx))}
-                    </div>
-                )}
-
-                {/* 메트릭이 하나도 표시되지 않을 때 */}
-                {visibleTopMetrics.length === 0 && visibleTransferStats.length === 0 && (
-                    <div className="flex items-center justify-center h-20 text-gray-500 text-sm text-center">
-                        <div>
-                            <div className="text-2xl mb-2">📊</div>
-                            <div>표시할 메트릭이 없습니다.</div>
-                            <div className="text-xs text-gray-400 mt-1">
-                                환경설정 → 패널설정에서 항목을 선택하세요.
-                            </div>
-                            <button
-                                onClick={loadConfig}
-                                className="mt-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-                            >
-                                새로고침
-                            </button>
+            {/* 🎯 모든 메트릭을 반응형 그리드로 표시 */}
+            {visibleMetrics.length > 0 ? (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 transition-all duration-300">
+                    {visibleMetrics.map((item, idx) => renderMetricItem(item, idx))}
+                </div>
+            ) : (
+                /* 메트릭이 하나도 표시되지 않을 때 */
+                <div className="flex items-center justify-center h-20 text-gray-500 text-sm text-center">
+                    <div>
+                        <div className="text-2xl mb-2">📊</div>
+                        <div>표시할 메트릭이 없습니다.</div>
+                        <div className="text-xs text-gray-400 mt-1">
+                            하드코딩 모드에서 메트릭 설정이 모두 비활성화되어 있습니다.
                         </div>
                     </div>
-                )}
-
-                {/* LogOn 정보 */}
-                {activeMetricsCount > 0 && (
-                    <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-xs">
-                        <span className="font-medium text-gray-700">LogOn : 44:42:17</span>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 animate-pulse"></div>
-                            <span className="text-green-600 font-bold">온라인</span>
-                        </div>
-                    </div>
-                )}
-            </div>
-
+                </div>
+            )}
         </div>
     );
 };

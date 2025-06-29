@@ -1,62 +1,4 @@
-
-// import { useRef, useLayoutEffect, useState } from "react";
-// import CustomTitlebar from "./ui/CustomTitlebar";
-// import PanelModeContent from "./ui/PanelModeContent";
-
-// interface PanelModePageProps {
-//     onBackToLauncher?: () => void;
-// }
-
-// export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) {
-//     const contentRef = useRef<HTMLDivElement>(null);
-//     const [currentSize, setCurrentSize] = useState({ width: 0, height: 0 });
-
-//     useLayoutEffect(() => {
-//         const updateSize = () => {
-//             if (contentRef.current) {
-//                 const rect = contentRef.current.getBoundingClientRect();
-//                 // 🔥 순수한 측정값만 사용 (추가 계산 제거)
-//                 const width = Math.ceil(rect.width);
-//                 const height = Math.ceil(rect.height);
-
-//                 setCurrentSize({ width, height });
-//                 console.log(`🔍 실제 컨텐츠 크기: ${width} × ${height}px`);
-//                 console.log(`📏 rect 상세:`, rect);
-//             }
-//         };
-
-//         updateSize();
-
-//         const resizeObserver = new ResizeObserver(() => {
-//             updateSize();
-//         });
-
-//         if (contentRef.current) {
-//             resizeObserver.observe(contentRef.current);
-//         }
-
-//         return () => {
-//             resizeObserver.disconnect();
-//         };
-//     }, []);
-
-//     return (
-//         <div className="h-screen flex flex-col bg-white">
-//             <CustomTitlebar
-//                 title="CTI Task Master – 패널 모드"
-//                 onBackToLauncher={onBackToLauncher || (() => { })}
-//                 currentSize={currentSize}
-//             />
-//             <div ref={contentRef} className="p-4 flex flex-col gap-4">
-//                 <PanelModeContent />
-//             </div>
-//         </div>
-//     );
-// }
-
-// C:\tauri\cti-task-manager-tauri\src\app\panel-mode\index.tsx
-
-import { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { invoke } from '@tauri-apps/api/core';
 import CustomTitlebar from "./ui/CustomTitlebar";
 import PanelModeContent from "./ui/PanelModeContent";
@@ -66,101 +8,182 @@ interface PanelModePageProps {
 }
 
 export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) {
-    // 🎯 컨텐츠 영역만 측정
-    const contentRef = useRef<HTMLDivElement>(null);
     const [currentSize, setCurrentSize] = useState({ width: 0, height: 0 });
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [hasAppliedSize, setHasAppliedSize] = useState(false);
+    const [initialSizeSet, setInitialSizeSet] = useState(false);
 
-    useLayoutEffect(() => {
-        const updateSize = async () => {
-            if (contentRef.current) {
-                const rect = contentRef.current.getBoundingClientRect();
-                const contentWidth = Math.ceil(rect.width);
-                const contentHeight = Math.ceil(rect.height);
+    // 🎯 크기 적용 함수
+    const applyWindowSize = useCallback(async (size: { width: number; height: number }) => {
+        try {
+            console.log(`🔄 윈도우 크기 적용: ${size.width}x${size.height}`);
 
-                // 🔧 보정값 계산
-                const TITLEBAR_HEIGHT = 41; // 타이틀바 높이 (border 포함)
-                const PADDING = 16; // p-2 = 8px * 2 = 16px 
-                const WINDOW_BORDER = 8; // 윈도우 경계선 등 여백
-
-                const finalWidth = contentWidth;
-                const finalHeight = contentHeight + TITLEBAR_HEIGHT + PADDING + WINDOW_BORDER;
-
-                setCurrentSize({
-                    width: finalWidth,
-                    height: finalHeight
-                });
-
-                try {
-                    await invoke('save_window_size', {
-                        width: finalWidth,
-                        height: finalHeight
-                    });
-                    await invoke('apply_window_size', {
-                        width: finalWidth,
-                        height: finalHeight
-                    });
-                    console.log(`✅ 윈도우 크기 업데이트: ${finalWidth}x${finalHeight}`);
-                } catch (error) {
-                    console.error("❌ 윈도우 크기 조정 실패:", error);
-                }
-
-                // 🔍 상세 디버깅 정보
-                console.log(`📏 컨텐츠 크기: ${contentWidth} × ${contentHeight}px`);
-                console.log(`🔧 보정값: 타이틀바(${TITLEBAR_HEIGHT}) + 패딩(${PADDING}) + 여백(${WINDOW_BORDER}) = +${TITLEBAR_HEIGHT + PADDING + WINDOW_BORDER}px`);
-                console.log(`🎯 최종 윈도우 크기: ${finalWidth} × ${finalHeight}px`);
-            }
-        };
-
-        // DOM 렌더링 완료 후 측정
-        const timer = setTimeout(updateSize, 150);
-
-        const resizeObserver = new ResizeObserver(() => {
-            console.log("🔄 컨텐츠 크기 변화 감지");
-            // 약간의 지연으로 안정적인 측정
-            setTimeout(updateSize, 100);
-        });
-
-        if (contentRef.current) {
-            resizeObserver.observe(contentRef.current);
-        }
-
-        return () => {
-            clearTimeout(timer);
-            resizeObserver.disconnect();
-        };
-    }, []);
-
-    // 🔄 앱 시작 시 저장된 크기 복원
-    useEffect(() => {
-        const restoreSize = async () => {
+            // 백엔드 저장 시도
             try {
-                const size = await invoke('load_window_size') as { width: number, height: number };
+                await invoke('save_window_size', {
+                    width: size.width,
+                    height: size.height
+                });
+                console.log('💾 크기 저장 완료');
+            } catch (saveError) {
+                console.log('ℹ️ 크기 저장 함수 없음');
+            }
+
+            // 백엔드 적용 시도
+            try {
                 await invoke('apply_window_size', {
                     width: size.width,
                     height: size.height
                 });
-                console.log(`🔄 저장된 크기 복원: ${size.width}x${size.height}`);
-            } catch (error) {
-                console.error("❌ 크기 복원 실패:", error);
+                console.log('🎯 크기 적용 완료');
+            } catch (applyError) {
+                console.log('ℹ️ 크기 적용 함수 없음');
+            }
+
+            setHasAppliedSize(true);
+            console.log(`✅ 크기 처리 완료: ${size.width}x${size.height}`);
+
+        } catch (error) {
+            console.error("❌ 윈도우 크기 처리 실패:", error);
+        }
+    }, []);
+
+    // 🎯 PanelModeContent에서 계산된 크기 받기
+    const handleSizeCalculated = useCallback((size: { width: number; height: number }) => {
+        console.log(`📐 새 크기 수신: ${size.width}x${size.height}`);
+
+        setCurrentSize(size);
+
+        // 초기 설정이 완료되었거나, 크기가 현재와 다른 경우에만 적용
+        if (!initialSizeSet ||
+            Math.abs(size.width - currentSize.width) > 10 ||
+            Math.abs(size.height - currentSize.height) > 10) {
+
+            console.log('📏 크기 변화 감지 - 적용 시작');
+            setInitialSizeSet(true);
+            applyWindowSize(size);
+        }
+    }, [currentSize, initialSizeSet, applyWindowSize]);
+
+    // 📱 수동 크기 맞춤 함수
+    const manualResize = useCallback(async () => {
+        console.log("📐 수동 크기 맞춤 요청");
+
+        // 수동 요청시에는 플래그들 리셋하고 강제 재계산
+        setHasAppliedSize(false);
+        setInitialSizeSet(false);
+
+        // 잠시 후 컨텐츠 재측정하도록 유도
+        setTimeout(() => {
+            console.log("🔄 컨텐츠 재측정 유도");
+            window.dispatchEvent(new Event('resize'));
+        }, 100);
+    }, []);
+
+    // ⌨️ 키보드 단축키
+    useEffect(() => {
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                console.log("⌨️ Ctrl+R 수동 리사이즈");
+                manualResize();
+            }
+            if (e.key === 'F5') {
+                e.preventDefault();
+                console.log("⌨️ F5 수동 리사이즈");
+                manualResize();
             }
         };
 
-        // 컴포넌트 마운트 후 약간 지연
-        const timer = setTimeout(restoreSize, 200);
+        document.addEventListener('keydown', handleKeyPress);
+        return () => document.removeEventListener('keydown', handleKeyPress);
+    }, [manualResize]);
+
+    // 🔄 앱 시작 시 초기화
+    useEffect(() => {
+        const initializePanel = async () => {
+            try {
+                console.log("🚀 패널 모드 초기화 시작");
+
+                // 💡 새로고침 시 최소 크기로 먼저 설정하여 스크롤 방지
+                try {
+                    const INITIAL_WIDTH = 900;
+                    const INITIAL_HEIGHT = 500;
+
+                    console.log(`🎯 초기 최소 크기 설정: ${INITIAL_WIDTH}x${INITIAL_HEIGHT}`);
+
+                    await invoke('apply_window_size', {
+                        width: INITIAL_WIDTH,
+                        height: INITIAL_HEIGHT
+                    });
+
+                    // 잠시 대기 후 정확한 크기 재계산 유도
+                    setTimeout(() => {
+                        console.log("🔄 정확한 크기 재계산 유도");
+                        window.dispatchEvent(new Event('resize'));
+                    }, 200);
+
+                } catch (error) {
+                    console.log('ℹ️ 초기 크기 설정 함수 없음');
+                }
+
+            } catch (error) {
+                console.error("❌ 패널 초기화 실패:", error);
+            } finally {
+                setIsInitialized(true);
+                console.log("✅ 패널 모드 초기화 완료");
+            }
+        };
+
+        const timer = setTimeout(initializePanel, 100);
         return () => clearTimeout(timer);
     }, []);
+
+    if (!isInitialized) {
+        return (
+            <div className="h-full bg-white p-2 rounded-lg shadow-md border border-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                    <span className="text-sm text-gray-600">패널 초기화 중...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col bg-white min-h-screen">
             <CustomTitlebar
-                title="CTI Task Master – 패널 모드"
+                title="CTI Task Master - 패널 모드"
                 onBackToLauncher={onBackToLauncher || (() => { })}
                 currentSize={currentSize}
             />
-            {/* 🎯 이 영역만 측정해서 정확한 컨텐츠 크기 파악 */}
-            <div ref={contentRef} className="p-2 flex flex-col gap-2">
-                <PanelModeContent />
+
+            {/* 🎯 컨텐츠 영역 */}
+            <div className="p-2 flex flex-col">
+                <PanelModeContent
+                    onSizeCalculated={handleSizeCalculated}
+                    showTopBoxes={true}
+                    showBottomBox={true}
+                />
             </div>
+
+            {/* 🔍 개발 모드 상태 정보 */}
+            {/* {import.meta.env.MODE === 'development' && (
+                <div className="fixed bottom-2 left-2 bg-black bg-opacity-90 text-white text-xs p-3 rounded font-mono z-50">
+                    <div className="text-green-400 font-bold mb-2">🎯 크기 상태</div>
+
+                    <div className="space-y-1">
+                        <div>현재 크기: {currentSize.width}×{currentSize.height}</div>
+                        <div>적용 상태: {hasAppliedSize ? '✅ 완료' : '⏸️ 대기'}</div>
+                        <div>초기 설정: {initialSizeSet ? '✅ 완료' : '⏸️ 대기'}</div>
+                    </div>
+
+                    <div className="text-xs mt-2 pt-2 border-t border-gray-600">
+                        <div>단축키: Ctrl+R, F5 (강제 리사이즈)</div>
+                        <div className="text-yellow-400">스크롤 방지 모드</div>
+                    </div>
+                </div>
+            )} */}
         </div>
     );
 }
