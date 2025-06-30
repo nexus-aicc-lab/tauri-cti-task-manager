@@ -1,8 +1,9 @@
-// C:\tauri\cti-task-manager-tauri\src-tauri\src\windows.rs
+// src-tauri/src/windows.rs
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use uuid::Uuid;
 
-/// 앱에서 사용할 윈도우 모드 종류 정의
+/// 윈도우 모드
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum WindowMode {
@@ -13,233 +14,241 @@ pub enum WindowMode {
     Login,
 }
 
-/// 각 모드별 윈도우 옵션을 저장하는 구조체
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct WindowConfig {
-    pub url: String,
-    pub title: String,
-    pub width: f64,
-    pub height: f64,
-    pub min_width: Option<f64>,
-    pub min_height: Option<f64>,
-    pub resizable: bool,
-    pub always_on_top: bool,
-    pub decorations: bool,
-    pub max_width: Option<f64>, // 최대 너비 추가
+/// 윈도우 설정
+#[derive(Clone, Debug)]
+struct WindowConfig {
+    url: String,
+    title: String,
+    width: f64,
+    height: f64,
+    min_width: Option<f64>,
+    min_height: Option<f64>,
+    resizable: bool,
+    always_on_top: bool,
+    decorations: bool,
+    is_main: bool,        // ✅ 메인 창 여부 추가
+    is_independent: bool, // ✅ 독립 창 여부 추가
 }
 
 impl WindowMode {
-    /// 이 모드가 메인 윈도우인지 확인 (기존 창을 대체해야 하는지)
-    pub fn is_main_window(&self) -> bool {
-        matches!(
-            self,
-            WindowMode::Launcher | WindowMode::Bar | WindowMode::Panel
-        )
-    }
-
-    /// 모드별 기본 윈도우 설정 반환
-    pub fn default_config(&self) -> WindowConfig {
+    fn config(&self) -> WindowConfig {
         match self {
             WindowMode::Launcher => WindowConfig {
-                // url: "index.html?mode=launcher".into(),
-                url: "launcher.html".into(), // 🔥 이 부분만 변경
+                url: "launcher.html".into(),
                 title: "CTI Task Master - 런처".into(),
                 width: 500.0,
                 height: 600.0,
                 min_width: Some(400.0),
                 min_height: Some(500.0),
-                max_width: Some(600.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: false,
                 decorations: true,
+                is_main: true, // ✅ 메인 창
+                is_independent: false,
             },
             WindowMode::Bar => WindowConfig {
-                url: "index.html?mode=bar".into(),
+                url: "bar.html".into(),
                 title: "CTI Task Master - 바 모드".into(),
                 width: 1200.0,
                 height: 40.0,
                 min_width: Some(800.0),
                 min_height: Some(40.0),
-                max_width: Some(1500.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: true,
                 decorations: false,
+                is_main: true, // ✅ 메인 창
+                is_independent: false,
             },
             WindowMode::Panel => WindowConfig {
-                url: "index.html?mode=panel".into(),
+                url: "panel.html".into(),
                 title: "CTI Task Master - 패널 모드".into(),
-                width: 900.0,            // 기본 크기를 약간 줄임
-                height: 350.0,           // 기본 크기를 약간 줄임
-                min_width: Some(600.0),  // 🔥 최소 너비 제한 추가 (반응형 대응)
-                min_height: Some(200.0), // 🔥 최소 높이 제한 추가 (반응형 대응)
-                max_width: Some(900.0),  // 🔥 최대 너비 제한 추가
+                width: 900.0,
+                height: 350.0,
+                min_width: Some(600.0),
+                min_height: Some(200.0),
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
+                is_main: true, // ✅ 메인 창
+                is_independent: false,
             },
             WindowMode::Settings => WindowConfig {
-                // url: "index.html?mode=settings".into(),
-                url: "settings.html".into(), // 🔥 이 부분 변경
+                url: "settings.html".into(),
                 title: "CTI Task Master - 환경 설정".into(),
                 width: 900.0,
                 height: 700.0,
                 min_width: Some(550.0),
                 min_height: Some(450.0),
-                max_width: Some(1200.0), // 🔥 최대 너비 제한 추가
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
+                is_main: true, // ✅ 메인 창
+                is_independent: false,
             },
             WindowMode::Login => WindowConfig {
-                url: "index.html?mode=login".into(),
+                url: "login.html".into(),
                 title: "CTI Task Master - 로그인".into(),
                 width: 500.0,
                 height: 600.0,
                 min_width: Some(400.0),
                 min_height: Some(500.0),
-                max_width: Some(600.0), // 🔥 최대 너비 제한 추가
                 resizable: false,
                 always_on_top: true,
                 decorations: true,
+                is_main: false,       // ✅ 메인 창 아님
+                is_independent: true, // ✅ 독립 창
             },
         }
     }
+
+    // ✅ config에서 가져오는 방식으로 변경
+    fn is_main(&self) -> bool {
+        self.config().is_main
+    }
+
+    fn is_independent(&self) -> bool {
+        self.config().is_independent
+    }
 }
 
-/// 공통으로 윈도우를 생성하고, 기존 윈도우를 정리하는 함수
-pub fn create_window(handle: &AppHandle, mode: WindowMode) {
-    let config = mode.default_config();
-    let timestamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+/// 🔄 창 교체 (메인 기능) - 안전한 순서: 새 창 생성 → 기존 창 닫기
+pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
+    println!("🔄 창 교체 시작: {:?}", mode);
 
-    let label = format!("{:?}_{}", mode, timestamp).to_lowercase();
+    // ✅ 1단계: 새 창을 먼저 생성
+    let new_window_created = create_window(handle, mode.clone());
 
-    let mut window_builder =
-        WebviewWindowBuilder::new(handle, &label, WebviewUrl::App(config.url.parse().unwrap()))
+    if new_window_created {
+        println!("✅ 새 창 생성 완료, 기존 창 정리 시작");
+
+        // ✅ 2단계: 새 창이 성공적으로 생성된 후에만 기존 창들 닫기
+        // 🚨 중요: 잠시 대기 후 닫기 (앱 종료 방지)
+        std::thread::sleep(std::time::Duration::from_millis(100));
+
+        if mode.is_main() {
+            close_main_windows_safely(handle);
+        } else if mode.is_independent() {
+            close_same_type_windows(handle, &mode);
+        }
+
+        println!("✅ 창 교체 완료: {:?}", mode);
+    } else {
+        println!("❌ 새 창 생성 실패: {:?}", mode);
+    }
+}
+
+/// 🪟 창 생성 - 성공/실패 반환
+pub fn create_window(handle: &AppHandle, mode: WindowMode) -> bool {
+    let config = mode.config();
+    let label = format!(
+        "{}_{}",
+        match mode {
+            WindowMode::Launcher => "launcher",
+            WindowMode::Bar => "bar",
+            WindowMode::Panel => "panel",
+            WindowMode::Settings => "settings",
+            WindowMode::Login => "login",
+        },
+        Uuid::new_v4()
+    );
+
+    println!("🏗️ 창 생성 시작: {} ({})", config.title, label);
+
+    let mut builder =
+        WebviewWindowBuilder::new(handle, label.clone(), WebviewUrl::App(config.url.into()))
             .title(&config.title)
             .inner_size(config.width, config.height)
             .resizable(config.resizable)
             .always_on_top(config.always_on_top)
-            .decorations(config.decorations)
-            .visible(true);
+            .decorations(config.decorations);
 
-    // 최소 크기 설정 (resize 가능한 경우에만)
-    if config.resizable {
-        if let (Some(min_width), Some(min_height)) = (config.min_width, config.min_height) {
-            window_builder = window_builder.min_inner_size(min_width, min_height);
-            println!("🔧 최소 크기 설정: {}x{}", min_width, min_height);
-        }
+    if let Some(min_width) = config.min_width {
+        builder = builder.min_inner_size(min_width, config.min_height.unwrap_or(0.0));
     }
 
-    // 설정 창일 경우, 부모 창 중앙에 배치
-    if matches!(mode, WindowMode::Settings) {
-        let windows = handle.webview_windows();
-        let mut parent_found = false;
-
-        for (window_label, window) in windows.iter() {
-            if window_label.starts_with("bar_")
-                || window_label.starts_with("panel_")
-                || window_label.starts_with("launcher_")
-            {
-                if let Ok(position) = window.outer_position() {
-                    if let Ok(size) = window.outer_size() {
-                        let center_x =
-                            position.x + (size.width as i32 / 2) - (config.width as i32 / 2);
-                        let center_y =
-                            position.y + (size.height as i32 / 2) - (config.height as i32 / 2);
-
-                        window_builder = window_builder.position(center_x as f64, center_y as f64);
-                        parent_found = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if !parent_found {
-            window_builder = window_builder.center();
-        }
-    }
-    // 로그인 창일 경우, 런처 창의 위치를 찾아서 그 위에 배치
-    else if matches!(mode, WindowMode::Login) {
-        let windows = handle.webview_windows();
-        for (window_label, window) in windows.iter() {
-            if window_label.starts_with("launcher_") {
-                if let Ok(position) = window.outer_position() {
-                    let new_position = LogicalPosition::new(position.x as f64, position.y as f64);
-                    window_builder = window_builder.position(new_position.x, new_position.y);
-                    break;
-                }
-            }
-        }
-        if !windows
-            .iter()
-            .any(|(label, _)| label.starts_with("launcher_"))
-        {
-            window_builder = window_builder.center();
-        }
-    } else {
-        window_builder = window_builder.center();
-    }
-
-    let window_result = window_builder.build();
-
-    match window_result {
-        Ok(window) => {
-            println!("✅ 새 창 생성 성공: {}", label);
-
-            // 패널 모드의 경우 추가 설정
-            if matches!(mode, WindowMode::Panel) {
-                println!("🎯 패널 모드 창 추가 설정");
-
-                // 윈도우가 생성된 후 약간의 지연을 두고 초기 크기 조정
-                let window_clone = window.clone();
-                tauri::async_runtime::spawn(async move {
-                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-
-                    // 초기 크기가 예상과 다를 경우를 대비한 보정
-                    if let Ok(current_size) = window_clone.inner_size() {
-                        println!(
-                            "📏 패널 창 현재 크기: {}x{}",
-                            current_size.width, current_size.height
-                        );
-
-                        // 너무 크거나 작으면 기본값으로 재조정
-                        if current_size.width > 1500 || current_size.height > 800 {
-                            let _ = window_clone.set_size(tauri::Size::Physical(
-                                tauri::PhysicalSize::new(900, 350),
-                            ));
-                            println!("🔧 패널 크기 자동 보정 완료");
-                        }
-                    }
-                });
-            }
-
-            if mode.is_main_window() {
-                println!("🔄 메인 윈도우 모드 - 기존 메인 창 정리");
-
-                let windows = handle.webview_windows();
-                for (other_label, window) in windows.iter() {
-                    if &label != other_label {
-                        let should_keep = other_label.starts_with("settings_")
-                            || other_label.starts_with("login_");
-
-                        if !should_keep {
-                            println!("🗑️ 기존 창 닫기: {}", other_label);
-                            let _ = window.destroy();
-                        } else {
-                            println!("🔒 창 유지: {}", other_label);
-                        }
-                    }
-                }
-            } else {
-                println!("📌 보조 윈도우 모드 - 기존 창 모두 유지");
-            }
+    match builder.build() {
+        Ok(_) => {
+            println!("✅ 창 생성 성공: {}", label);
+            true
         }
         Err(e) => {
-            eprintln!("❌ 창 생성 실패: {:?} - {}", mode, e);
+            println!("❌ 창 생성 실패: {} - {:?}", label, e);
+            false
+        }
+    }
+}
+
+/// ➕ 창 추가
+pub fn add_window(handle: &AppHandle, mode: WindowMode) {
+    println!("➕ 창 추가: {:?}", mode);
+    let success = create_window(handle, mode);
+    if !success {
+        println!("❌ 창 추가 실패");
+    }
+}
+
+/// 🗑️ 메인 창들 안전하게 닫기 (앱 종료 방지)
+fn close_main_windows_safely(handle: &AppHandle) {
+    let windows = handle.webview_windows();
+    let mut windows_to_close = Vec::new();
+
+    // 닫을 창들을 수집
+    for (label, _) in windows.iter() {
+        if label.starts_with("launcher_")
+            || label.starts_with("bar_")
+            || label.starts_with("panel_")
+            || label.starts_with("settings_")
+        {
+            windows_to_close.push(label.clone());
+        }
+    }
+
+    println!("🔍 닫을 대상 창들: {:?}", windows_to_close);
+
+    // 🚨 중요: 최소 2개 이상의 창이 있을 때만 이전 창들을 닫기 (앱 종료 방지)
+    if windows_to_close.len() > 1 {
+        // 정렬하여 가장 오래된 창들부터 닫기 (최신 창 보호)
+        windows_to_close.sort();
+
+        // 마지막 창(최신)은 보호하고 나머지만 닫기
+        for label in &windows_to_close[..windows_to_close.len() - 1] {
+            if let Some(window) = windows.get(label) {
+                println!("🗑️ 이전 메인 창 닫기: {}", label);
+                let _ = window.destroy();
+
+                // 창 닫기 간 약간의 딜레이 (안정성)
+                std::thread::sleep(std::time::Duration::from_millis(50));
+            }
+        }
+        println!("✅ 이전 창들 정리 완료, 최신 창 유지");
+    } else {
+        println!("ℹ️ 단일 창 상태, 정리하지 않음 (앱 종료 방지)");
+    }
+}
+
+/// 🗑️ 동일한 타입의 창들 닫기 (Login 등 독립 창용)
+fn close_same_type_windows(handle: &AppHandle, mode: &WindowMode) {
+    let windows = handle.webview_windows();
+    let prefix = match mode {
+        WindowMode::Login => "login_",
+        _ => return,
+    };
+
+    let mut windows_to_close = Vec::new();
+    for (label, _) in windows.iter() {
+        if label.starts_with(prefix) {
+            windows_to_close.push(label.clone());
+        }
+    }
+
+    // 독립 창도 최신 것은 보호
+    if windows_to_close.len() > 1 {
+        windows_to_close.sort();
+        for label in &windows_to_close[..windows_to_close.len() - 1] {
+            if let Some(window) = windows.get(label) {
+                println!("🗑️ 동일 타입 이전 창 닫기: {}", label);
+                let _ = window.destroy();
+            }
         }
     }
 }

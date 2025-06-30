@@ -4,15 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import SystemSettingWindow from '../../app/system-setting-window';
-import { requestModeSwitch } from '../../shared/utils/windowManager';
 import type { WindowMode } from '../../shared/types/window';
 
 const SettingsApp: React.FC = () => {
     console.log('⚙️ 설정 윈도우 앱 시작');
-
-    const handleModeChange = async (mode: WindowMode) => {
-        await requestModeSwitch(mode);
-    };
 
     return (
         <div

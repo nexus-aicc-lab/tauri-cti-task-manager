@@ -10,18 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [
-      {
-        "label": "main",
-        "url": "index.html",
-        "width": 500,
-        "height": 600,
-        "resizable": false,
-        "visible": true,
-        "title": "CTI Task Master - 런처",
-        "center": true
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": {
         "default-src": "'self' asset:",

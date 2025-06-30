@@ -5,15 +5,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Launcher } from '../../app/launcher';
-import { requestModeSwitch } from '../../shared/utils/windowManager';
 import type { WindowMode } from '../../shared/types/window';
 
 const LauncherApp: React.FC = () => {
     console.log('🚀 런처 윈도우 앱 시작');
-
-    const handleModeChange = async (mode: WindowMode) => {
-        await requestModeSwitch(mode);
-    };
 
     return (
         <div
@@ -24,7 +19,7 @@ const LauncherApp: React.FC = () => {
                 overflow: 'hidden',
             }}
         >
-            <Launcher onModeChange={handleModeChange} />
+            <Launcher />
 
             {/* Toast UI */}
             <ToastContainer

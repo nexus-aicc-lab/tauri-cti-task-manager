@@ -1,40 +1,13 @@
+// C:\tauri\cti-task-manager-tauri\src\app\launcher\index.tsx
 
-
-// src/pages/Launcher.tsx (시스템 환경 설정 추가)
 import React, { useState, useEffect } from 'react';
 import { emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
 
-interface LauncherProps {
-    onModeChange: (mode: Mode) => void;
-}
-
-// 딥링크 데이터 인터페이스
-interface DeepLinkData {
-    timestamp: string;
-    url: string;
-    scheme: string;
-    path: string;
-    query_params: [string, string][];
-}
-
-// 파싱된 로그인 데이터 인터페이스
-interface ParsedLoginData {
-    username: string;
-    department: string;
-    role: string;
-    email: string;
-    safeToken: string;
-    timestamp: string;
-    sessionId: string;
-    loginMethod: string;
-    koreanSupport: string;
-    version: string;
-}
-
-export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
+// ✅ onModeChange prop 제거 - 모든 모드 변경을 직접 이벤트로 처리
+export const Launcher: React.FC = () => {
     // 딥링크 히스토리 state
     const [deepLinkHistory, setDeepLinkHistory] = useState<DeepLinkData[]>([]);
     const [isLoadingDeepLinks, setIsLoadingDeepLinks] = useState(false);
@@ -130,23 +103,13 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
         }
     };
 
-    // 로그인 창 열기 (새 창)
-    const openLoginWindow = async () => {
+    // 🎯 통합 모드 변경 함수 - 모든 버튼이 이 함수를 사용
+    const switchMode = async (mode: Mode) => {
         try {
-            await emit('switch-mode', 'login');
-            console.log('📤 로그인 창 열기 요청 전송');
+            await emit('switch-mode', mode);
+            console.log(`📤 ${mode} 모드로 창 교체 요청 전송`);
         } catch (error) {
-            console.error('❌ 로그인 창 열기 실패:', error);
-        }
-    };
-
-    // 🆕 시스템 환경 설정 창 열기 (새 창)
-    const openSystemSettingsWindow = async () => {
-        try {
-            await emit('switch-mode', 'settings');
-            console.log('📤 시스템 환경 설정 창 열기 요청 전송');
-        } catch (error) {
-            console.error('❌ 시스템 환경 설정 창 열기 실패:', error);
+            console.error(`❌ ${mode} 모드 교체 실패:`, error);
         }
     };
 
@@ -320,18 +283,19 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                 </h1>
 
                 <div className="space-y-3">
+                    {/* ✅ 모든 버튼이 switchMode 함수 사용 */}
                     <button
-                        onClick={openLoginWindow}
+                        onClick={() => switchMode('login')}
                         className="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                     >
-                        🔐 로그인 (새 창)
+                        🔐 로그인
                         <div className="text-xs text-purple-100 mt-0.5">
                             사용자 인증 창 열기 (500x600)
                         </div>
                     </button>
 
                     <button
-                        onClick={() => onModeChange('bar')}
+                        onClick={() => switchMode('bar')}
                         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                     >
                         📊 바 모드
@@ -341,7 +305,7 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                     </button>
 
                     <button
-                        onClick={() => onModeChange('panel')}
+                        onClick={() => switchMode('panel')}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                     >
                         📋 패널 모드
@@ -350,12 +314,11 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                         </div>
                     </button>
 
-                    {/* 🆕 시스템 환경 설정 버튼 추가 */}
                     <button
-                        onClick={openSystemSettingsWindow}
+                        onClick={() => switchMode('settings')}
                         className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                     >
-                        ⚙️ 시스템 환경 설정 (새 창)
+                        ⚙️ 시스템 환경 설정
                         <div className="text-xs text-orange-100 mt-0.5">
                             시스템 전체 설정 관리 (600x500)
                         </div>
@@ -370,7 +333,29 @@ export const Launcher: React.FC<LauncherProps> = ({ onModeChange }) => {
                     </p>
                 </div>
             </div>
-
         </div>
     );
 };
+
+// 딥링크 데이터 인터페이스
+interface DeepLinkData {
+    timestamp: string;
+    url: string;
+    scheme: string;
+    path: string;
+    query_params: [string, string][];
+}
+
+// 파싱된 로그인 데이터 인터페이스
+interface ParsedLoginData {
+    username: string;
+    department: string;
+    role: string;
+    email: string;
+    safeToken: string;
+    timestamp: string;
+    sessionId: string;
+    loginMethod: string;
+    koreanSupport: string;
+    version: string;
+}
