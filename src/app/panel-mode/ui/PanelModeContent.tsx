@@ -8,18 +8,14 @@ import AgentStatusInfoBoxForPanelMode4 from './AgentStatusInfoBoxForPanelMode4';
 
 interface PanelModeContentProps {
     onSizeCalculated?: (size: { width: number; height: number }) => void;
-    showTopBoxes?: boolean;
-    showBottomBox?: boolean;
 }
 
 const PanelModeContent: React.FC<PanelModeContentProps> = ({
-    onSizeCalculated,
-    showTopBoxes = true,
-    showBottomBox = false
+    onSizeCalculated
 }) => {
     const [lastNotifiedSize, setLastNotifiedSize] = useState({ width: 0, height: 0 });
     const isInitialMount = useRef(true);
-    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const resizeTimeoutRef = useRef<number | null>(null);
 
     // 🎯 react-use-measure로 정확한 크기 측정
     const [ref, bounds] = useMeasure({

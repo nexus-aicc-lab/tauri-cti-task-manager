@@ -10,7 +10,7 @@ interface PanelModePageProps {
 export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) {
     const [currentSize, setCurrentSize] = useState({ width: 0, height: 0 });
     const [isInitialized, setIsInitialized] = useState(false);
-    const [hasAppliedSize, setHasAppliedSize] = useState(false);
+    // const [hasAppliedSize, setHasAppliedSize] = useState(false);
     const [initialSizeSet, setInitialSizeSet] = useState(false);
 
     // 🎯 최대 크기 제한 상수 (windows.rs Panel 모드 설정 반영)
@@ -55,7 +55,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
                 console.log('ℹ️ [panel-mode] 크기 적용 함수 없음');
             }
 
-            setHasAppliedSize(true);
+            // setHasAppliedSize(true);
             console.log(`✅ [panel-mode] 크기 처리 완료: ${limitedSize.width}x${limitedSize.height}`);
 
         } catch (error) {
@@ -91,7 +91,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
         console.log("📐 [panel-mode] 수동 크기 맞춤 요청");
 
         // 수동 요청시에는 플래그들 리셋하고 강제 재계산
-        setHasAppliedSize(false);
+        // setHasAppliedSize(false);
         setInitialSizeSet(false);
 
         // 잠시 후 컨텐츠 재측정하도록 유도
@@ -208,8 +208,6 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
             <div className="p-2 flex flex-col">
                 <PanelModeContent
                     onSizeCalculated={handleSizeCalculated}
-                    showTopBoxes={true}
-                    showBottomBox={true}
                 />
             </div>
 

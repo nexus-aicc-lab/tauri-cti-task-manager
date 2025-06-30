@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const MinimapSettings = (props: Props) => {
+const MinimapSettings = () => {
     return (
         <div>
 

@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const GeneralSettings = (props: Props) => {
+const GeneralSettings = () => {
     return (
         <div>
 

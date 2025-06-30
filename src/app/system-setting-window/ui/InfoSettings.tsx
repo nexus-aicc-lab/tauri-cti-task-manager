@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const InfoSettings = (props: Props) => {
+const InfoSettings = () => {
     return (
         <div>
 

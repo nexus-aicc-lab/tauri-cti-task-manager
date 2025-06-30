@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const CallSettings = (props: Props) => {
+const CallSettings = () => {
     return (
         <div>
 

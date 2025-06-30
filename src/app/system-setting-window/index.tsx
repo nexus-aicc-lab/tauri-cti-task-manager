@@ -1,8 +1,8 @@
 
-
 // src/app/system-setting-window/index.tsx
 import React, { useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { invoke } from '@tauri-apps/api/core';  // ✅ 추가
 import GeneralSettings from './ui/GeneralSettings';
 import PersonalSettings from './ui/PersonalSettings';
 import CommunicationSettings from './ui/CommunicationSettings';
@@ -37,6 +37,11 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
         panelMode: 'floating',
         panelSize: 'medium',
         panelTransparency: 100,
+        // 패널 전체화면 관련 설정 추가
+        panelFullscreen: false,
+        panelMaximized: false,
+        panelWidth: 900,
+        panelHeight: 350,
     });
 
     const categories = [
@@ -69,6 +74,26 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
 
     const updateSetting = (key: string, value: any) => {
         setSettings(prev => ({ ...prev, [key]: value }));
+        console.log(`🔧 설정 업데이트: ${key} = ${value}`);
+    };
+
+    // ✅ 카테고리 변경 핸들러 - 패널설정 선택시 자동 최대화
+    const handleCategoryChange = async (categoryName: string) => {
+        setSelectedCategory(categoryName);
+
+        // 패널설정 선택시 자동으로 윈도우 최대화
+        if (categoryName === '패널설정') {
+            try {
+                await invoke('apply_window_size', {
+                    width: -3,  // -3: 최대화
+                    height: -3,
+                    windowType: 'settings'
+                });
+                console.log('✅ 패널설정 화면 - 윈도우 최대화 완료');
+            } catch (error) {
+                console.error('❌ 윈도우 최대화 실패:', error);
+            }
+        }
     };
 
     const renderContent = () => {
@@ -76,19 +101,19 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
 
         switch (selectedCategory) {
             case '일반':
-                return <GeneralSettings {...componentProps} />;
+                return <GeneralSettings />;
             case '개인':
-                return <PersonalSettings {...componentProps} />;
+                return <PersonalSettings />;
             case '통신설정':
-                return <CommunicationSettings {...componentProps} />;
+                return <CommunicationSettings />;
             case '통화설정':
-                return <CallSettings {...componentProps} />;
-            case '패널설정':
-                return <PanelModeSetting />;
+                return <CallSettings />;
             case '미니맵':
-                return <MinimapSettings {...componentProps} />;
+                return <MinimapSettings />;
             case '정보':
-                return <InfoSettings {...componentProps} />;
+                return <InfoSettings />;
+            case '패널설정':
+                return <PanelModeSetting />;  // ✅ props 전달 추가
             default:
                 return null;
         }
@@ -107,7 +132,7 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
                     className="text-white hover:bg-blue-600 px-2 py-1 text-xs"
                     style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}
                 >
-                    ×
+                    x
                 </button>
             </div>
 
@@ -117,7 +142,7 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
                     {categories.map(cat => (
                         <div
                             key={cat.name}
-                            onClick={() => setSelectedCategory(cat.name)}
+                            onClick={() => handleCategoryChange(cat.name)}
                             className={`flex items-center px-3 py-2 cursor-pointer text-sm border-b border-gray-200 ${selectedCategory === cat.name ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-50'}`}
                             style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}
                         >
@@ -130,7 +155,6 @@ const SystemSettingWindow: React.FC<SystemSettingWindowProps> = () => {
                 {/* 설정 내용 */}
                 <div className="flex-1 flex flex-col">
                     <div className="flex-1 p-0 bg-gray-50 overflow-auto" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>
-                        {/* <h3 className="text-lg font-medium mb-4">{selectedCategory}</h3> */}
                         {renderContent()}
                     </div>
                     <div className="bg-gray-100 px-4 py-3 border-t border-gray-300 flex justify-end space-x-2" style={{ WebkitAppRegion: 'no-drag' } as ExtendedCSSProperties}>

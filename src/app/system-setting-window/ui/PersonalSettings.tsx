@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const PersonalSettings = (props: Props) => {
+const PersonalSettings = () => {
     return (
         <div>
 

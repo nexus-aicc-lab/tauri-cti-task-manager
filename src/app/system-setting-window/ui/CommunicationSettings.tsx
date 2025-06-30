@@ -4,7 +4,7 @@ interface Props {
 
 }
 
-const CommunicationSettings = (props: Props) => {
+const CommunicationSettings = () => {
     return (
         <div>
 
