@@ -1,46 +1,8 @@
-// import { defineConfig } from "vite";
-// import react from "@vitejs/plugin-react";
-// import tailwindcss from '@tailwindcss/vite'
-
-
-// // @ts-expect-error process is a nodejs global
-// const host = process.env.TAURI_DEV_HOST;
-
-// // https://vitejs.dev/config/
-// export default defineConfig(async () => ({
-//   plugins: [
-//     react(),
-//     tailwindcss(),
-//   ],
-
-//   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-//   //
-//   // 1. prevent vite from obscuring rust errors
-//   clearScreen: false,
-//   // 2. tauri expects a fixed port, fail if that port is not available
-//   server: {
-//     port: 1420,
-//     strictPort: true,
-//     host: host || false,
-//     hmr: host
-//       ? {
-//         protocol: "ws",
-//         host,
-//         port: 1421,
-//       }
-//       : undefined,
-//     watch: {
-//       // 3. tell vite to ignore watching `src-tauri`
-//       ignored: ["**/src-tauri/**"],
-//     },
-//   },
-// }));
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'path';
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
@@ -50,10 +12,30 @@ export default defineConfig(async () => ({
     tailwindcss(),
   ],
 
-  // 경로 별칭 추가 (상대 경로 사용)
+  // 🔥 멀티 엔트리 빌드 설정 추가
+  build: {
+    rollupOptions: {
+      input: {
+        // 기존 메인 엔트리 (개발 중에는 유지)
+        main: resolve(__dirname, 'index.html'),
+
+        // 🆕 각 윈도우별 독립 엔트리
+        launcher: resolve(__dirname, 'launcher.html'),
+        bar: resolve(__dirname, 'bar.html'),
+        panel: resolve(__dirname, 'panel.html'),
+        settings: resolve(__dirname, 'settings.html'),
+        login: resolve(__dirname, 'login.html'),
+      },
+    },
+  },
+
+  // 🔥 경로 별칭 확장
   resolve: {
     alias: {
-      "@": "/src",
+      "@": resolve(__dirname, "src"),
+      "@shared": resolve(__dirname, "src/shared"),
+      "@app": resolve(__dirname, "src/app"),
+      "@windows": resolve(__dirname, "src/windows"),
     },
   },
 
@@ -67,7 +49,7 @@ export default defineConfig(async () => ({
         protocol: "ws",
         host,
         port: 1421,
-        overlay: false, // ← 이 한 줄이면 됩니다!
+        overlay: false,
       }
       : undefined,
     watch: {

@@ -1,114 +1,23 @@
+import React from 'react';
 
-// src/App.tsx
-import { useState, useEffect } from 'react';
-import { emit, listen } from '@tauri-apps/api/event';
-import LoginComponent from './pages/LoginMode';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import PanelModePage from './app/panel-mode';
-import BarModePage from './app/bar-mode';
-import { Launcher } from './app/launcher';
-import SystemSettingWindow from './app/system-setting-window';  // 새로 추가
+const App: React.FC = () => {
+    return (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+            <h1>🚀 Tauri 멀티윈도우 개발 중...</h1>
+            <p>각 윈도우별 독립 앱으로 이동 중입니다!</p>
 
-type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings';
-
-function App() {
-  const [mode, setMode] = useState<Mode>('launcher');
-
-  // URL 파라미터에서 모드 감지
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlMode = urlParams.get('mode') as Mode;
-
-    if (urlMode && ['launcher', 'bar', 'panel', 'login', 'settings'].includes(urlMode)) {
-      setMode(urlMode);
-      console.log(`🎯 URL에서 모드 감지: ${urlMode}`);
-    }
-  }, []);
-
-  // 자동 모드 전환 이벤트 리스너
-  useEffect(() => {
-    const unlisten = listen('auto-switch-mode', (event) => {
-      const newMode = event.payload as Mode;
-      console.log(`🔄 자동 모드 전환: ${newMode}`);
-      // 자동 전환은 Rust에서 새 창을 생성하므로 여기서는 처리하지 않음
-    });
-
-    return () => {
-      unlisten.then((fn) => fn());
-    };
-  }, []);
-
-  // 모드 전환 요청 (Rust에게 이벤트 전송)
-  const requestModeSwitch = async (newMode: Mode) => {
-    try {
-      await emit('switch-mode', newMode);
-      console.log(`📤 모드 전환 요청 전송: ${newMode}`);
-    } catch (error) {
-      console.error('❌ 모드 전환 요청 실패:', error);
-    }
-  };
-
-  console.log(`🎨 현재 렌더링 모드: ${mode}`);
-
-  // 모드별 배경색
-  const getBackgroundColor = () => {
-    switch (mode) {
-      case 'launcher':
-        return '#f3f4f6';
-      case 'bar':
-        return '#ffffff';  // 바 모드는 흰색 배경
-      case 'panel':
-        return '#059669';
-      case 'login':
-        return '#7c3aed';
-      case 'settings':
-        return '#f5f5f5';  // 설정 창은 연한 회색 배경
-      default:
-        return '#f3f4f6';
-    }
-  };
-
-  return (
-    <div
-      style={{
-        backgroundColor: getBackgroundColor(),
-        minHeight: '100vh',
-        width: '100%',
-        overflow: 'hidden',
-      }}
-    >
-      {mode === 'launcher' && <Launcher onModeChange={requestModeSwitch} />}
-
-      {mode === 'bar' && (
-        <BarModePage onModeChange={requestModeSwitch} />
-      )}
-
-      {mode === 'panel' && (
-        <div style={{ color: 'white' }}>
-          <PanelModePage
-          // onBackToLauncher={function (): void {
-          //   throw new Error('Function not implemented.');
-          // }} 
-          />
+            <div style={{ marginTop: '20px' }}>
+                <h3>개발 중인 윈도우들:</h3>
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                    <li>🎯 <a href="/launcher.html">런처 윈도우</a></li>
+                    <li>📊 <a href="/bar.html">바 윈도우</a></li>
+                    <li>📋 <a href="/panel.html">패널 윈도우</a></li>
+                    <li>⚙️ <a href="/settings.html">설정 윈도우</a></li>
+                    <li>🔐 <a href="/login.html">로그인 윈도우</a></li>
+                </ul>
+            </div>
         </div>
-      )}
-
-      {mode === 'login' && <LoginComponent />}
-
-      {/* 기존 설정 컴포넌트 대신 새로운 시스템 설정 창 사용 */}
-      {mode === 'settings' && <SystemSettingWindow />}
-
-      {/* ✅ Toast UI는 항상 렌더링! */}
-      <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        closeOnClick
-        pauseOnHover
-        theme="light"
-      />
-    </div>
-  );
-}
+    );
+};
 
 export default App;

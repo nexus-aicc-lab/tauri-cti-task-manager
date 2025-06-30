@@ -41,7 +41,8 @@ impl WindowMode {
     pub fn default_config(&self) -> WindowConfig {
         match self {
             WindowMode::Launcher => WindowConfig {
-                url: "index.html?mode=launcher".into(),
+                // url: "index.html?mode=launcher".into(),
+                url: "launcher.html".into(), // 🔥 이 부분만 변경
                 title: "CTI Task Master - 런처".into(),
                 width: 500.0,
                 height: 600.0,
@@ -77,7 +78,8 @@ impl WindowMode {
                 decorations: false,
             },
             WindowMode::Settings => WindowConfig {
-                url: "index.html?mode=settings".into(),
+                // url: "index.html?mode=settings".into(),
+                url: "settings.html".into(), // 🔥 이 부분 변경
                 title: "CTI Task Master - 환경 설정".into(),
                 width: 900.0,
                 height: 700.0,
