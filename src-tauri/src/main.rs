@@ -398,6 +398,7 @@ fn main() {
 
             // 이벤트 리스너들
             let event_handle = handle.clone();
+
             app.listen("switch-mode", move |event| {
                 let payload = event.payload();
                 if let Ok(mode) = serde_json::from_str::<WindowMode>(payload) {
