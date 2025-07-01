@@ -72,17 +72,30 @@ impl WindowMode {
                 is_main: true, // ✅ 메인 창
                 is_independent: false,
             },
+            // WindowMode::Settings => WindowConfig {
+            //     url: "settings.html".into(),
+            //     title: "CTI Task Master - 환경 설정".into(),
+            //     width: 900.0,
+            //     height: 700.0,
+            //     min_width: Some(550.0),
+            //     min_height: Some(450.0),
+            //     resizable: true,
+            //     always_on_top: false,
+            //     decorations: false,
+            //     is_main: true, // ✅ 메인 창
+            //     is_independent: false,
+            // },
             WindowMode::Settings => WindowConfig {
                 url: "settings.html".into(),
                 title: "CTI Task Master - 환경 설정".into(),
-                width: 900.0,
-                height: 700.0,
+                width: 650.0,
+                height: 420.0,
                 min_width: Some(550.0),
-                min_height: Some(450.0),
+                min_height: Some(420.0),
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
-                is_main: true, // ✅ 메인 창
+                is_main: true,
                 is_independent: false,
             },
             WindowMode::Login => WindowConfig {
