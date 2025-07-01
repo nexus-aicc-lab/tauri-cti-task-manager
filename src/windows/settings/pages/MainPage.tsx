@@ -1,4 +1,4 @@
-// C:\tauri\cti-task-manager-tauri\src\windows\settings\pages\MainPage.tsx
+// C:\\tauri\\cti-task-manager-tauri\\src\\windows\\settings\\pages\\MainPage.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -110,36 +110,58 @@ const MainPage: React.FC = () => {
     return (
         <div
             className="h-screen flex flex-col"
-            style={{ fontFamily: 'Malgun Gothic, sans-serif', backgroundColor: '#f1fafa', borderRadius: '8px', overflow: 'hidden' } as ExtendedCSSProperties}
+            style={{
+                fontFamily: 'Malgun Gothic, sans-serif',
+                backgroundColor: '#f1fafa',
+                borderRadius: '8px',
+                overflow: 'hidden'
+            } as ExtendedCSSProperties}
         >
             <CustomTitlebar title="환경설정" />
             <div className="flex flex-1">
-                <div className="w-36 border-r" style={{ backgroundColor: '#F1FBFC' }}>
+                <div
+                    className="w-36"
+                    style={{ backgroundColor: '#FFFFFF', borderRight: '1px solid #EBEBEB' }}
+                >
                     {categories.map(cat => (
                         <div
                             key={cat.name}
                             onClick={() => handleCategoryChange(cat.name)}
-                            className="flex items-center px-3 py-2 cursor-pointer text-sm border-b"
+                            className="flex items-center px-3 py-2 cursor-pointer text-sm"
                             style={{
-                                backgroundColor: selectedCategory === cat.name ? '#D0F0F2' : 'transparent',
-                                color: selectedCategory === cat.name ? '#00A1A7' : '#333',
-                                fontWeight: selectedCategory === cat.name ? '600' : 'normal',
-                            }}
+                                backgroundColor: selectedCategory === cat.name ? '#F1FBFC' : '#FFFFFF',
+                                color: '#333',
+                                borderBottom: '1px solid #EBEBEB'
+                            } as ExtendedCSSProperties}
                         >
-                            <img src={cat.iconPath} alt={cat.name} className="w-5 h-5 mr-2" />
+                            <img
+                                src={cat.iconPath}
+                                alt={cat.name}
+                                className="w-5 h-5 mr-2"
+                                style={{ filter: 'grayscale(60%) brightness(80%)' }}
+                            />
                             <span>{cat.name}</span>
                         </div>
                     ))}
                 </div>
                 <div className="flex-1 flex flex-col">
-                    <div className="flex-1 p-4 overflow-auto bg-white">
+                    <div className="flex-1 p-4 overflow-auto" style={{ backgroundColor: '#FFFFFF' }}>
                         {renderContent()}
                     </div>
-                    <div className="px-4 py-3 border-t flex justify-end space-x-2" style={{ backgroundColor: '#DFF2F4' }}>
-                        <button onClick={handleOK} className="px-6 py-1 bg-teal-600 text-white text-sm hover:bg-teal-700">
+                    <div
+                        className="px-4 py-3 flex justify-end space-x-2"
+                        style={{ backgroundColor: '#DFF2F4', borderTop: '1px solid #EBEBEB' }}
+                    >
+                        <button
+                            onClick={handleOK}
+                            className="px-6 py-1 bg-teal-600 text-white text-sm hover:bg-teal-700"
+                        >
                             확인
                         </button>
-                        <button onClick={handleCancel} className="px-6 py-1 bg-white border border-gray-300 text-sm hover:bg-gray-50">
+                        <button
+                            onClick={handleCancel}
+                            className="px-6 py-1 bg-white border border-gray-300 text-sm hover:bg-gray-50"
+                        >
                             취소
                         </button>
                     </div>
