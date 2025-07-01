@@ -148,9 +148,15 @@ const MainPage: React.FC = () => {
                     <div className="flex-1 p-4 overflow-auto" style={{ backgroundColor: '#FFFFFF' }}>
                         {renderContent()}
                     </div>
+                    {/* 푸터 분리, 배경 흰색으로 */}
                     <div
                         className="px-4 py-3 flex justify-end space-x-2"
-                        style={{ backgroundColor: '#DFF2F4', borderTop: '1px solid #EBEBEB' }}
+                        style={{
+                            backgroundColor: '#FFFFFF',
+                            // borderTop: '1px solid #EBEBEB',
+                            borderBottomLeftRadius: '8px',
+                            borderBottomRightRadius: '8px'
+                        }}
                     >
                         <button
                             onClick={handleOK}
