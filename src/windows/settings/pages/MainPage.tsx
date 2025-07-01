@@ -1,15 +1,15 @@
 
-// src/app/system-setting-window/index.tsx
+// C:\tauri\cti-task-manager-tauri\src\windows\settings\pages\MainPage.tsx
 import React, { useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { invoke } from '@tauri-apps/api/core';  // ✅ 추가
-import GeneralSettings from '@/app/system-setting-window/ui/GeneralSettings';
-import PersonalSettings from '@/app/system-setting-window/ui/PersonalSettings';
-import CommunicationSettings from '@/app/system-setting-window/ui/CommunicationSettings';
-import CallSettings from '@/app/system-setting-window/ui/CallSettings';
-import MinimapSettings from '@/app/system-setting-window/ui/MinimapSettings';
-import InfoSettings from '@/app/system-setting-window/ui/InfoSettings';
-import PanelModeSetting from '@/app/system-setting-window/ui/PanelModeSetting';
+import GeneralSettings from '@/windows/settings/pages/ui/GeneralSettings';
+import PersonalSettings from '@/windows/settings/pages/ui/PersonalSettings';
+import CommunicationSettings from '@/windows/settings/pages/ui/CommunicationSettings';
+import CallSettings from '@/windows/settings/pages/ui/CallSettings';
+import MinimapSettings from '@/windows/settings/pages/ui/MinimapSettings';
+import InfoSettings from '@/windows/settings/pages/ui/InfoSettings';
+import PanelModeSetting from '@/windows/settings/pages/ui/PanelModeSetting';
 
 
 // Extend CSS properties to include webkit-app-region
