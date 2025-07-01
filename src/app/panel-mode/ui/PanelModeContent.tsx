@@ -15,7 +15,7 @@ const PanelModeContent: React.FC<PanelModeContentProps> = ({
 }) => {
     const [lastNotifiedSize, setLastNotifiedSize] = useState({ width: 0, height: 0 });
     const isInitialMount = useRef(true);
-    const resizeTimeoutRef = useRef<number | null>(null);
+    const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // 🎯 react-use-measure로 정확한 크기 측정
     const [ref, bounds] = useMeasure({

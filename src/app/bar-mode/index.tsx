@@ -460,7 +460,6 @@
 import React, { useState, useEffect } from 'react';
 import { Pin, PinOff, Minus, BetweenHorizontalStart, X, LogOut } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import MainSystemMenu from '@/widgets/titlebar/ui/MainSystemMenu';
 
 interface Props {
     onModeChange: (mode: 'launcher' | 'bar' | 'panel' | 'login' | 'settings') => Promise<void>;
@@ -537,7 +536,7 @@ const BarModePage: React.FC<Props> = ({ onModeChange }) => {
         >
             {/* 좌측 시스템 메뉴 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-                <MainSystemMenu />
+                {/* <MainSystemMenu /> */}
 
                 {/* LogOff 버튼 */}
                 <div
