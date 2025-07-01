@@ -1,4 +1,3 @@
-// C:\\tauri\\cti-task-manager-tauri\\src\\windows\\settings\\pages\\MainPage.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -13,6 +12,7 @@ import MinimapSettings from '@/windows/settings/pages/ui/MinimapSettings';
 import InfoSettings from '@/windows/settings/pages/ui/InfoSettings';
 import PanelModeSetting from '@/windows/settings/pages/ui/PanelModeSetting';
 import CustomTitlebar from '../components/CustomTitlebar';
+import SideMenuForEnvironmentSettingWindow from '../components/SideMenuForEnvironmentSettingWindow';
 
 interface ExtendedCSSProperties extends React.CSSProperties {
     WebkitAppRegion?: 'drag' | 'no-drag';
@@ -44,16 +44,6 @@ const MainPage: React.FC = () => {
         panelHeight: 350,
     });
 
-    const categories = [
-        { name: '일반', iconPath: '/icons/environment_setting/settings_on_gear.svg' },
-        { name: '개인', iconPath: '/icons/environment_setting/profile_on_avatar.svg' },
-        { name: '큐 통계범위', iconPath: '/icons/environment_setting/statistics_lange_on.svg' },
-        { name: '통계보기', iconPath: '/icons/environment_setting/statistics_view_on.svg' },
-        { name: '통계항목', iconPath: '/icons/environment_setting/statistics_list_on.svg' },
-        { name: '미니바', iconPath: '/icons/environment_setting/minibar_on_panel.svg' },
-        { name: '알림', iconPath: '/icons/environment_setting/notifications_on_bell.svg' },
-    ];
-
     const handleClose = async () => {
         try {
             await getCurrentWebviewWindow().close();
@@ -79,16 +69,29 @@ const MainPage: React.FC = () => {
 
     const handleCategoryChange = async (categoryName: string) => {
         setSelectedCategory(categoryName);
-        if (categoryName === '패널설정') {
+        if (categoryName === '알림') {
             try {
                 await invoke('apply_window_size', {
                     width: -3,
                     height: -3,
                     windowType: 'settings',
                 });
-                console.log('✅ 패널설정 화면 - 윈도우 최대화 완료');
+                console.log('✅ 알림 화면 - 윈도우 최대화 완료');
             } catch (error) {
                 console.error('❌ 윈도우 최대화 실패:', error);
+            }
+        } else {
+            try {
+                // You might want to define a default size or logic to revert the window size
+                // when switching away from '알림' category. For now, leaving it as is.
+                // For example, to set a fixed size for other categories:
+                // await invoke('apply_window_size', {
+                //     width: 800,
+                //     height: 600,
+                //     windowType: 'settings',
+                // });
+            } catch (error) {
+                console.error('❌ 윈도우 크기 변경 실패:', error);
             }
         }
     };
@@ -102,7 +105,8 @@ const MainPage: React.FC = () => {
             case '통계보기': return <CallSettings />;
             case '통계항목': return <InfoSettings />;
             case '미니바': return <MinimapSettings />;
-            case '알림': return <PanelModeSetting />;
+            // case '알림': return <PanelModeSetting />;
+            case '알림': return <div>알림 페이지</div>;
             default: return null;
         }
     };
@@ -112,64 +116,58 @@ const MainPage: React.FC = () => {
             className="h-screen flex flex-col"
             style={{
                 fontFamily: 'Malgun Gothic, sans-serif',
-                backgroundColor: '#f1fafa',
+                backgroundColor: '#FFFFFF',
                 borderRadius: '8px',
                 overflow: 'hidden'
             } as ExtendedCSSProperties}
         >
             <CustomTitlebar title="환경설정" />
-            <div className="flex flex-1">
+
+            {/* 메인 컨텐츠 영역에 패딩 추가 */}
+            <div className="flex flex-1 pl-3 pr-2 pt-3 pb-2" >
+                {/* 컨텐츠 컨테이너 - 흰색 배경과 테두리 */}
                 <div
-                    className="w-36"
-                    style={{ backgroundColor: '#FFFFFF', borderRight: '1px solid #EBEBEB' }}
+                    className="flex flex-1"
+                    style={{
+                        backgroundColor: '#FFFFFF',
+                        // borderRadius: '8px',
+                        // border: '1px solid #E5E5E5',
+                        overflow: 'hidden'
+                    }}
                 >
-                    {categories.map(cat => (
-                        <div
-                            key={cat.name}
-                            onClick={() => handleCategoryChange(cat.name)}
-                            className="flex items-center px-3 py-2 cursor-pointer text-sm"
-                            style={{
-                                backgroundColor: selectedCategory === cat.name ? '#F1FBFC' : '#FFFFFF',
-                                color: '#333',
-                                borderBottom: '1px solid #EBEBEB'
-                            } as ExtendedCSSProperties}
-                        >
-                            <img
-                                src={cat.iconPath}
-                                alt={cat.name}
-                                className="w-5 h-5 mr-2"
-                                style={{ filter: 'grayscale(60%) brightness(80%)' }}
-                            />
-                            <span>{cat.name}</span>
+                    <SideMenuForEnvironmentSettingWindow
+                        selectedCategory={selectedCategory}
+                        onCategoryChange={handleCategoryChange}
+                    />
+                    <div className="flex-1 flex flex-col">
+                        <div className="flex-1 px-3 py-1 overflow-auto" style={{ position: 'relative' }}>
+                            {/* 컨텐츠 영역 크기 정보 */}
+
+                            {renderContent()}
                         </div>
-                    ))}
-                </div>
-                <div className="flex-1 flex flex-col">
-                    <div className="flex-1 p-4 overflow-auto" style={{ backgroundColor: '#FFFFFF' }}>
-                        {renderContent()}
-                    </div>
-                    {/* 푸터 분리, 배경 흰색으로 */}
-                    <div
-                        className="px-4 py-3 flex justify-end space-x-2"
-                        style={{
-                            backgroundColor: '#FFFFFF',
-                            // borderTop: '1px solid #EBEBEB',
-                            borderBottomLeftRadius: '8px',
-                            borderBottomRightRadius: '8px'
-                        }}
-                    >
-                        <button
-                            onClick={handleOK}
-                            className="px-6 py-1 bg-teal-600 text-white text-sm hover:bg-teal-700"
+                        {/* 푸터 */}
+                        <div
+                            className="flex justify-end space-x-2"
+                            style={{
+                                // Removed borderTop to make the footer border cleaner
+                                borderBottomRightRadius: '8px'
+                            }}
                         >
-                            확인
-                        </button>
-                        <button
-                            onClick={handleCancel}
-                            className="px-6 py-1 bg-white border border-gray-300 text-sm hover:bg-gray-50"
-                        >
-                            취소
-                        </button>
+                            <button
+                                onClick={handleOK}
+                                className="px-6 py-1 bg-teal-600 text-white text-sm hover:bg-teal-700"
+                                style={{ borderRadius: '4px' }}
+                            >
+                                확인
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="px-6 py-1 bg-white border border-gray-300 text-sm hover:bg-gray-50"
+                                style={{ borderRadius: '4px' }}
+                            >
+                                취소
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -77,44 +77,44 @@ export default function CustomTitlebar({ title }: Props) {
 
     return (
         <div
-            className="h-10 px-4 bg-[#55BDC7] flex items-center justify-between text-white border-b border-[#55AAB7] select-none"
+            className="h-6 px-4 bg-[#55BDC7] flex items-center justify-between text-white border-b border-[#55AAB7] select-none"
             data-tauri-drag-region
         >
-            <div className="text-sm font-semibold pointer-events-none">{title}</div>
+            <div className="text-xs font-semibold pointer-events-none">{title}</div>
             <div className="flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
                 <button
                     onClick={togglePin}
-                    className={`p-1 rounded transition-colors shadow-sm ${isPinned
-                        ? 'text-green-700 bg-white bg-opacity-90 hover:bg-opacity-100'
-                        : 'text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90'
+                    className={`p-0.5 rounded transition-colors shadow-sm ${isPinned
+                        ? 'text-green-700 bg-white/90 hover:bg-white'
+                        : 'text-gray-700 bg-white/80 hover:bg-white/90'
                         }`}
                     title={isPinned ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
+                    {isPinned ? <Pin size={12} /> : <PinOff size={12} />}
                 </button>
 
                 <button
                     onClick={minimize}
-                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-gray-900 p-1 rounded shadow-sm transition-colors"
+                    className="text-gray-700 bg-white/80 hover:bg-white/90 hover:text-gray-900 p-0.5 rounded shadow-sm transition-colors"
                     title="최소화"
                 >
-                    <Minus size={14} />
+                    <Minus size={12} />
                 </button>
 
                 <button
                     onClick={toggleMaximize}
-                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-gray-900 p-1 rounded shadow-sm transition-colors"
+                    className="text-gray-700 bg-white/80 hover:bg-white/90 hover:text-gray-900 p-0.5 rounded shadow-sm transition-colors"
                     title={isMaximized ? '복원' : '최대화'}
                 >
-                    {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                    {isMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                 </button>
 
                 <button
                     onClick={close}
-                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-red-600 p-1 rounded shadow-sm transition-colors"
+                    className="text-gray-700 bg-white/80 hover:bg-white/90 hover:text-red-600 p-0.5 rounded shadow-sm transition-colors"
                     title="닫기"
                 >
-                    <X size={14} />
+                    <X size={12} />
                 </button>
             </div>
         </div>
