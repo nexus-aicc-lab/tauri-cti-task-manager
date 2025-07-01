@@ -9,10 +9,11 @@ import PersonalSettings from '@/windows/settings/pages/ui/PersonalSettings';
 import CommunicationSettings from '@/windows/settings/pages/ui/CommunicationSettings';
 import CallSettings from '@/windows/settings/pages/ui/CallSettings';
 import MinimapSettings from '@/windows/settings/pages/ui/MinimapSettings';
-import InfoSettings from '@/windows/settings/pages/ui/InfoSettings';
+import InfoSettings from '@/windows/settings/pages/ui/StatisticsItemsSettings';
 import PanelModeSetting from '@/windows/settings/pages/ui/PanelModeSetting';
 import CustomTitlebar from '../components/CustomTitlebar';
 import SideMenuForEnvironmentSettingWindow from '../components/SideMenuForEnvironmentSettingWindow';
+import StatisticsItemsSettings from '@/windows/settings/pages/ui/StatisticsItemsSettings';
 
 interface ExtendedCSSProperties extends React.CSSProperties {
     WebkitAppRegion?: 'drag' | 'no-drag';
@@ -103,7 +104,7 @@ const MainPage: React.FC = () => {
             case '개인': return <PersonalSettings />;
             case '큐 통계범위': return <CommunicationSettings />;
             case '통계보기': return <CallSettings />;
-            case '통계항목': return <InfoSettings />;
+            case '통계항목': return <StatisticsItemsSettings />;
             case '미니바': return <MinimapSettings />;
             // case '알림': return <PanelModeSetting />;
             case '알림': return <div>알림 페이지</div>;
@@ -140,7 +141,7 @@ const MainPage: React.FC = () => {
                         onCategoryChange={handleCategoryChange}
                     />
                     <div className="flex-1 flex flex-col">
-                        <div className="flex-1 px-3 py-1 overflow-auto" style={{ position: 'relative' }}>
+                        <div className="flex-1 px-3 overflow-auto" style={{ position: 'relative' }}>
                             {/* 컨텐츠 영역 크기 정보 */}
 
                             {renderContent()}
