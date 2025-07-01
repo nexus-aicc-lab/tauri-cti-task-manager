@@ -1,13 +1,13 @@
-// src/windows/settings/SettingsApp.tsx
+// src/windows/settings/app/App.tsx
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import SystemSettingWindow from '../../app/system-setting-window';
-import type { WindowMode } from '../../shared/types/window';
+// ✅ FSD Pages 가져오기
+import MainPage from '../pages/MainPage';
 
-const SettingsApp: React.FC = () => {
-    console.log('⚙️ 설정 윈도우 앱 시작');
+const App: React.FC = () => {
+    console.log('⚙️ 설정 윈도우 앱 시작 (FSD 구조)');
 
     return (
         <div
@@ -18,7 +18,8 @@ const SettingsApp: React.FC = () => {
                 overflow: 'hidden',
             }}
         >
-            <SystemSettingWindow />
+            {/* ✅ MainPage 컴포넌트 사용 */}
+            <MainPage />
 
             {/* Toast UI */}
             <ToastContainer
@@ -32,4 +33,4 @@ const SettingsApp: React.FC = () => {
     );
 };
 
-export default SettingsApp;
+export default App;
