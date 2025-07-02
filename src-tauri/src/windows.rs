@@ -91,7 +91,7 @@ impl WindowMode {
                 width: 650.0,
                 height: 420.0,
                 min_width: Some(550.0),
-                min_height: Some(420.0),
+                min_height: None,
                 resizable: true,
                 always_on_top: false,
                 decorations: false,
