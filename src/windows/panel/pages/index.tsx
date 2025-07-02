@@ -784,7 +784,9 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
                         // PhysicalSize로 재시도 (DPI 스케일링 수동 적용)
                         try {
+                            const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
                             const { PhysicalSize } = await import('@tauri-apps/api/window');
+                            const currentWindow = getCurrentWebviewWindow();
                             await currentWindow.setSize(new PhysicalSize(finalWidth, finalHeight));
                             console.log(`✅ [panel-mode] PhysicalSize로 크기 적용: ${finalWidth}x${finalHeight}`);
                         } catch (physicalError) {

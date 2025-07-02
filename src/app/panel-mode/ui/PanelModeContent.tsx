@@ -107,9 +107,6 @@ const PanelModeContent: React.FC<PanelModeContentProps> = ({
             <div className="w-full">
                 <AgentStatusInfoBoxForPanelMode4 />
             </div>
-            {/* <div className="w-full">
-                <AgentStatusInfoBoxForPanelMode4 />
-            </div> */}
 
             {/* 개발 모드에서 실시간 측정 정보 */}
             {/* {import.meta.env.MODE === 'development' && (
