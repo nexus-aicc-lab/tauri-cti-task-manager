@@ -6,6 +6,7 @@ mod devtools;
 mod events;
 mod windows;
 
+use commands::panel::{apply_window_size, load_window_size, save_window_size};
 use deeplink::{
     clear_login_data, get_deep_link_history, manual_deep_link_test, process_deep_link_url,
 };
@@ -57,7 +58,10 @@ fn main() {
             open_devtools,
             close_devtools,
             toggle_always_on_top,
-            get_always_on_top_state
+            get_always_on_top_state,
+            save_window_size,
+            load_window_size,
+            apply_window_size
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
