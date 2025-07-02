@@ -99,6 +99,10 @@ const MainPage: React.FC = () => {
 
     const renderContent = () => {
         const componentProps = { settings, updateSetting };
+
+        console.log("🔍 현재 선택된 카테고리:", selectedCategory);
+
+
         switch (selectedCategory) {
             case '일반': return <GeneralSettings />;
             case '개인': return <PersonalSettings />;
@@ -106,7 +110,6 @@ const MainPage: React.FC = () => {
             case '통계보기': return <CallSettings />;
             case '통계항목': return <StatisticsItemsSettings />;
             case '미니바': return <MinimapSettings />;
-            // case '알림': return <PanelModeSetting />;
             case '알림': return <div>알림 페이지</div>;
             default: return null;
         }
