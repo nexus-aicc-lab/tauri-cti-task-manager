@@ -140,10 +140,10 @@ const StatisticsItemsSettings: React.FC = () => {
     return (
         <div className="p-4 font-['Malgun_Gothic'] text-gray-800 bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
-                <h2 className="text-lg font-bold mb-6 text-gray-800">통계 항목 설정</h2>
+                <h2 className="text-lg font-bold mb-2 text-gray-800">통계 항목 설정</h2>
 
                 {/* 상단 토글 버튼들 */}
-                <div className="mb-4 p-3 bg-white rounded border border-gray-300">
+                <div className="mb-2 p-3 bg-white rounded border border-gray-300">
                     <div className="flex gap-2">
                         {toggleButtons.map(num => (
                             <button
