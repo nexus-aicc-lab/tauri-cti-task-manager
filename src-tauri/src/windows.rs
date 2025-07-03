@@ -11,6 +11,7 @@ pub enum WindowMode {
     Bar,
     Panel,
     Settings,
+    SettingsWithPath(String),
     Login,
 }
 
@@ -33,6 +34,20 @@ struct WindowConfig {
 impl WindowMode {
     fn config(&self) -> WindowConfig {
         match self {
+            WindowMode::SettingsWithPath(path) => WindowConfig {
+                url: format!("settings#/settings/{}", path),
+                title: "CTI Task Master - 환경 설정".into(),
+                width: 650.0,
+                height: 420.0,
+                min_width: Some(550.0),
+                min_height: None,
+                resizable: true,
+                always_on_top: false,
+                decorations: false,
+                is_main: true,
+                is_independent: false,
+            },
+
             WindowMode::Launcher => WindowConfig {
                 url: "launcher.html".into(),
                 title: "CTI Task Master - 런처".into(),
@@ -160,6 +175,7 @@ pub fn create_window(handle: &AppHandle, mode: WindowMode) -> bool {
             WindowMode::Bar => "bar",
             WindowMode::Panel => "panel",
             WindowMode::Settings => "settings",
+            WindowMode::SettingsWithPath(_) => "settings_with_path",
             WindowMode::Login => "login",
         },
         Uuid::new_v4()

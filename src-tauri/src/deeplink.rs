@@ -1,4 +1,5 @@
-// src-tauri/src/deeplink.rs
+// C:\tauri\cti-task-manager-tauri\src-tauri\src\deeplink.rs
+
 use serde::{Deserialize, Serialize};
 use std::{env, fs, path::PathBuf};
 
