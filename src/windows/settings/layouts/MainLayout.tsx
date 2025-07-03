@@ -144,11 +144,11 @@ const MainLayout: React.FC = () => {
                     <div className="flex-1 flex flex-col">
                         {/* 뒤로 가기 버튼과 콘텐츠 영역 */}
                         <div className="flex-1 flex flex-col">
-                            {showBackButton && (
+                            {/* {showBackButton && (
                                 <div className="px-3 py-2 border-b border-gray-200">
                                     <BackButton onBack={handleBack} />
                                 </div>
-                            )}
+                            )} */}
                             <div className="flex-1 px-3 overflow-auto" style={{ position: 'relative' }}>
                                 {/* React Router의 Outlet 대신 TanStack Router의 Outlet 사용 */}
                                 <Outlet />
