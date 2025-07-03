@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { exit } from '@tauri-apps/plugin-process';
+import { emit } from '@tauri-apps/api/event';
 
 const menuItems = [
     '멀티계정정보',
@@ -41,7 +42,12 @@ export default function HamburgerButtonForSystemMenuWithDropdownStyle() {
                 await exit(0);
                 break;
             case '환경설정':
-                console.log('환경설정 열기');
+                console.log('📤 환경설정 모드 전환 요청');
+                try {
+                    await emit('switch-mode', 'settings');
+                } catch (err) {
+                    console.error('❌ 환경설정 모드 전환 실패:', err);
+                }
                 break;
             case '버전정보':
                 console.log('버전 정보 보기');
@@ -57,7 +63,7 @@ export default function HamburgerButtonForSystemMenuWithDropdownStyle() {
             <div
                 className="relative inline-block"
                 ref={wrapperRef}
-                style={{ zIndex: 1000 }} // 인라인 스타일로 강제 적용
+                style={{ zIndex: 1000 }}
             >
                 <button
                     onClick={handleClick}
@@ -80,8 +86,8 @@ export default function HamburgerButtonForSystemMenuWithDropdownStyle() {
                     <div
                         className="absolute left-0 w-44 bg-white border border-gray-400 rounded-md shadow-lg overflow-hidden"
                         style={{
-                            top: '32px', // 버튼 아래에 위치
-                            zIndex: 9999, // 매우 높은 z-index
+                            top: '32px',
+                            zIndex: 9999,
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                             border: '1px solid #999',
                         }}

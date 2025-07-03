@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke } from '@tauri-apps/api/core';
 import PanelModeContent from "@/app/panel-mode/ui/PanelModeContent";

@@ -7,6 +7,7 @@ import {
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { invoke } from '@tauri-apps/api/core';
 import { useRouter } from '@tanstack/react-router';
+import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
 
 interface Props {
     title: string;
@@ -172,6 +173,7 @@ export default function CustomTitlebar({ title }: Props) {
         >
             {/* 왼쪽: 제목 + 네비게이션 버튼들 */}
             <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as any}>
+                <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-xs font-semibold pointer-events-none" style={{ WebkitAppRegion: 'drag' } as any}>
                     {title}
                 </div>

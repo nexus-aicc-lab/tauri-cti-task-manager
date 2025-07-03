@@ -11,6 +11,7 @@ import {
     X,
     BetweenHorizontalEnd,
 } from 'lucide-react';
+import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
 
 interface Props {
     title: string;
@@ -93,7 +94,7 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
         >
             {/* 왼쪽 영역 */}
             <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-                {/* <MainSystemMenu /> */}
+                <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-sm text-white flex items-center space-x-1 pl-4">
                     <span>👤 박소연(NEX1011)</span>
                 </div>
