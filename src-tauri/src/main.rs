@@ -10,6 +10,11 @@ mod events;
 mod windows;
 
 use commands::panel::{apply_window_size, load_window_size, save_window_size};
+use commands::statistics::{
+    export_statistics_settings, get_statistics_settings_path, import_statistics_settings,
+    load_statistics_settings, reset_statistics_settings, save_statistics_settings,
+}; // 🆕 commands 폴더 하위로 이동!
+
 use deeplink::{
     clear_login_data, get_deep_link_history, manual_deep_link_test, process_deep_link_url,
 };
@@ -104,7 +109,14 @@ fn main() {
             get_always_on_top_state,
             save_window_size,
             load_window_size,
-            apply_window_size
+            apply_window_size,
+            // 새로 추가된 통계 설정 명령들
+            save_statistics_settings,
+            load_statistics_settings,
+            get_statistics_settings_path,
+            reset_statistics_settings,
+            export_statistics_settings,
+            import_statistics_settings
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())

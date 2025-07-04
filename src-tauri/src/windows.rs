@@ -140,28 +140,77 @@ impl WindowMode {
 }
 
 /// 🔄 창 교체 (메인 기능) - 안전한 순서: 새 창 생성 → 기존 창 닫기
+// pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
+//     println!("🔄 창 교체 시작: {:?}", mode);
+
+//     // ✅ 1단계: 새 창을 먼저 생성
+//     let new_window_created = create_window(handle, mode.clone());
+
+//     if new_window_created {
+//         println!("✅ 새 창 생성 완료, 기존 창 정리 시작");
+
+//         // ✅ 2단계: 새 창이 성공적으로 생성된 후에만 기존 창들 닫기
+//         // 🚨 중요: 잠시 대기 후 닫기 (앱 종료 방지)
+//         std::thread::sleep(std::time::Duration::from_millis(100));
+
+//         if mode.is_main() {
+//             close_main_windows_safely(handle);
+//         } else if mode.is_independent() {
+//             close_same_type_windows(handle, &mode);
+//         }
+
+//         println!("✅ 창 교체 완료: {:?}", mode);
+//     } else {
+//         println!("❌ 새 창 생성 실패: {:?}", mode);
+//     }
+// }
+
 pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
     println!("🔄 창 교체 시작: {:?}", mode);
 
-    // ✅ 1단계: 새 창을 먼저 생성
-    let new_window_created = create_window(handle, mode.clone());
+    // ✅ 새 창 생성
+    let config = mode.config();
+    let label = format!(
+        "{}_{}",
+        match mode {
+            WindowMode::Launcher => "launcher",
+            WindowMode::Bar => "bar",
+            WindowMode::Panel => "panel",
+            WindowMode::Settings => "settings",
+            WindowMode::SettingsWithPath(_) => "settings_with_path",
+            WindowMode::Login => "login",
+        },
+        Uuid::new_v4()
+    );
 
-    if new_window_created {
-        println!("✅ 새 창 생성 완료, 기존 창 정리 시작");
+    println!("🏗️ 새 창 생성 시작: {} ({})", config.title, label);
 
-        // ✅ 2단계: 새 창이 성공적으로 생성된 후에만 기존 창들 닫기
-        // 🚨 중요: 잠시 대기 후 닫기 (앱 종료 방지)
-        std::thread::sleep(std::time::Duration::from_millis(100));
+    let mut builder =
+        WebviewWindowBuilder::new(handle, label.clone(), WebviewUrl::App(config.url.into()))
+            .title(&config.title)
+            .inner_size(config.width, config.height)
+            .resizable(config.resizable)
+            .always_on_top(config.always_on_top)
+            .decorations(config.decorations);
 
-        if mode.is_main() {
-            close_main_windows_safely(handle);
-        } else if mode.is_independent() {
-            close_same_type_windows(handle, &mode);
+    if let Some(min_width) = config.min_width {
+        builder = builder.min_inner_size(min_width, config.min_height.unwrap_or(0.0));
+    }
+
+    match builder.build() {
+        Ok(_) => {
+            println!("✅ 새 창 생성 성공: {}", label);
+
+            // ✅ 기존 창 닫기
+            let windows = handle.webview_windows();
+            for (existing_label, window) in windows.iter() {
+                if existing_label != &label {
+                    println!("🗑️ 기존 창 닫기: {}", existing_label);
+                    let _ = window.destroy();
+                }
+            }
         }
-
-        println!("✅ 창 교체 완료: {:?}", mode);
-    } else {
-        println!("❌ 새 창 생성 실패: {:?}", mode);
+        Err(e) => println!("❌ 새 창 생성 실패: {} - {:?}", label, e),
     }
 }
 
