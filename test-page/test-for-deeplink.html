@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Settings Test Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex flex-col items-center justify-center h-full p-8">
+        <h1 class="text-2xl font-bold mb-6 text-blue-700">📦 Tauri Settings Test</h1>
+
+        <div class="w-full max-w-md space-y-4">
+            <a href="cti-personal://settings/general"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                General Settings
+            </a>
+
+            <a href="cti-personal://settings/personal"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Personal Settings
+            </a>
+
+            <a href="cti-personal://settings/communication"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Communication Settings
+            </a>
+
+            <a href="cti-personal://settings/statistics-view"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Call View Settings
+            </a>
+
+            <a href="cti-personal://settings/statistics-items"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Statistics Items Settings
+            </a>
+
+            <a href="cti-personal://settings/minimap"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Minimap Settings
+            </a>
+
+            <a href="cti-personal://settings/notifications"
+                class="block px-6 py-3 bg-white shadow rounded hover:bg-blue-50 border border-blue-300 transition">
+                Notifications Settings
+            </a>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-10">
+            위 버튼을 누르면 Tauri 앱이 해당 설정 페이지로 열려야 해요! (딥링크 테스트용)
+        </p>
+    </div>
+</body>
+
+</html>
