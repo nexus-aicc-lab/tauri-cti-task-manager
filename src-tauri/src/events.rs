@@ -16,6 +16,7 @@ pub fn setup_event_listeners(app: &tauri::App, handle: AppHandle) {
                 "panel" => WindowMode::Panel,
                 "settings" => WindowMode::Settings,
                 "login" => WindowMode::Login,
+                "counselor_dashboard" => WindowMode::CounselorDashboard, // ✅ 추가됨!
                 _ => {
                     println!("⚠️ 알 수 없는 모드: {}", mode_str);
                     return;
@@ -36,6 +37,7 @@ pub fn setup_event_listeners(app: &tauri::App, handle: AppHandle) {
             let mode = match mode_str.as_str() {
                 "settings" => WindowMode::Settings,
                 "login" => WindowMode::Login,
+                // counselor_dashboard는 창 추가가 아닌 switch 창으로만 열리도록 유지
                 _ => {
                     println!("⚠️ 알 수 없는 모드: {}", mode_str);
                     return;

@@ -13,6 +13,7 @@ pub enum WindowMode {
     Settings,
     SettingsWithPath(String),
     Login,
+    CounselorDashboard,
 }
 
 /// 윈도우 설정
@@ -32,6 +33,22 @@ struct WindowConfig {
 }
 
 impl WindowMode {
+    fn label_prefix(&self) -> &'static str {
+        match self {
+            WindowMode::Launcher => "launcher",
+            WindowMode::Bar => "bar",
+            WindowMode::Panel => "panel",
+            WindowMode::Settings => "settings",
+            WindowMode::SettingsWithPath(_) => "settings_with_path",
+            WindowMode::Login => "login",
+            WindowMode::CounselorDashboard => "counselor_dashboard",
+        }
+    }
+
+    fn label(&self) -> String {
+        format!("{}_{}", self.label_prefix(), Uuid::new_v4())
+    }
+
     fn config(&self) -> WindowConfig {
         match self {
             WindowMode::SettingsWithPath(path) => WindowConfig {
@@ -87,19 +104,7 @@ impl WindowMode {
                 is_main: true, // ✅ 메인 창
                 is_independent: false,
             },
-            // WindowMode::Settings => WindowConfig {
-            //     url: "settings.html".into(),
-            //     title: "CTI Task Master - 환경 설정".into(),
-            //     width: 900.0,
-            //     height: 700.0,
-            //     min_width: Some(550.0),
-            //     min_height: Some(450.0),
-            //     resizable: true,
-            //     always_on_top: false,
-            //     decorations: false,
-            //     is_main: true, // ✅ 메인 창
-            //     is_independent: false,
-            // },
+
             WindowMode::Settings => WindowConfig {
                 url: "settings.html".into(),
                 title: "CTI Task Master - 환경 설정".into(),
@@ -126,6 +131,20 @@ impl WindowMode {
                 is_main: false,       // ✅ 메인 창 아님
                 is_independent: true, // ✅ 독립 창
             },
+
+            WindowMode::CounselorDashboard => WindowConfig {
+                url: "counselor-dashboard.html".into(),
+                title: "CTI Task Master - 상담사 대시보드".into(),
+                width: 950.0,
+                height: 600.0,
+                min_width: Some(950.0),
+                min_height: Some(600.0),
+                resizable: true,
+                always_on_top: false,
+                decorations: false, // ✅ 타이틀바 제거
+                is_main: true,
+                is_independent: false,
+            },
         }
     }
 
@@ -139,49 +158,25 @@ impl WindowMode {
     }
 }
 
-/// 🔄 창 교체 (메인 기능) - 안전한 순서: 새 창 생성 → 기존 창 닫기
-// pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
-//     println!("🔄 창 교체 시작: {:?}", mode);
-
-//     // ✅ 1단계: 새 창을 먼저 생성
-//     let new_window_created = create_window(handle, mode.clone());
-
-//     if new_window_created {
-//         println!("✅ 새 창 생성 완료, 기존 창 정리 시작");
-
-//         // ✅ 2단계: 새 창이 성공적으로 생성된 후에만 기존 창들 닫기
-//         // 🚨 중요: 잠시 대기 후 닫기 (앱 종료 방지)
-//         std::thread::sleep(std::time::Duration::from_millis(100));
-
-//         if mode.is_main() {
-//             close_main_windows_safely(handle);
-//         } else if mode.is_independent() {
-//             close_same_type_windows(handle, &mode);
-//         }
-
-//         println!("✅ 창 교체 완료: {:?}", mode);
-//     } else {
-//         println!("❌ 새 창 생성 실패: {:?}", mode);
-//     }
-// }
-
 pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
     println!("🔄 창 교체 시작: {:?}", mode);
 
     // ✅ 새 창 생성
     let config = mode.config();
-    let label = format!(
-        "{}_{}",
-        match mode {
-            WindowMode::Launcher => "launcher",
-            WindowMode::Bar => "bar",
-            WindowMode::Panel => "panel",
-            WindowMode::Settings => "settings",
-            WindowMode::SettingsWithPath(_) => "settings_with_path",
-            WindowMode::Login => "login",
-        },
-        Uuid::new_v4()
-    );
+    // let label = format!(
+    //     "{}_{}",
+    //     match mode {
+    //         WindowMode::Launcher => "launcher",
+    //         WindowMode::Bar => "bar",
+    //         WindowMode::Panel => "panel",
+    //         WindowMode::Settings => "settings",
+    //         WindowMode::SettingsWithPath(_) => "settings_with_path",
+    //         WindowMode::Login => "login",
+    //         WindowMode::CounselorDashboard => "counselor_dashboard", // 🆕 이 줄 추가!
+    //     },
+    //     Uuid::new_v4()
+    // );
+    let label = mode.label();
 
     println!("🏗️ 새 창 생성 시작: {} ({})", config.title, label);
 
@@ -217,18 +212,20 @@ pub fn switch_window(handle: &AppHandle, mode: WindowMode) {
 /// 🪟 창 생성 - 성공/실패 반환
 pub fn create_window(handle: &AppHandle, mode: WindowMode) -> bool {
     let config = mode.config();
-    let label = format!(
-        "{}_{}",
-        match mode {
-            WindowMode::Launcher => "launcher",
-            WindowMode::Bar => "bar",
-            WindowMode::Panel => "panel",
-            WindowMode::Settings => "settings",
-            WindowMode::SettingsWithPath(_) => "settings_with_path",
-            WindowMode::Login => "login",
-        },
-        Uuid::new_v4()
-    );
+    // let label = format!(
+    //     "{}_{}",
+    //     match mode {
+    //         WindowMode::Launcher => "launcher",
+    //         WindowMode::Bar => "bar",
+    //         WindowMode::Panel => "panel",
+    //         WindowMode::Settings => "settings",
+    //         WindowMode::SettingsWithPath(_) => "settings_with_path",
+    //         WindowMode::Login => "login",
+    //         WindowMode::CounselorDashboard => "counselor_dashboard", // 🆕 여기도!
+    //     },
+    //     Uuid::new_v4()
+    // );
+    let label = mode.label();
 
     println!("🏗️ 창 생성 시작: {} ({})", config.title, label);
 

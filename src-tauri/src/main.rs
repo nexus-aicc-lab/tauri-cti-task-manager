@@ -23,7 +23,7 @@ use events::setup_event_listeners;
 use tauri::{generate_handler, Manager};
 use tauri_plugin_deep_link::DeepLinkExt;
 use url::Url;
-use windows::{add_window, switch_window, WindowMode};
+use windows::{add_window, create_window, switch_window, WindowMode};
 
 fn main() {
     tauri::Builder::default()
@@ -92,7 +92,7 @@ fn main() {
 
             // 💡 일반 실행 (딥링크 없을 경우)
             println!("🟡 앱 일반 실행 → Launcher");
-            switch_window(&app.handle(), WindowMode::Launcher);
+            create_window(&app.handle(), WindowMode::Launcher);
 
             // 이벤트 리스너 등록
             setup_event_listeners(app, app.handle().clone());
