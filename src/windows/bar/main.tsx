@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 // 스타일 가져오기
-import "../../main.css";
+// import "../../main.css👤 대기";
 import "../../App.css";
 
 // ✅ 새로운 FSD App 컴포넌트 사용

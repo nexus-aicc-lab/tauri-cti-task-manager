@@ -151,12 +151,12 @@ impl WindowMode {
                 url: "bar-menu.html".into(),
                 title: "바 메뉴".into(),
                 width: 250.0,
-                height: 300.0,
+                height: 100.0,
                 min_width: Some(200.0),
-                min_height: Some(250.0),
+                min_height: Some(100.0),
                 resizable: false,
-                always_on_top: true,
-                decorations: false,
+                always_on_top: false,
+                decorations: true,
                 is_main: false,       // 메인 창 아님
                 is_independent: true, // 독립 창
             },

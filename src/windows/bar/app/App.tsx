@@ -12,9 +12,7 @@ const App = (props: Props) => {
     };
 
     return (
-        <div>
-            <BarMode />
-        </div>
+        <BarMode />
     )
 }
 
