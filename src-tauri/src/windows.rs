@@ -14,6 +14,7 @@ pub enum WindowMode {
     SettingsWithPath(String),
     Login,
     CounselorDashboard,
+    BarContextMenu,
 }
 
 /// 윈도우 설정
@@ -42,6 +43,7 @@ impl WindowMode {
             WindowMode::SettingsWithPath(_) => "settings_with_path",
             WindowMode::Login => "login",
             WindowMode::CounselorDashboard => "counselor_dashboard",
+            WindowMode::BarContextMenu => "bar_context_menu",
         }
     }
 
@@ -82,9 +84,9 @@ impl WindowMode {
                 url: "bar.html".into(),
                 title: "CTI Task Master - 바 모드".into(),
                 width: 1200.0,
-                height: 40.0,
+                height: 44.0,
                 min_width: Some(800.0),
-                min_height: Some(40.0),
+                min_height: Some(44.0),
                 resizable: true,
                 always_on_top: true,
                 decorations: false,
@@ -144,6 +146,19 @@ impl WindowMode {
                 decorations: false, // ✅ 타이틀바 제거
                 is_main: true,
                 is_independent: false,
+            },
+            WindowMode::BarContextMenu => WindowConfig {
+                url: "bar-menu.html".into(),
+                title: "바 메뉴".into(),
+                width: 250.0,
+                height: 300.0,
+                min_width: Some(200.0),
+                min_height: Some(250.0),
+                resizable: false,
+                always_on_top: true,
+                decorations: false,
+                is_main: false,       // 메인 창 아님
+                is_independent: true, // 독립 창
             },
         }
     }

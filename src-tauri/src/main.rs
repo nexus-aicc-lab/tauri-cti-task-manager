@@ -15,15 +15,20 @@ use commands::statistics::{
     load_statistics_settings, reset_statistics_settings, save_statistics_settings,
 }; // 🆕 commands 폴더 하위로 이동!
 
+use commands::context_menu::{
+    handle_context_menu_event, show_context_menu_at_position, show_tray_context_menu,
+}; // 🆕 컨텍스트 메뉴 이벤트 핸들러
+
 use deeplink::{
     clear_login_data, get_deep_link_history, manual_deep_link_test, process_deep_link_url,
 };
+
 use devtools::{close_devtools, get_always_on_top_state, open_devtools, toggle_always_on_top};
 use events::setup_event_listeners;
 use tauri::{generate_handler, Manager};
 use tauri_plugin_deep_link::DeepLinkExt;
 use url::Url;
-use windows::{add_window, create_window, switch_window, WindowMode};
+use windows::{add_window, create_window, switch_window, WindowMode}; // 🆕 메뉴 명령어 추가
 
 fn main() {
     tauri::Builder::default()
@@ -116,8 +121,14 @@ fn main() {
             get_statistics_settings_path,
             reset_statistics_settings,
             export_statistics_settings,
-            import_statistics_settings
+            import_statistics_settings,
+            show_tray_context_menu,
+            show_context_menu_at_position
         ])
+        .on_menu_event(|app, event| {
+            // 🆕 컨텍스트 메뉴 이벤트 처리 추가
+            handle_context_menu_event(app, event.id().as_ref());
+        })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())

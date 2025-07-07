@@ -28,6 +28,7 @@ chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "1.0", features = ["full"] }
 tauri-plugin-deep-link = "2"
 uuid = { version = "1.0", features = ["v4"] }
+muda = "0.11"  # 최신 버전 확인
 
 
 # ✅ 워닝 무시
