@@ -1,20 +1,27 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 const AgentStatus2: React.FC = () => {
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
     const formatTime = (hours: number, minutes: number, seconds: number) => {
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
+    // 상태 변경 처리 함수 (API 호출 포함)
+    const handleStatusChange = (status: string) => {
+        setSelectedStatus(status);
+        console.log(`🚀 [상태변경] 상담사 상태를 "${status}" 로 변경합니다.`);
+
+        // 여기에 실제 API 호출 추가
+        // ex) await axios.post('/api/agent/status', { status });
+    };
+
     const items = [
         {
-            icon: (
-                <img
-                    src="/icons/panel-mode/hourglass.png"
-                    alt="대기"
-                    className="w-6 h-6"
-                    style={{ objectFit: 'contain' }}
-                />
-            ),
+            key: 'WAITING',
+            icon: '/icons/panel-mode/hourglass.png',
             label: '대기',
             time: formatTime(12, 0, 34),
             count: 15,
@@ -22,14 +29,8 @@ const AgentStatus2: React.FC = () => {
             textColor: '#2563eb',
         },
         {
-            icon: (
-                <img
-                    src="/icons/panel-mode/cell_phone.png"
-                    alt="통화"
-                    className="w-6 h-6"
-                    style={{ objectFit: 'contain' }}
-                />
-            ),
+            key: 'ON_CALL',
+            icon: '/icons/panel-mode/cell_phone.png',
             label: '통화',
             time: formatTime(12, 50, 20),
             count: 12,
@@ -37,14 +38,8 @@ const AgentStatus2: React.FC = () => {
             textColor: '#14b8a6',
         },
         {
-            icon: (
-                <img
-                    src="/icons/panel-mode/pencel.png"
-                    alt="후처리"
-                    className="w-6 h-6"
-                    style={{ objectFit: 'contain' }}
-                />
-            ),
+            key: 'AFTER_CALL',
+            icon: '/icons/panel-mode/pencel.png',
             label: '후처리',
             time: formatTime(0, 34, 20),
             count: 15,
@@ -52,14 +47,8 @@ const AgentStatus2: React.FC = () => {
             textColor: '#f97316',
         },
         {
-            icon: (
-                <img
-                    src="/icons/panel-mode/coffe.png"
-                    alt="휴식"
-                    className="w-6 h-6"
-                    style={{ objectFit: 'contain' }}
-                />
-            ),
+            key: 'BREAK',
+            icon: '/icons/panel-mode/coffe.png',
             label: '휴식',
             time: formatTime(0, 0, 0),
             count: 0,
@@ -69,39 +58,46 @@ const AgentStatus2: React.FC = () => {
     ];
 
     return (
-        // 전체 컨테이너의 padding을 p-2로 변경
         <div className="h-full bg-white p-1 rounded-lg shadow-md border border-gray-200 overflow-hidden">
-            {/* grid의 gap을 gap-2로 변경하여 박스 사이의 간격을 넓힘 */}
             <div className="grid grid-cols-2 gap-2 h-full">
-                {items.map((item, idx) => (
-                    <div
-                        key={idx}
-                        style={{ backgroundColor: item.bg }}
-                        // 각 아이템의 padding과 내부 요소(아이콘, 흰 박스)의 gap을 p-2, gap-2로 변경
-                        // justify-center를 추가하여 수직 중앙 정렬
-                        className="rounded-md p-2 flex flex-col items-center justify-center shadow-sm gap-3"
-                    >
-                        {/* 아이콘 (별도 div 제거하여 코드 간소화) */}
-                        <div className='pt-2'>
-                            {item.icon}
-                        </div>
-
-                        {/* 콘텐츠 */}
-                        <div className="bg-white rounded px-2 py-1 w-full text-center min-h-0">
-                            <div className="text-xs font-medium text-gray-800 mb-0.5 truncate leading-tight">
-                                {item.label}
+                {items.map((item, idx) => {
+                    const isSelected = selectedStatus === item.key;
+                    return (
+                        <button
+                            key={idx}
+                            onClick={() => handleStatusChange(item.key)}
+                            style={{
+                                backgroundColor: item.bg,
+                                boxShadow: isSelected ? '0 0 0 2px #0ea5e9' : 'none', // 강조 테두리
+                            }}
+                            className={`rounded-md p-2 flex flex-col items-center justify-center gap-3 transition 
+                                hover:scale-[1.02] active:scale-[0.98] 
+                                ${isSelected ? 'ring-2 ring-sky-400' : ''}`}
+                        >
+                            <div className="pt-2">
+                                <img
+                                    src={item.icon}
+                                    alt={item.label}
+                                    className="w-6 h-6"
+                                    style={{ objectFit: 'contain' }}
+                                />
                             </div>
-                            <div className="flex flex-col items-center gap-0">
-                                <span className="text-sm font-bold leading-none" style={{ color: item.textColor }}>
-                                    {item.time}
-                                </span>
-                                <span className="text-xs font-semibold leading-none" style={{ color: item.textColor }}>
-                                    ({item.count})
-                                </span>
+                            <div className="bg-white rounded px-2 py-1 w-full text-center min-h-0">
+                                <div className="text-xs font-medium text-gray-800 mb-0.5 truncate leading-tight">
+                                    {item.label}
+                                </div>
+                                <div className="flex flex-col items-center gap-0">
+                                    <span className="text-sm font-bold leading-none" style={{ color: item.textColor }}>
+                                        {item.time}
+                                    </span>
+                                    <span className="text-xs font-semibold leading-none" style={{ color: item.textColor }}>
+                                        ({item.count})
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                ))}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );
