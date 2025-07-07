@@ -1,5 +1,5 @@
 import React from 'react'
-import BarMode from '../component/barmode'
+import BarMode from '../component/BarMode';
 
 interface Props {
 
