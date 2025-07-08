@@ -41,16 +41,16 @@ fn create_simple_menu(app: &AppHandle) -> Result<(), String> {
     use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 
     // 기본 메뉴 아이템들 생성
-    let settings_item = MenuItem::with_id(app, "settings", "⚙️ 환경설정", true, None::<&str>)
+    let settings_item = MenuItem::with_id(app, "settings", "환경설정", true, None::<&str>)
         .map_err(|e| format!("환경설정 메뉴 아이템 생성 실패: {}", e))?;
 
-    let version_item = MenuItem::with_id(app, "version", "ℹ️ 버전정보", true, None::<&str>)
+    let version_item = MenuItem::with_id(app, "version", "버전정보", true, None::<&str>)
         .map_err(|e| format!("버전정보 메뉴 아이템 생성 실패: {}", e))?;
 
     let separator =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선 생성 실패: {}", e))?;
 
-    let exit_item = MenuItem::with_id(app, "exit", "🚪 종료", true, None::<&str>)
+    let exit_item = MenuItem::with_id(app, "exit", "종료", true, None::<&str>)
         .map_err(|e| format!("종료 메뉴 아이템 생성 실패: {}", e))?;
 
     // 메뉴 생성
@@ -79,15 +79,15 @@ fn create_positioned_menu(app: &AppHandle, x: f64, y: f64) -> Result<(), String>
     use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
     use tauri::{LogicalPosition, Position};
 
-    // 이미지에 맞는 메뉴 아이템들 생성
+    // 메뉴 아이템들 생성
     let multi_account_item =
-        MenuItem::with_id(app, "multi-account", "👥 멀티 계정정보", true, None::<&str>)
+        MenuItem::with_id(app, "multi-account", "멀티 계정정보", true, None::<&str>)
             .map_err(|e| format!("멀티 계정정보 메뉴 생성 실패: {}", e))?;
 
     let daily_statistics_item = MenuItem::with_id(
         app,
         "daily-statistics",
-        "📊 당일 누적 통계 보기",
+        "당일 누적 통계 보기",
         true,
         None::<&str>,
     )
@@ -96,19 +96,19 @@ fn create_positioned_menu(app: &AppHandle, x: f64, y: f64) -> Result<(), String>
     let separator1 =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선1 생성 실패: {}", e))?;
 
-    let settings_item = MenuItem::with_id(app, "settings", "⚙️ 환경설정", true, None::<&str>)
+    let settings_item = MenuItem::with_id(app, "settings", "환경설정", true, None::<&str>)
         .map_err(|e| format!("환경설정 메뉴 생성 실패: {}", e))?;
 
     let separator2 =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선2 생성 실패: {}", e))?;
 
-    let version_item = MenuItem::with_id(app, "version", "ℹ️ 버전정보", true, None::<&str>)
+    let version_item = MenuItem::with_id(app, "version", "버전정보", true, None::<&str>)
         .map_err(|e| format!("버전정보 메뉴 생성 실패: {}", e))?;
 
-    let exit_item = MenuItem::with_id(app, "exit", "🚪 종료", true, None::<&str>)
+    let exit_item = MenuItem::with_id(app, "exit", "종료", true, None::<&str>)
         .map_err(|e| format!("종료 메뉴 생성 실패: {}", e))?;
 
-    // 메뉴 생성 (이미지 순서대로)
+    // 메뉴 생성
     let menu = Menu::with_items(
         app,
         &[

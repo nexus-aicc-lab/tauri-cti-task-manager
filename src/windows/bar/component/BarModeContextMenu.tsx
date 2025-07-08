@@ -31,7 +31,7 @@ const BarModeHamburgerButtonForContextMenu: React.FC = () => {
     const openContextMenu = async (
         rect: DOMRect
     ) => {
-        const x = rect.left - 1;
+        const x = rect.left - 10;
         const y = rect.bottom + 10;
         try {
             console.log(`📋 메뉴 열기 위치: x=${x}, y=${y}`);

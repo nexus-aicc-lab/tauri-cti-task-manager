@@ -147,7 +147,7 @@ const BarMode: React.FC = () => {
                     style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
                 >
                     {/* 통계 아이콘들 */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mr-2">
                         <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
                             <img
                                 src="/icons/bar-mode/brown_phone_for_bar_mode.svg"
