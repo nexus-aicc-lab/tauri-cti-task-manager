@@ -1,9 +1,9 @@
 // BarMode.tsx
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pin, PinOff, Minus, BetweenHorizontalStart, X } from 'lucide-react';
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { emit } from '@tauri-apps/api/event';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -11,12 +11,11 @@ import BarModeHamburgerButtonForContextMenu from './BarModeContextMenu';
 
 const BarMode: React.FC = () => {
     const [alwaysOnTop, setAlwaysOnTop] = useState(false);
-    const hamburgerRef = useRef<HTMLButtonElement>(null); // 여전히 부모 ref는 사용하지 않음
 
     useEffect(() => {
         (async () => {
             try {
-                const win = getCurrentWebviewWindow();
+                const win = await getCurrentWindow();
                 const pinState = await win.isAlwaysOnTop();
                 setAlwaysOnTop(pinState);
             } catch (error) {
@@ -27,7 +26,7 @@ const BarMode: React.FC = () => {
 
     const handleAlwaysOnTop = async () => {
         try {
-            const win = getCurrentWebviewWindow();
+            const win = await getCurrentWindow();
             const next = !alwaysOnTop;
             await win.setAlwaysOnTop(next);
             setAlwaysOnTop(next);
@@ -37,11 +36,21 @@ const BarMode: React.FC = () => {
     };
 
     const handleMinimize = async () => {
-        await getCurrentWebviewWindow().minimize();
+        try {
+            const win = await getCurrentWindow();
+            await win.minimize();
+        } catch (error) {
+            console.error('Error minimizing window:', error);
+        }
     };
 
     const handleClose = async () => {
-        await getCurrentWebviewWindow().close();
+        try {
+            const win = await getCurrentWindow();
+            await win.close();
+        } catch (error) {
+            console.error('Error closing window:', error);
+        }
     };
 
     const handleSwitchToPanelMode = async () => {
@@ -74,43 +83,80 @@ const BarMode: React.FC = () => {
 
                 {/* 가운데 (드래그 영역) */}
                 <div
-                    className="flex items-center gap-2 flex-1 justify-center"
+                    className="flex items-center gap-4 flex-1 justify-center"
                     style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
                 >
-                    <span className="bg-blue-500 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-                        👤 대기중 00:38:08
+                    {/* 대기중 배지 */}
+                    <span
+                        className="bg-[#4199E0] text-white rounded-full px-3 py-1 flex items-center gap-2 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+                        title="대기중 상태"
+                    >
+                        <img
+                            src="/icons/bar-mode/sandglass_for_bar_mode.svg"
+                            alt="대기중 모래시계 아이콘"
+                            className="w-4 h-4"
+                        />
+                        대기중 00:38:08
                     </span>
-                    <span className="bg-teal-500 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-                        📞 12:50:20(12)
+
+                    {/* 전화기 녹색 아이콘 */}
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/green_phone_for_bar_mode.svg"
+                            alt="녹색 전화기 아이콘"
+                            className="w-4 h-4"
+                        />
+                        12:50:20(12)
                     </span>
-                    <span className="bg-orange-500 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-                        ✏️ 00:34:20(8)
+
+                    {/* 전화기 갈색 아이콘 */}
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/brown_phone_for_bar_mode.svg"
+                            alt="갈색 전화기 아이콘"
+                            className="w-4 h-4"
+                        />
+                        00:34:20(8)
                     </span>
-                    <span className="bg-blue-600 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-                        🕐 12:00:34(15)
-                    </span>
-                    <span className="bg-purple-500 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-                        ☕ 00:00:00(0)
+
+                    {/* 커피 아이콘 */}
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/coffe_cup_for_bar_mode.svg"
+                            alt="커피 아이콘"
+                            className="w-4 h-4"
+                        />
+                        00:00:00(0)
                     </span>
                 </div>
 
                 {/* 오른쪽 */}
                 <div
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-3"
                     style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
                 >
-                    <div className="flex items-center gap-1 text-xs">
-                        <span className="bg-amber-100 text-amber-800 rounded-full px-2 py-1 flex items-center gap-1 font-mono shadow-sm hover:shadow-md transition-shadow">
-                            🕒 8
+                    <div className="flex items-center gap-2 text-xs">
+                        <span className="text-slate-600 font-medium flex items-center gap-1">
+                            <img
+                                src="/icons/bar-mode/timer_for_bar_mode.svg"
+                                alt="타이머 아이콘"
+                                className="w-4 h-4"
+                            />
+                            8
                         </span>
-                        <span className="bg-emerald-100 text-emerald-800 rounded-full px-2 py-1 flex items-center gap-1 font-mono shadow-sm hover:shadow-md transition-shadow">
-                            ✅ 10
+                        <span className="text-slate-600 font-medium flex items-center gap-1">
+                            <img
+                                src="/icons/bar-mode/cell_phone_for_bar_mode.svg"
+                                alt="완료 아이콘"
+                                className="w-4 h-4"
+                            />
+                            10
                         </span>
                     </div>
 
                     <div className="w-px h-4 bg-slate-300"></div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         <Button
                             variant="ghost"
                             size="icon"
@@ -120,6 +166,7 @@ const BarMode: React.FC = () => {
                         >
                             <BetweenHorizontalStart size={14} />
                         </Button>
+                        {/* 항상 위에 고정 버튼 */}
                         <Button
                             variant="ghost"
                             size="icon"
