@@ -148,15 +148,13 @@ fn create_positioned_menu(app: &AppHandle, x: f64, y: f64) -> Result<(), String>
 pub fn handle_context_menu_event(app: &AppHandle, menu_id: &str) {
     println!("📋 메뉴 이벤트 받음: {}", menu_id);
 
-    use crate::windows::{add_window, WindowMode};
+    use crate::windows::{add_window, switch_window, WindowMode};
 
     match menu_id {
         "multi-account" => {
-            println!("📋 멀티 계정정보 메뉴 클릭됨");
-            add_window(
-                app,
-                WindowMode::SettingsWithPath("multi-account".to_string()),
-            );
+            println!("📋 멀티 계정정보 메뉴 클릭됨 - 런처 윈도우로 전환");
+            // 런처 윈도우를 switch_mode로 출력
+            switch_window(app, WindowMode::Launcher);
         }
         "daily-statistics" => {
             println!("📋 당일 누적 통계 보기 메뉴 클릭됨");

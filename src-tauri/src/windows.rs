@@ -70,7 +70,7 @@ impl WindowMode {
             WindowMode::Launcher => WindowConfig {
                 url: "launcher.html".into(),
                 title: "CTI Task Master - 런처".into(),
-                width: 500.0,
+                width: 1200.0,
                 height: 600.0,
                 min_width: Some(400.0),
                 min_height: Some(500.0),

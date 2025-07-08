@@ -19,9 +19,7 @@ use commands::context_menu::{
     handle_context_menu_event, show_context_menu_at_position, show_tray_context_menu,
 }; // 🆕 컨텍스트 메뉴 이벤트 핸들러
 
-use deeplink::{
-    clear_login_data, get_deep_link_history, manual_deep_link_test, process_deep_link_url,
-};
+use deeplink::{get_login_info, process_deep_link_url};
 
 use devtools::{close_devtools, get_always_on_top_state, open_devtools, toggle_always_on_top};
 use events::setup_event_listeners;
@@ -44,6 +42,9 @@ fn main() {
                 let url_str = &args[1];
                 if url_str.starts_with("cti-personal://") {
                     println!("📥 딥링크 직접 처리: {}", url_str);
+
+                    // 딥링크 URL 파싱 및 처리
+                    process_deep_link_url(url_str.to_string());
 
                     if let Ok(parsed_url) = Url::parse(url_str) {
                         let cmd = parsed_url.host_str().map(|s| s.to_string()).or_else(|| {
@@ -105,9 +106,6 @@ fn main() {
             Ok(())
         })
         .invoke_handler(generate_handler![
-            get_deep_link_history,
-            clear_login_data,
-            manual_deep_link_test,
             open_devtools,
             close_devtools,
             toggle_always_on_top,
@@ -123,7 +121,8 @@ fn main() {
             export_statistics_settings,
             import_statistics_settings,
             show_tray_context_menu,
-            show_context_menu_at_position
+            show_context_menu_at_position,
+            get_login_info
         ])
         .on_menu_event(|app, event| {
             // 🆕 컨텍스트 메뉴 이벤트 처리 추가
