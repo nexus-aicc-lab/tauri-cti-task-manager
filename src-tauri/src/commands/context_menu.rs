@@ -5,7 +5,6 @@
 // pub async fn show_tray_context_menu(app: AppHandle) -> Result<(), String> {
 //     println!("📋 트레이 메뉴 호출됨");
 
-//     // 가장 간단한 방법: 메뉴 하나만 시도
 //     match create_simple_menu(&app) {
 //         Ok(_) => println!("✅ 메뉴 생성 성공"),
 //         Err(e) => {
@@ -23,7 +22,6 @@
 // pub async fn show_context_menu_at_position(app: AppHandle, x: f64, y: f64) -> Result<(), String> {
 //     println!("📋 위치 메뉴 호출됨: ({}, {})", x, y);
 
-//     // 위치 기반 메뉴 생성 시도
 //     match create_positioned_menu(&app, x, y) {
 //         Ok(_) => println!("✅ 위치 메뉴 생성 성공"),
 //         Err(e) => {
@@ -40,7 +38,6 @@
 // fn create_simple_menu(app: &AppHandle) -> Result<(), String> {
 //     println!("🔄 Tauri v2 Menu API 시도 중...");
 
-//     // Tauri v2 Menu API
 //     use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 
 //     // 메뉴 아이템들 생성
@@ -63,7 +60,7 @@
 //     )
 //     .map_err(|e| format!("메뉴 생성 실패: {}", e))?;
 
-//     // 현재 활성 윈도우에서 메뉴 표시
+//     // 현재 활성 윈도우에서 커서 위치에 메뉴 표시
 //     let windows = app.webview_windows();
 //     if let Some((_, window)) = windows.iter().next() {
 //         window
@@ -127,18 +124,20 @@
 //         .map(|(_, window)| window);
 
 //     if let Some(window) = bar_window {
-//         // 🔧 실제 위치 정보 사용!
+//         // 🎯 정확한 위치에 메뉴 표시 - popup_menu_at 사용!
 //         let position = Position::Logical(LogicalPosition { x, y });
 
 //         window
-//             .popup_menu(&menu)
+//             .popup_menu_at(&menu, position)
 //             .map_err(|e| format!("위치 기반 메뉴 팝업 실패: {}", e))?;
+
 //         println!("✅ 위치 기반 메뉴 팝업 성공! 위치: ({}, {})", x, y);
 //         return Ok(());
 //     }
 
 //     Err("바 윈도우를 찾을 수 없음".to_string())
 // }
+
 // pub fn handle_context_menu_event(app: &AppHandle, menu_id: &str) {
 //     println!("📋 메뉴 이벤트 받음: {}", menu_id);
 
@@ -204,7 +203,7 @@ pub async fn show_context_menu_at_position(app: AppHandle, x: f64, y: f64) -> Re
             println!("❌ 위치 메뉴 생성 실패: {}", e);
             // Fallback: 바로 설정 창 열기
             use crate::windows::{add_window, WindowMode};
-            add_window(&app, WindowMode::SettingsWithPath("personal".to_string()));
+            add_window(&app, WindowMode::SettingsWithPath("settings".to_string()));
         }
     }
 
@@ -216,23 +215,23 @@ fn create_simple_menu(app: &AppHandle) -> Result<(), String> {
 
     use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 
-    // 메뉴 아이템들 생성
-    let settings_item = MenuItem::with_id(app, "settings", "⚙️ 설정", true, None::<&str>)
-        .map_err(|e| format!("설정 메뉴 아이템 생성 실패: {}", e))?;
+    // 기본 메뉴 아이템들 생성
+    let settings_item = MenuItem::with_id(app, "settings", "⚙️ 환경설정", true, None::<&str>)
+        .map_err(|e| format!("환경설정 메뉴 아이템 생성 실패: {}", e))?;
 
-    let personal_item = MenuItem::with_id(app, "personal", "👤 개인 설정", true, None::<&str>)
-        .map_err(|e| format!("개인 설정 메뉴 아이템 생성 실패: {}", e))?;
+    let version_item = MenuItem::with_id(app, "version", "ℹ️ 버전정보", true, None::<&str>)
+        .map_err(|e| format!("버전정보 메뉴 아이템 생성 실패: {}", e))?;
 
     let separator =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선 생성 실패: {}", e))?;
 
-    let about_item = MenuItem::with_id(app, "about", "ℹ️ 정보", true, None::<&str>)
-        .map_err(|e| format!("정보 메뉴 아이템 생성 실패: {}", e))?;
+    let exit_item = MenuItem::with_id(app, "exit", "🚪 종료", true, None::<&str>)
+        .map_err(|e| format!("종료 메뉴 아이템 생성 실패: {}", e))?;
 
     // 메뉴 생성
     let menu = Menu::with_items(
         app,
-        &[&settings_item, &personal_item, &separator, &about_item],
+        &[&settings_item, &version_item, &separator, &exit_item],
     )
     .map_err(|e| format!("메뉴 생성 실패: {}", e))?;
 
@@ -255,39 +254,46 @@ fn create_positioned_menu(app: &AppHandle, x: f64, y: f64) -> Result<(), String>
     use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
     use tauri::{LogicalPosition, Position};
 
-    // 메뉴 아이템들 생성 (위치 기반용)
-    let general_item = MenuItem::with_id(app, "general", "⚙️ 일반 설정", true, None::<&str>)
-        .map_err(|e| format!("일반 설정 메뉴 생성 실패: {}", e))?;
+    // 이미지에 맞는 메뉴 아이템들 생성
+    let multi_account_item =
+        MenuItem::with_id(app, "multi-account", "👥 멀티 계정정보", true, None::<&str>)
+            .map_err(|e| format!("멀티 계정정보 메뉴 생성 실패: {}", e))?;
 
-    let personal_item = MenuItem::with_id(app, "personal", "👤 개인 설정", true, None::<&str>)
-        .map_err(|e| format!("개인 설정 메뉴 생성 실패: {}", e))?;
+    let daily_statistics_item = MenuItem::with_id(
+        app,
+        "daily-statistics",
+        "📊 당일 누적 통계 보기",
+        true,
+        None::<&str>,
+    )
+    .map_err(|e| format!("당일 누적 통계 보기 메뉴 생성 실패: {}", e))?;
 
     let separator1 =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선1 생성 실패: {}", e))?;
 
-    let stats_item = MenuItem::with_id(app, "statistics-view", "📊 통계보기", true, None::<&str>)
-        .map_err(|e| format!("통계 메뉴 생성 실패: {}", e))?;
-
-    let minibar_item = MenuItem::with_id(app, "minimap", "📱 미니바", true, None::<&str>)
-        .map_err(|e| format!("미니바 메뉴 생성 실패: {}", e))?;
+    let settings_item = MenuItem::with_id(app, "settings", "⚙️ 환경설정", true, None::<&str>)
+        .map_err(|e| format!("환경설정 메뉴 생성 실패: {}", e))?;
 
     let separator2 =
         PredefinedMenuItem::separator(app).map_err(|e| format!("구분선2 생성 실패: {}", e))?;
 
-    let about_item = MenuItem::with_id(app, "about", "ℹ️ 정보", true, None::<&str>)
-        .map_err(|e| format!("정보 메뉴 생성 실패: {}", e))?;
+    let version_item = MenuItem::with_id(app, "version", "ℹ️ 버전정보", true, None::<&str>)
+        .map_err(|e| format!("버전정보 메뉴 생성 실패: {}", e))?;
 
-    // 메뉴 생성
+    let exit_item = MenuItem::with_id(app, "exit", "🚪 종료", true, None::<&str>)
+        .map_err(|e| format!("종료 메뉴 생성 실패: {}", e))?;
+
+    // 메뉴 생성 (이미지 순서대로)
     let menu = Menu::with_items(
         app,
         &[
-            &general_item,
-            &personal_item,
+            &multi_account_item,
+            &daily_statistics_item,
             &separator1,
-            &stats_item,
-            &minibar_item,
+            &settings_item,
             &separator2,
-            &about_item,
+            &version_item,
+            &exit_item,
         ],
     )
     .map_err(|e| format!("위치 메뉴 생성 실패: {}", e))?;
@@ -320,28 +326,32 @@ pub fn handle_context_menu_event(app: &AppHandle, menu_id: &str) {
     use crate::windows::{add_window, WindowMode};
 
     match menu_id {
-        "settings" | "general" => {
-            println!("📋 일반 설정 메뉴 클릭됨");
-            add_window(app, WindowMode::SettingsWithPath("general".to_string()));
-        }
-        "personal" => {
-            println!("📋 개인 설정 메뉴 클릭됨");
-            add_window(app, WindowMode::SettingsWithPath("personal".to_string()));
-        }
-        "statistics-view" => {
-            println!("📋 통계보기 메뉴 클릭됨");
+        "multi-account" => {
+            println!("📋 멀티 계정정보 메뉴 클릭됨");
             add_window(
                 app,
-                WindowMode::SettingsWithPath("statistics-view".to_string()),
+                WindowMode::SettingsWithPath("multi-account".to_string()),
             );
         }
-        "minimap" => {
-            println!("📋 미니바 설정 메뉴 클릭됨");
-            add_window(app, WindowMode::SettingsWithPath("minimap".to_string()));
+        "daily-statistics" => {
+            println!("📋 당일 누적 통계 보기 메뉴 클릭됨");
+            add_window(
+                app,
+                WindowMode::SettingsWithPath("daily-statistics".to_string()),
+            );
         }
-        "about" => {
-            println!("📋 정보 메뉴 클릭됨");
-            add_window(app, WindowMode::SettingsWithPath("about".to_string()));
+        "settings" => {
+            println!("📋 환경설정 메뉴 클릭됨");
+            add_window(app, WindowMode::SettingsWithPath("settings".to_string()));
+        }
+        "version" => {
+            println!("📋 버전정보 메뉴 클릭됨");
+            add_window(app, WindowMode::SettingsWithPath("version".to_string()));
+        }
+        "exit" => {
+            println!("📋 종료 메뉴 클릭됨");
+            // 애플리케이션 종료 처리
+            std::process::exit(0);
         }
         _ => {
             println!("❓ 알 수 없는 메뉴 ID: {}", menu_id);
