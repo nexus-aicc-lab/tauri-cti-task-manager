@@ -79,27 +79,30 @@ const BarMode: React.FC = () => {
                         <span className="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded-md">
                             08:02:40
                         </span>
+                        <div className="w-px h-4 bg-slate-300"></div>
+                        {/* 대기중 배지 */}
+                        <span
+                            className="bg-[#4199E0] text-white rounded-full px-3 py-1 flex items-center gap-2 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
+                            title="대기중 상태"
+                        >
+                            <img
+                                src="/icons/bar-mode/sandglass_for_bar_mode.svg"
+                                alt="대기중 모래시계 아이콘"
+                                className="w-4 h-4"
+                            />
+                            대기중 00:38:08
+                        </span>
+                        <div className="w-px h-4 bg-slate-300"></div>
                     </div>
                 </div>
+
 
                 {/* 가운데 (드래그 영역) */}
                 <div
                     className="flex items-center gap-4 flex-1 justify-center"
                     style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
                 >
-                    {/* 대기중 배지 */}
-                    <span
-                        className="bg-[#4199E0] text-white rounded-full px-3 py-1 flex items-center gap-2 font-mono text-xs whitespace-nowrap shadow-sm hover:shadow-md transition-shadow"
-                        title="대기중 상태"
-                    >
-                        <img
-                            src="/icons/bar-mode/sandglass_for_bar_mode.svg"
-                            alt="대기중 모래시계 아이콘"
-                            className="w-4 h-4"
-                        />
-                        대기중 00:38:08
-                    </span>
-
+                    <div className="w-px h-4 bg-slate-300"></div>
                     {/* 전화기 녹색 아이콘 */}
                     <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
                         <img
@@ -139,10 +142,16 @@ const BarMode: React.FC = () => {
                         />
                         00:00:00(0)
                     </span>
+                    <div className="w-px h-4 bg-slate-300"></div>
+                </div>
 
+                {/* 오른쪽 */}
+                <div
+                    className="flex items-center gap-2"
+                    style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+                >
 
-                    |
-
+                    <div className="w-px h-4 bg-slate-300 mr-2"></div>
                     <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
                         <img
                             src="/icons/bar-mode/brown_phone_for_bar_mode.svg"
@@ -161,13 +170,10 @@ const BarMode: React.FC = () => {
                         10
                     </span>
 
-                </div>
+                    {/* 세로 구분선 */}
+                    <div className="w-px h-4 bg-slate-300 mx-2"></div>
 
-                {/* 오른쪽 */}
-                <div
-                    className="flex items-center gap-2"
-                    style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-                >
+                    {/* 설정 버튼 */}
 
                     {/* 패널 모드 전환 버튼 */}
                     <button
