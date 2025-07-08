@@ -198,11 +198,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
     return (
         <div className="flex flex-col bg-white min-h-screen">
-            <CustomTitlebar
-                title="U PERSONAL"
-                onBackToLauncher={onBackToLauncher || (() => { })}
-                currentSize={currentSize}
-            />
+            <CustomTitlebar />
 
             {/* 🎯 컨텐츠 영역 */}
             <div className="p-2 flex flex-col">

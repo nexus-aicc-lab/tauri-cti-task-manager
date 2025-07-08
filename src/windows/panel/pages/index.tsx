@@ -233,11 +233,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
                 overflow: 'hidden'
             }}
         >
-            <CustomTitlebar
-                title="U PERSONAL"
-                onBackToLauncher={onBackToLauncher || (() => { })}
-                currentSize={currentSize}
-            />
+            <CustomTitlebar />
 
             <div
                 style={{

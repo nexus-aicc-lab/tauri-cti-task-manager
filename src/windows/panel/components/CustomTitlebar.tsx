@@ -1,125 +1,178 @@
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Pin,
     PinOff,
     Minus,
-    BetweenHorizontalStart,
+    Maximize2,
+    Minimize2,
     X,
-    Menu,
+    BetweenHorizontalEnd,
 } from 'lucide-react';
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { emit } from '@tauri-apps/api/event';
+import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
 
-const BarMode = () => {
-    const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+interface Props {
+    title: string;
+    onBackToLauncher: () => void;
+    currentSize?: { width: number; height: number }; // 🆕 크기 정보 prop
+}
+
+export default function CustomTitlebar({ title, currentSize }: Props) {
+    const [isMaximized, setIsMaximized] = useState(false);
+    const [isPinned, setIsPinned] = useState(false);
+
+    // 핀 상태 변경 함수 (백엔드 명령어 사용)
+    const changeToggleMode = async () => {
+        try {
+            const { invoke } = await import('@tauri-apps/api/core');
+            const newState = await invoke('toggle_always_on_top') as boolean;
+            setIsPinned(newState);
+
+            console.log(newState ? '📌 항상 위에 보이기 활성화' : '📌 항상 위에 보이기 비활성화');
+        } catch (error) {
+            console.error('❌ 핀 모드 변경 실패:', error);
+        }
+    };
+
+    const minimize = async () => {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        (await getCurrentWindow()).minimize();
+    };
+
+    const maximize = async () => {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const win = await getCurrentWindow();
+        const max = await win.isMaximized();
+        if (max) {
+            await win.unmaximize();
+        } else {
+            await win.maximize();
+        }
+        setIsMaximized(!max);
+    };
+
+    const close = async () => {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        (await getCurrentWindow()).close();
+    };
+
+    const handleSwitchToBar = async () => {
+        try {
+            const { emit } = await import('@tauri-apps/api/event');
+            await emit('switch-mode', 'bar');
+            console.log('📤 바 모드 전환 요청 전송');
+        } catch (error) {
+            console.error('❌ 바 모드 전환 요청 실패:', error);
+        }
+    };
 
     useEffect(() => {
         (async () => {
             try {
-                const win = getCurrentWebviewWindow();
-                const pinState = await win.isAlwaysOnTop();
-                setAlwaysOnTop(pinState);
+                const { invoke } = await import('@tauri-apps/api/core');
+                const { getCurrentWindow } = await import('@tauri-apps/api/window');
+                const win = getCurrentWindow();
+
+                // 현재 창 상태 동기화
+                setIsMaximized(await win.isMaximized());
+
+                // 백엔드에서 핀 상태 확인
+                const pinState = await invoke('get_always_on_top_state') as boolean;
+                setIsPinned(pinState);
             } catch (error) {
-                console.error('Error getting always on top state:', error);
+                console.error('❌ 창 상태 확인 실패:', error);
             }
         })();
     }, []);
 
-    const handleAlwaysOnTop = async () => {
-        try {
-            const win = getCurrentWebviewWindow();
-            const next = !alwaysOnTop;
-            await win.setAlwaysOnTop(next);
-            setAlwaysOnTop(next);
-        } catch (error) {
-            console.error('Error toggling always on top:', error);
-        }
-    };
-
-    const handleMinimize = async () => {
-        await getCurrentWebviewWindow().minimize();
-    };
-
-    const handleClose = async () => {
-        await getCurrentWebviewWindow().close();
-    };
-
-    const handleSwitchToPanelMode = async () => {
-        try {
-            await emit('switch-mode', 'panel');
-            console.log('📤 패널 모드 전환 이벤트 전송');
-        } catch (error) {
-            console.error('❌ 패널 전환 실패:', error);
-        }
-    };
-
     return (
         <div
-            className="w-full h-11 flex items-center bg-white text-sm font-sans text-gray-700 cursor-move"
-            style={{ backgroundColor: '#F6FBFA' }}
-            data-tauri-drag-region // 🎯 드래그 가능한 영역 설정
+            className="h-10 bg-cyan-500 flex items-center justify-between px-4 select-none border-b border-cyan-600"
+            data-tauri-drag-region
         >
-            <div className="w-full flex items-center justify-between px-4 py-2">
-                {/* 왼쪽 - 햄버거 메뉴 */}
-                <div
-                    className="flex items-center gap-2"
-                    style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties} // 🎯 드래그 방지 설정
-                >
-                    <button
-                        className="h-7 w-7 hover:bg-gray-100"
-                        title="메뉴"
-                    >
-                        <Menu size={14} />
-                    </button>
+            {/* 왼쪽 영역 */}
+            <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+                <HamburgerButtonForSystemMenuWithDropdownStyle />
+                <div className="text-sm text-white flex items-center space-x-1 pl-4">
+                    <span>👤 박소연(NEX1011)</span>
                 </div>
+                {/* 🆕 크기 정보 표시 */}
+                {currentSize && (
+                    <div className="text-xs text-cyan-800 bg-white bg-opacity-20 px-2 py-1 rounded">
+                        📏 {currentSize.width} × {currentSize.height}px
+                    </div>
+                )}
+            </div>
 
-                {/* 가운데 - 상태 배지들 */}
-                <div className="flex items-center gap-2 flex-1 justify-center pointer-events-none">
-                    <span className="bg-blue-500 text-white rounded-full px-3 py-1 flex items-center gap-1 font-mono text-xs whitespace-nowrap">
-                        👤 대기중 00:38:08
-                    </span>
-                </div>
+            {/* 가운데 영역 */}
+            <div className="text-center flex-1 pointer-events-none">
+                <span className="text-sm font-semibold text-white">{title}</span>
+            </div>
 
-                {/* 오른쪽 - 컨트롤 버튼들 */}
-                <div
-                    className="flex items-center gap-2"
-                    style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties} // 🎯 드래그 방지 설정
+            {/* 오른쪽 영역 */}
+            <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+                {/* 핀 버튼 (항상 위에 보이기) */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        changeToggleMode();
+                    }}
+                    className={`p-1 rounded transition-colors shadow-sm ${isPinned
+                        ? 'text-green-700 bg-white bg-opacity-90 hover:bg-opacity-100'
+                        : 'text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90'
+                        }`}
+                    title={isPinned ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >
-                    <button
-                        onClick={handleSwitchToPanelMode}
-                        className="h-7 w-7 hover:bg-gray-100"
-                        title="패널 모드로 전환"
-                    >
-                        <BetweenHorizontalStart size={14} />
-                    </button>
-                    <button
-                        onClick={handleAlwaysOnTop}
-                        className={`h-7 w-7 hover:bg-gray-100 ${alwaysOnTop ? 'text-green-600' : 'text-gray-500'
-                            }`}
-                        title={alwaysOnTop ? '항상 위에 해제' : '항상 위에 고정'}
-                    >
-                        {alwaysOnTop ? <Pin size={14} /> : <PinOff size={14} />}
-                    </button>
-                    <button
-                        onClick={handleMinimize}
-                        className="h-7 w-7 hover:bg-gray-100"
-                        title="최소화"
-                    >
-                        <Minus size={14} />
-                    </button>
-                    <button
-                        onClick={handleClose}
-                        className="h-7 w-7 hover:bg-red-100 hover:text-red-500"
-                        title="닫기"
-                    >
-                        <X size={14} />
-                    </button>
-                </div>
+                    {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
+                </button>
+
+                {/* 바 모드 전환 버튼 */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleSwitchToBar();
+                    }}
+                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-blue-600 p-1 rounded shadow-sm transition-colors"
+                    title="바 모드로 전환"
+                >
+                    <BetweenHorizontalEnd size={14} />
+                </button>
+
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        minimize();
+                    }}
+                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-gray-900 p-1 rounded shadow-sm transition-colors"
+                    title="최소화"
+                >
+                    <Minus size={14} />
+                </button>
+
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        maximize();
+                    }}
+                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-gray-900 p-1 rounded shadow-sm transition-colors"
+                    title={isMaximized ? '복원' : '최대화'}
+                >
+                    {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                </button>
+
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        close();
+                    }}
+                    className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-red-600 p-1 rounded shadow-sm transition-colors"
+                    title="닫기"
+                >
+                    <X size={14} />
+                </button>
             </div>
         </div>
     );
-};
-
-export default BarMode;
+}
