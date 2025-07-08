@@ -15,7 +15,6 @@ import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/H
 
 interface Props {
     title: string;
-    onBackToLauncher: () => void;
     currentSize?: { width: number; height: number }; // 🆕 크기 정보 prop
 }
 

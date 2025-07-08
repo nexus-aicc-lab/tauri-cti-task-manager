@@ -198,7 +198,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
     return (
         <div className="flex flex-col bg-white min-h-screen">
-            <CustomTitlebar />
+            <CustomTitlebar title="Panel Mode" />
 
             {/* 🎯 컨텐츠 영역 */}
             <div className="p-2 flex flex-col">

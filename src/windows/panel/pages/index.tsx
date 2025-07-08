@@ -233,7 +233,9 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
                 overflow: 'hidden'
             }}
         >
-            <CustomTitlebar />
+            <CustomTitlebar
+                title="Panel Mode"
+            />
 
             <div
                 style={{
