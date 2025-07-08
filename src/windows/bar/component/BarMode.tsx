@@ -26,12 +26,13 @@ const BarMode: React.FC = () => {
 
     const handleAlwaysOnTop = async () => {
         try {
-            const win = await getCurrentWindow();
-            const next = !alwaysOnTop;
-            await win.setAlwaysOnTop(next);
-            setAlwaysOnTop(next);
+            const { invoke } = await import('@tauri-apps/api/core');
+            const newState = await invoke('toggle_always_on_top') as boolean;
+            setAlwaysOnTop(newState);
+
+            console.log(newState ? '📌 항상 위에 보이기 활성화' : '📌 항상 위에 보이기 비활성화');
         } catch (error) {
-            console.error('Error toggling always on top:', error);
+            console.error('❌ 핀 모드 변경 실패:', error);
         }
     };
 
@@ -102,7 +103,17 @@ const BarMode: React.FC = () => {
                     {/* 전화기 녹색 아이콘 */}
                     <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
                         <img
-                            src="/icons/bar-mode/green_phone_for_bar_mode.svg"
+                            src="/icons/bar-mode/calling_icon_for_bar_mode.svg"
+                            alt="녹색 전화기 아이콘"
+                            className="w-4 h-4"
+                        />
+                        12:50:20(12)
+                    </span>
+
+                    {/*  */}
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/orange_pencil_for_bar_mode.svg"
                             alt="녹색 전화기 아이콘"
                             className="w-4 h-4"
                         />
@@ -112,7 +123,7 @@ const BarMode: React.FC = () => {
                     {/* 전화기 갈색 아이콘 */}
                     <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
                         <img
-                            src="/icons/bar-mode/brown_phone_for_bar_mode.svg"
+                            src="/icons/bar-mode/hourglass_for_bar_mode.svg"
                             alt="갈색 전화기 아이콘"
                             className="w-4 h-4"
                         />
@@ -128,78 +139,86 @@ const BarMode: React.FC = () => {
                         />
                         00:00:00(0)
                     </span>
+
+
+                    |
+
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/brown_phone_for_bar_mode.svg"
+                            alt="커피 아이콘"
+                            className="w-4 h-4"
+                        />
+                        8
+                    </span>
+
+                    <span className="text-slate-600 font-medium text-xs flex items-center gap-1">
+                        <img
+                            src="/icons/bar-mode/call_stopping_green_for_bar_mode.svg"
+                            alt="커피 아이콘"
+                            className="w-4 h-4"
+                        />
+                        10
+                    </span>
+
                 </div>
 
                 {/* 오른쪽 */}
                 <div
-                    className="flex items-center gap-3"
+                    className="flex items-center gap-2"
                     style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
                 >
-                    <div className="flex items-center gap-2 text-xs">
-                        <span className="text-slate-600 font-medium flex items-center gap-1">
-                            <img
-                                src="/icons/bar-mode/timer_for_bar_mode.svg"
-                                alt="타이머 아이콘"
-                                className="w-4 h-4"
-                            />
-                            8
-                        </span>
-                        <span className="text-slate-600 font-medium flex items-center gap-1">
-                            <img
-                                src="/icons/bar-mode/cell_phone_for_bar_mode.svg"
-                                alt="완료 아이콘"
-                                className="w-4 h-4"
-                            />
-                            10
-                        </span>
-                    </div>
 
-                    <div className="w-px h-4 bg-slate-300"></div>
+                    {/* 패널 모드 전환 버튼 */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleSwitchToPanelMode();
+                        }}
+                        className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-blue-600 p-1 rounded shadow-sm transition-colors"
+                        title="패널 모드로 전환"
+                    >
+                        <BetweenHorizontalStart size={15} />
+                    </button>
 
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleSwitchToPanelMode}
-                            className="h-7 w-7 hover:bg-slate-100 text-slate-600 hover:text-blue-600 transition-colors"
-                            title="패널 모드로 전환"
-                        >
-                            <BetweenHorizontalStart size={14} />
-                        </Button>
-                        {/* 항상 위에 고정 버튼 */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleAlwaysOnTop}
-                            className={cn(
-                                'h-7 w-7 hover:bg-slate-100 transition-colors',
-                                alwaysOnTop
-                                    ? 'text-emerald-600 hover:text-emerald-700'
-                                    : 'text-slate-500 hover:text-slate-700'
-                            )}
-                            title={alwaysOnTop ? '항상 위에 해제' : '항상 위에 고정'}
-                        >
-                            {alwaysOnTop ? <Pin size={14} /> : <PinOff size={14} />}
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleMinimize}
-                            className="h-7 w-7 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
-                            title="최소화"
-                        >
-                            <Minus size={14} />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleClose}
-                            className="h-7 w-7 hover:bg-red-100 hover:text-red-600 text-slate-600 transition-colors"
-                            title="닫기"
-                        >
-                            <X size={14} />
-                        </Button>
-                    </div>
+                    {/* 항상 위에 고정 버튼 */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAlwaysOnTop();
+                        }}
+                        className={`p-1 rounded transition-colors shadow-sm ${alwaysOnTop
+                            ? 'text-green-700 bg-white bg-opacity-90 hover:bg-opacity-100'
+                            : 'text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90'
+                            }`}
+                        title={alwaysOnTop ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
+                    >
+                        {alwaysOnTop ? <Pin size={15} /> : <PinOff size={15} />}
+                    </button>
+
+                    {/* 최소화 버튼 */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleMinimize();
+                        }}
+                        className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-gray-900 p-1 rounded shadow-sm transition-colors"
+                        title="최소화"
+                    >
+                        <Minus size={15} />
+                    </button>
+
+                    {/* 닫기 버튼 */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleClose();
+                        }}
+                        className="text-gray-700 bg-white bg-opacity-80 hover:bg-opacity-90 hover:text-red-600 p-1 rounded shadow-sm transition-colors"
+                        title="닫기"
+                    >
+                        <X size={15} />
+                    </button>
                 </div>
             </div>
         </div>

@@ -155,9 +155,9 @@ impl WindowMode {
                 min_width: Some(200.0),
                 min_height: Some(100.0),
                 resizable: false,
-                always_on_top: false,
+                always_on_top: true,
                 decorations: true,
-                is_main: false,       // 메인 창 아님
+                is_main: true,        // 메인 창 아님
                 is_independent: true, // 독립 창
             },
         }
