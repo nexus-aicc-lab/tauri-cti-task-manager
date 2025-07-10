@@ -77,7 +77,6 @@ export default function CustomTitlebar({ title }: Props) {
             data-tauri-drag-region
         >
             <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as any}>
-                <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-xs font-semibold pointer-events-none" style={{ WebkitAppRegion: 'drag' } as any}>
                     {title}
                 </div>
@@ -94,8 +93,8 @@ export default function CustomTitlebar({ title }: Props) {
                 <button
                     onClick={togglePin}
                     className={`p-0.5 rounded transition-colors shadow-sm ${isPinned
-                            ? 'text-green-700 bg-white/90 hover:bg-white'
-                            : 'text-gray-700 bg-white/80 hover:bg-white/90'
+                        ? 'text-green-700 bg-white/90 hover:bg-white'
+                        : 'text-gray-700 bg-white/80 hover:bg-white/90'
                         }`}
                     title={isPinned ? '항상 위에 보이기 해제' : '항상 위에 보이기'}
                 >

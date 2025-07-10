@@ -60,6 +60,7 @@ const BarModeHamburgerButtonForContextMenu: React.FC = () => {
 
     return (
         <div ref={wrapperRef} style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+
             <Button
                 variant="ghost"
                 size="icon"

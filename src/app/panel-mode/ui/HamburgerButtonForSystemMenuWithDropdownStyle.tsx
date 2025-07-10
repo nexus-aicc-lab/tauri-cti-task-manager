@@ -49,6 +49,14 @@ export default function HamburgerButtonForSystemMenuWithDropdownStyle() {
                     console.error('❌ 환경설정 모드 전환 실패:', err);
                 }
                 break;
+            case '멀티계정정보':
+                console.log('📤 패널 모드 전환 요청 (멀티계정정보)');
+                try {
+                    await emit('switch-mode', 'launcher');
+                } catch (err) {
+                    console.error('❌ 패널 모드 전환 실패:', err);
+                }
+                break;
             case '버전정보':
                 console.log('버전 정보 보기');
                 break;

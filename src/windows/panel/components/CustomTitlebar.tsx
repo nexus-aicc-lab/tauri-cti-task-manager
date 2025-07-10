@@ -94,6 +94,7 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
             {/* 왼쪽 영역 */}
             <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 <HamburgerButtonForSystemMenuWithDropdownStyle />
+
                 <div className="text-sm text-white flex items-center space-x-1 pl-4">
                     <span>👤 박소연(NEX1011)</span>
                 </div>
