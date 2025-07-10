@@ -53,7 +53,7 @@ import AgentDashboardContent from '../ui/AgentDashboardContent';
 import { StatusUpdater } from '../components/StatusUpdater';
 import { useUser } from '../hooks/useUserQueries';
 import { UserProfileUpdate } from '../../../lib/redis-events';
-import { useRedisEvents } from '@/windows/panel/hooks/useRedisEvents';
+import { useRedisEvents } from '@/hooks/useRedisEvents';
 import { Toast } from '@/windows/panel/components/ToastNotification';
 
 const MainPage = () => {

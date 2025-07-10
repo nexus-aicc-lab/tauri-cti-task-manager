@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { setupRedisEventListener, UserProfileUpdate } from '../../../lib/redis-events';
+import { setupRedisEventListener, UserProfileUpdate } from '../lib/redis-events';
 
 interface UseRedisEventsOptions {
     onUserUpdate?: (data: UserProfileUpdate) => void;
