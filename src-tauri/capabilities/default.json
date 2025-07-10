@@ -64,6 +64,10 @@
         "$APPDATA/panel_metrics_config.json"
       ]
     },
-    "deep-link:default"
+    "deep-link:default",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-show"
   ]
 }
