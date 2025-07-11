@@ -90,7 +90,7 @@ fn main() {
 
                             Some("login") => {
                                 println!("🧭 Login 창 열기");
-                                add_window(&app.handle(), WindowMode::Login);
+                                add_window(&app.handle(), WindowMode::Launcher);
                                 return Ok(());
                             }
                             Some("panel") => {

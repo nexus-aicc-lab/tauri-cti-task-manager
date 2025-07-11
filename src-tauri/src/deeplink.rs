@@ -173,7 +173,9 @@ pub fn process_deep_link_url(url: String) {
 
 // 로그인 정보 저장 (기존 파일 덮어쓰기)
 fn save_login_info(login_info: LoginInfo) -> Result<(), String> {
-    let path = get_config_dir()?.join("login_info.json");
+    let path: PathBuf = get_config_dir()?.join("login_info.json");
+
+    println!("💾 로그인 정보 저장: {:?}", login_info);
 
     let json = serde_json::to_string_pretty(&login_info).map_err(|e| e.to_string())?;
     fs::write(&path, json).map_err(|e| e.to_string())?;
