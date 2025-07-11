@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke } from '@tauri-apps/api/core';
-import PanelModeContent from "@/app/panel-mode/ui/PanelModeContent";
+import PanelModeContent from "@/windows/panel/components/PanelModeContent";
 import CustomTitlebar from "../components/CustomTitlebar";
 
 interface PanelModePageProps {
