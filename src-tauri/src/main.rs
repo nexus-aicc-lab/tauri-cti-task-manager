@@ -35,7 +35,7 @@ use deeplink::{get_login_info, process_deep_link_url};
 
 use devtools::{close_devtools, get_always_on_top_state, open_devtools, toggle_always_on_top};
 use events::setup_event_listeners;
-use redis::{start_redis_subscriber, test_redis_connection}; // ✅ Redis 함수들 임포트
+use redis::start_redis_subscriber; // ✅ Redis 함수들 임포트
 use tauri::{async_runtime, generate_handler, Manager};
 use tauri_plugin_deep_link::DeepLinkExt;
 use url::Url;
@@ -141,7 +141,6 @@ fn main() {
             import_statistics_settings,
             show_tray_context_menu,
             show_context_menu_at_position,
-            test_redis_connection,
             get_login_info,
             // ✅ 기존 레거시 알림 명령어들 (호환성 유지)
             show_desktop_notification,

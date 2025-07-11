@@ -1,30 +1,8 @@
-// // 1. src/lib/redis-events.ts - 새로 생성
-// import { listen } from '@tauri-apps/api/event';
-
-// export interface UserProfileUpdate {
-//     userId: number;
-//     field: string;
-//     newValue: string;
-//     timestamp: number;
-// }
-
-// export interface RedisEvent {
-//     channel: string;
-//     data: UserProfileUpdate;
-// }
-
-// // Redis s이벤트 리스너 설정
-// export const setupRedisEventListener = (onUserProfileUpdate: (data: UserProfileUpdate) => void) => {
-//     return listen<RedisEvent>('redis-user-profile-update', (event) => {
-//         console.log('🔔 Redis 이벤트 수신:', event.payload);
-//         onUserProfileUpdate(event.payload.data);
-//     });
-// };
-
-// src/lib/redis-events.ts - 기존 파일에 추가
 import { listen } from '@tauri-apps/api/event';
 
-// 기존 인터페이스들
+//
+// 📌 공통 인터페이스들
+//
 export interface UserProfileUpdate {
     userId: number;
     field: string;
@@ -37,7 +15,6 @@ export interface RedisEvent {
     data: UserProfileUpdate;
 }
 
-// ✅ 새로 추가: 상담원 상태 관련 인터페이스들
 export interface AgentInfo {
     id: number;
     name: string;
@@ -70,37 +47,59 @@ export interface AgentStatusEvent {
     data: AgentStatusInfo;
 }
 
-// 기존 Redis 이벤트 리스너 설정
-export const setupRedisEventListener = (onUserProfileUpdate: (data: UserProfileUpdate) => void) => {
+export interface SimpleAgentStatus {
+    agentId: number;
+    name: string;
+    callStatus: string;
+}
+
+//
+// 📡 Redis 이벤트 리스너들
+//
+
+// 1. 유저 프로필 변경 리스너
+export const setupRedisEventListener = (
+    onUserProfileUpdate: (data: UserProfileUpdate) => void
+) => {
     return listen<RedisEvent>('redis-user-profile-update', (event) => {
         console.log('🔔 Redis 이벤트 수신:', event.payload);
         onUserProfileUpdate(event.payload.data);
     });
 };
 
-// ✅ 새로 추가: 상담원 상태 이벤트 리스너 설정
-export const setupAgentStatusEventListener = (onAgentStatusUpdate: (data: AgentStatusInfo) => void) => {
+// 2. 전체 상담원 상태 리스너
+export const setupAgentStatusEventListener = (
+    onAgentStatusUpdate: (data: AgentStatusInfo) => void
+) => {
     return listen<AgentStatusEvent>('redis-agent-status-update', (event) => {
         console.log('🔔 상담원 상태 이벤트 수신:', event.payload);
         onAgentStatusUpdate(event.payload.data);
     });
 };
 
-// ✅ 새로 추가: 모든 Redis 이벤트를 한 번에 설정하는 헬퍼 함수
-export const setupAllRedisEventListeners = (
-    onUserProfileUpdate: (data: UserProfileUpdate) => void,
-    onAgentStatusUpdate: (data: AgentStatusInfo) => void
+// 3. 단건 상담원 상태 리스너
+export const setupSingleAgentStatusEventListener = (
+    onSingleAgentStatusUpdate: (data: SimpleAgentStatus) => void
 ) => {
-    const userProfileUnlisten = setupRedisEventListener(onUserProfileUpdate);
-    const agentStatusUnlisten = setupAgentStatusEventListener(onAgentStatusUpdate);
+    return listen<SimpleAgentStatus>('redis-agent-status-single', (event) => {
+        console.log('🔔 단건 상담원 상태 이벤트 수신:', event.payload);
+        onSingleAgentStatusUpdate(event.payload);
+    });
+};
 
-    // 두 리스너를 모두 해제하는 함수 반환
-    return async () => {
-        const [userUnlisten, agentUnlisten] = await Promise.all([
-            userProfileUnlisten,
-            agentStatusUnlisten
-        ]);
+//
+// 🧩 전체 Redis 이벤트 통합 리스너
+//
+export const setupAllRedisEventListeners = async (
+    onUserProfileUpdate: (data: UserProfileUpdate) => void,
+    onSingleAgentStatusUpdate: (data: SimpleAgentStatus) => void
+) => {
+    const userUnlisten = await setupRedisEventListener(onUserProfileUpdate);
+    const singleAgentUnlisten = await setupSingleAgentStatusEventListener(onSingleAgentStatusUpdate);
+
+    // 🔁 해제 함수 통합 반환
+    return () => {
         userUnlisten();
-        agentUnlisten();
+        singleAgentUnlisten();
     };
 };
