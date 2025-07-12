@@ -52,19 +52,36 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
         }, delay);
     }, [currentSize]);
 
-    // 🔄 단일 초기화 useEffect  
+    // 🔄 단일 초기화 useEffect
     useEffect(() => {
         let mounted = true;
+        let resizeObserver: ResizeObserver | null = null;
 
         const initialize = async () => {
             try {
                 console.log("🚀 [panel-mode] 패널 모드 초기화");
 
-                // 저장된 크기 로드
+                // 1. 저장된 크기 로드
                 const savedSize = await loadSavedWindowSize('panel-mode');
                 if (savedSize && mounted) {
                     setCurrentSize(savedSize);
                     console.log(`🎯 [panel-mode] 저장된 크기 사용: ${savedSize.width}x${savedSize.height}`);
+                }
+
+                // 2. ResizeObserver 설정
+                if (mainContainerRef.current && mounted) {
+                    resizeObserver = new ResizeObserver(() => {
+                        console.log("🔍 [panel-mode] 콘텐츠 크기 변화 감지");
+                        adjustWindowSize(200);
+                    });
+                    resizeObserver.observe(mainContainerRef.current);
+                }
+
+                // 3. 초기 크기 조정 (단계적으로)
+                if (mounted) {
+                    adjustWindowSize(100);  // 즉시
+                    setTimeout(() => mounted && adjustWindowSize(0), 500);   // 0.5초 후
+                    setTimeout(() => mounted && adjustWindowSize(0), 1000);  // 1초 후
                 }
 
             } catch (error) {
@@ -84,6 +101,12 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
         return () => {
             mounted = false;
             clearTimeout(initTimeout);
+            if (resizeTimeoutRef.current) {
+                clearTimeout(resizeTimeoutRef.current);
+            }
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
         };
     }, []); // 의존성 배열 비움 - 한 번만 실행
 
@@ -124,6 +147,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
 
     return (
         <div
+            ref={mainContainerRef}
             style={{
                 width: `${PANEL_WINDOW_CONFIG.FIXED_WIDTH}px`,
                 minHeight: `${PANEL_WINDOW_CONFIG.MIN_HEIGHT}px`,
