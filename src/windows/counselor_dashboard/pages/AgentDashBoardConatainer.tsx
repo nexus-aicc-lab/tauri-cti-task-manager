@@ -207,7 +207,7 @@ import CustomTitlebar from '../components/CustomTitlebar';
 // ✅ 대시보드 전용 설정
 const DASHBOARD_WINDOW_CONFIG = {
     FIXED_WIDTH: 1400,
-    MIN_HEIGHT: 500,
+    MIN_HEIGHT: 400,
     MAX_HEIGHT: 1200, // 1500 → 1200으로 줄임
     TITLEBAR_HEIGHT: 42,
     CONTENT_PADDING: 20, // 60 → 20으로 줄임 (과도한 여백 방지)
@@ -286,7 +286,7 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
         const spacingHeight = sections.length > 1 ? (sections.length - 1) * 16 : 0;
 
         // 3. 콘텐츠 패딩 (16px * 2)
-        const contentPadding = 32;
+        const contentPadding = 20;
 
         // 4. 계산된 총 콘텐츠 높이
         const calculatedContentHeight = totalSectionHeight + spacingHeight + contentPadding;
@@ -294,7 +294,7 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
         // 5. 실제 측정된 높이와 비교 (더 작은 값 사용)
         const measuredHeight = Math.min(
             contentRef.current.scrollHeight,
-            contentRef.current.offsetHeight + 50, // 약간의 여유분
+            contentRef.current.offsetHeight + 30, // 약간의 여유분
             calculatedContentHeight
         );
 
@@ -744,7 +744,7 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
                 </div>
 
                 {/* 하단 2열 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <Card className="min-h-[140px] h-auto flex flex-col justify-between">
                         <CardHeader>
                             <CardTitle className="text-sm font-medium flex items-center gap-1">
@@ -777,43 +777,8 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
                             ))}
                         </CardContent>
                     </Card>
-                </div>
-
-                {/* 추가된 3번째 줄 */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    <Card className="min-h-[140px] h-auto flex flex-col justify-between">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium flex items-center gap-1">
-                                <ListTodo className="w-4 h-4" /> 대기 목록 2
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            {dummyQueue.map((item, idx) => (
-                                <div key={idx} className="flex justify-between text-sm">
-                                    <span>{item.name}</span>
-                                    <span className="text-muted-foreground">예상 {item.expected}</span>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-
-                    <Card className="min-h-[140px] h-auto flex flex-col justify-between">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium flex items-center gap-1">
-                                <PhoneIncoming className="w-4 h-4" /> 최근 통화 목록 2
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            {dummyCalls.map((call, idx) => (
-                                <div key={idx} className="flex justify-between text-sm">
-                                    <span>{call.time}</span>
-                                    <span>{call.name}</span>
-                                    <span>{call.duration}</span>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
                 </div> */}
+
             </div>
 
             {/* 강화된 디버그 정보 */}
