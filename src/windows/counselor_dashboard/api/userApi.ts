@@ -10,17 +10,6 @@ export interface User {
     createdAt: string;
 }
 
-export interface LoginRequest {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    token: string;
-    email: string;
-    name: string;
-}
-
 export interface UpdateProfileRequest {
     name?: string;
     email?: string;
@@ -29,25 +18,9 @@ export interface UpdateProfileRequest {
 }
 
 export const userApi = {
-    // ✅ 인증 관련
-    login: async (data: LoginRequest): Promise<LoginResponse> => {
-        const response = await apiClient.post('/users/login', data);
-        return response.data;
-    },
-
-    register: async (data: { email: string; name: string; password: string }): Promise<User> => {
-        const response = await apiClient.post('/users/register', data);
-        return response.data;
-    },
-
     // ✅ 사용자 조회
     getAllUsers: async (): Promise<User[]> => {
         const response = await apiClient.get('/users');
-        return response.data;
-    },
-
-    getCurrentProfile: async (): Promise<User> => {
-        const response = await apiClient.get('/users/profile');
         return response.data;
     },
 
@@ -79,12 +52,6 @@ export const userApi = {
         return response.data;
     },
 
-    // ✅ 비밀번호 변경
-    changePassword: async (data: { currentPassword: string; newPassword: string }): Promise<string> => {
-        const response = await apiClient.put('/users/password', data);
-        return response.data;
-    },
-
     // ✅ 통계 관련 (향후 확장용)
     getUserStatusStats: async (): Promise<{ callStatus: string; count: number }[]> => {
         const response = await apiClient.get('/users/stats/status');
@@ -106,6 +73,4 @@ export const userApi = {
         const response = await apiClient.get('/users/active');
         return response.data;
     },
-
-
 };

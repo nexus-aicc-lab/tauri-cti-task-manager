@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -13,23 +12,33 @@ import {
 } from 'lucide-react';
 import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
 
-interface Props {
-    title: string;
-    onBackToLauncher: () => void;
-    currentSize?: { width: number; height: number }; // 🆕 크기 정보 prop
+interface UserInfo {
+    id: string;
+    username: string;
+    email: string;
+    department: string;
+    role: string;
+    profileImage?: string;
 }
 
-export default function CustomTitlebar({ title, currentSize }: Props) {
+interface Props {
+    title: string;
+    currentSize?: { width: number; height: number };
+    user?: UserInfo | null;
+}
+
+export default function CustomTitlebar({ title, currentSize, user }: Props) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
 
-    // 핀 상태 변경 함수 (백엔드 명령어 사용)
+    console.log("user in CustomTitlebar:", user);
+
+
     const changeToggleMode = async () => {
         try {
             const { invoke } = await import('@tauri-apps/api/core');
             const newState = await invoke('toggle_always_on_top') as boolean;
             setIsPinned(newState);
-
             console.log(newState ? '📌 항상 위에 보이기 활성화' : '📌 항상 위에 보이기 비활성화');
         } catch (error) {
             console.error('❌ 핀 모드 변경 실패:', error);
@@ -75,10 +84,7 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
                 const { getCurrentWindow } = await import('@tauri-apps/api/window');
                 const win = getCurrentWindow();
 
-                // 현재 창 상태 동기화
                 setIsMaximized(await win.isMaximized());
-
-                // 백엔드에서 핀 상태 확인
                 const pinState = await invoke('get_always_on_top_state') as boolean;
                 setIsPinned(pinState);
             } catch (error) {
@@ -96,9 +102,12 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
             <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 <HamburgerButtonForSystemMenuWithDropdownStyle />
                 <div className="text-sm text-white flex items-center space-x-1 pl-4">
-                    <span>👤 박소연(NEX1011)</span>
+                    {user ? (
+                        <span>👤 {user.username}({user.id}) - {user.department}</span>
+                    ) : (
+                        <span>👤 로그인 필요</span>
+                    )}
                 </div>
-                {/* 🆕 크기 정보 표시 */}
                 {currentSize && (
                     <div className="text-xs text-cyan-800 bg-white bg-opacity-20 px-2 py-1 rounded">
                         📏 {currentSize.width} × {currentSize.height}px
@@ -113,7 +122,6 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
 
             {/* 오른쪽 영역 */}
             <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-                {/* 핀 버튼 (항상 위에 보이기) */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -128,7 +136,6 @@ export default function CustomTitlebar({ title, currentSize }: Props) {
                     {isPinned ? <Pin size={14} /> : <PinOff size={14} />}
                 </button>
 
-                {/* 바 모드 전환 버튼 */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

@@ -18,6 +18,7 @@ import AgentStatus1 from '../ui/AgentStatus1';
 import AgentStatus2 from '../ui/AgentStatus2';
 import AgentStatus3 from '../ui/AgentStatus3';
 import LoginForm from '@/shared/ui/LoginForm/LoginForm';
+import CustomTitlebar from '../components/CustomTitlebar';
 
 // ✅ User 타입 정의
 interface User {
@@ -66,27 +67,50 @@ const getStatusText = (status: User['callStatus']) => {
 };
 
 const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
+    const handleLogin = (username: string, password: string) => {
+        console.log('로그인 시도:', { username, password });
+        // 로그인 로직 구현
+    };
+
     return (
         <div className="px-4 py-6 space-y-6 max-w-7xl mx-auto">
+            {/* 메인 4열 구성 */}
 
 
-            {/* 메인 3열 구성 */}
+            <CustomTitlebar
+                title={"상담사 대쉬 보드"}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <div className="col-span-1 space-y-4">
-                    <AgentStatus1 />
-                </div>
-                <div className="col-span-1 space-y-4">
-                    <AgentStatus2 />
-                </div>
-                <div className="col-span-1 space-y-4">
-                    <AgentStatus3 />
-                </div>
+                <Card className="col-span-1">
+                    <CardContent className="p-4">
+                        <AgentStatus1 />
+                    </CardContent>
+                </Card>
 
-                <div className='col-span-1 space-y-4'>
-                    <LoginForm />
-                </div>
+                <Card className="col-span-1">
+                    <CardContent className="p-4">
+                        <AgentStatus2 />
+                    </CardContent>
+                </Card>
 
+                <Card className="col-span-1">
+                    <CardContent className="p-4">
+                        <AgentStatus3 />
+                    </CardContent>
+                </Card>
+
+                {/* 로그인 폼 카드 */}
+                <Card className="col-span-1">
+                    <CardContent className="p-0">
+                        <LoginForm
+                            onLogin={handleLogin}
+                            isLoading={false}
+                            error=""
+                        />
+                    </CardContent>
+                </Card>
             </div>
 
             {/* 하단 2열 */}
@@ -124,8 +148,6 @@ const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
                     </CardContent>
                 </Card>
             </div>
-
-
         </div>
     );
 };

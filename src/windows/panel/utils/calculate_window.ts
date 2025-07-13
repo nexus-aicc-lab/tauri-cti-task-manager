@@ -1,7 +1,5 @@
 // C:\tauri\cti-task-pilot\src\windows\panel\utils\calculate_window.ts
 
-// C:\tauri\cti-task-pilot\src\windows\panel\utils\calculate_window.ts
-
 import { invoke } from '@tauri-apps/api/core';
 
 /**
@@ -279,5 +277,48 @@ export function createDebouncedSizeAdjuster(
                 onSizeChanged(newSize);
             }
         }, delay);
+    };
+}
+
+/**
+ * 단일 크기 조정 함수 (디바운스 포함) - 새로 추가
+ */
+export function createWindowSizeAdjuster(delay: number = 200) {
+    let resizeTimeoutRef: NodeJS.Timeout | null = null;
+
+    return {
+        adjustWindowSize: async (
+            element: HTMLElement | null,
+            currentSize: WindowSize,
+            onSizeChanged?: (newSize: WindowSize) => void,
+            options?: SizeAdjustOptions
+        ) => {
+            if (!element) return;
+
+            // 기존 타이머 클리어
+            if (resizeTimeoutRef) {
+                clearTimeout(resizeTimeoutRef);
+            }
+
+            // 디바운스 적용
+            resizeTimeoutRef = setTimeout(async () => {
+                const newSize = await adjustPanelWindowSize(element, currentSize, {
+                    windowType: 'panel-mode',
+                    minHeightThreshold: 10,
+                    useLogicalSize: true,
+                    ...options
+                });
+
+                if (newSize && onSizeChanged) {
+                    onSizeChanged(newSize);
+                }
+            }, delay);
+        },
+
+        cleanup: () => {
+            if (resizeTimeoutRef) {
+                clearTimeout(resizeTimeoutRef);
+            }
+        }
     };
 }

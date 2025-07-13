@@ -1,13 +1,21 @@
-// src/windows/launcher/app/App.tsx
-import React from 'react';
+// C:\tauri\cti-task-pilot\src\windows\counselor_dashboard\app\App.tsx
+
+import React, { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// ✅ FSD Pages 가져오기
-import MainPage from '../pages/MainPage';
+import AgentDashBoardMain from '../pages/AgentDashBoardMain';
+import { useStoreForLoginInfo } from '../store/useStoreForLoginInfo';
 
 const App: React.FC = () => {
-    console.log('🚀 런처 윈도우 앱 시작 (FSD 구조)');
+    const { loadUserFromFile } = useStoreForLoginInfo();
+
+    // 앱 시작 시 로그인 정보 로드
+    useEffect(() => {
+        loadUserFromFile();
+    }, [loadUserFromFile]);
+
+    console.log('🚀 상담사 대시보드 앱 시작');
 
     return (
         <div
@@ -18,10 +26,8 @@ const App: React.FC = () => {
                 overflow: 'hidden',
             }}
         >
-            {/* ✅ MainPage 컴포넌트 사용 */}
-            <MainPage />
+            <AgentDashBoardMain />
 
-            {/* Toast UI */}
             <ToastContainer
                 position="top-center"
                 autoClose={2000}

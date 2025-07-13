@@ -5,52 +5,44 @@ import CustomTitlebar from "../components/CustomTitlebar";
 // 분리된 크기 계산 유틸리티 임포트
 import {
     PANEL_WINDOW_CONFIG,
-    adjustPanelWindowSize,
     loadSavedWindowSize,
+    createWindowSizeAdjuster,
     type WindowSize,
 } from "@/windows/panel/utils/calculate_window";
+import { useLoginStore } from "../store/useLoginStoreForFileSystem";
+import LoginForm from "@/shared/ui/LoginForm/LoginForm";
 
 interface PanelModePageProps {
     onBackToLauncher?: () => void;
 }
 
-export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) {
+export default function PanelModeContainer({ onBackToLauncher }: PanelModePageProps) {
     const [currentSize, setCurrentSize] = useState<WindowSize>({
         width: PANEL_WINDOW_CONFIG.FIXED_WIDTH,
         height: PANEL_WINDOW_CONFIG.MIN_HEIGHT
     });
-    const [isInitialized, setIsInitialized] = useState(false);
+
+    const { loadUserFromFile, user, isLoading, error } = useLoginStore();
 
     // DOM 참조
     const mainContainerRef = useRef<HTMLDivElement>(null);
-    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // 🎯 단일 크기 조정 함수 (디바운스 포함)
+    // 윈도우 크기 조정기 생성
+    const windowSizeAdjuster = useRef(createWindowSizeAdjuster(200));
+
+    // 🎯 크기 변경 핸들러
+    const handleSizeChanged = useCallback((newSize: WindowSize) => {
+        setCurrentSize(newSize);
+    }, []);
+
+    // 🎯 크기 조정 함수
     const adjustWindowSize = useCallback(async (delay: number = 200) => {
-        if (!mainContainerRef.current) return;
-
-        // 기존 타이머 클리어
-        if (resizeTimeoutRef.current) {
-            clearTimeout(resizeTimeoutRef.current);
-        }
-
-        // 디바운스 적용
-        resizeTimeoutRef.current = setTimeout(async () => {
-            const newSize = await adjustPanelWindowSize(
-                mainContainerRef.current!,
-                currentSize,
-                {
-                    windowType: 'panel-mode',
-                    minHeightThreshold: 10,
-                    useLogicalSize: true,
-                }
-            );
-
-            if (newSize) {
-                setCurrentSize(newSize);
-            }
-        }, delay);
-    }, [currentSize]);
+        await windowSizeAdjuster.current.adjustWindowSize(
+            mainContainerRef.current,
+            currentSize,
+            handleSizeChanged
+        );
+    }, [currentSize, handleSizeChanged]);
 
     // 🔄 단일 초기화 useEffect
     useEffect(() => {
@@ -88,7 +80,6 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
                 console.error("❌ [panel-mode] 초기화 실패:", error);
             } finally {
                 if (mounted) {
-                    setIsInitialized(true);
                     console.log("✅ [panel-mode] 초기화 완료");
                 }
             }
@@ -101,9 +92,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
         return () => {
             mounted = false;
             clearTimeout(initTimeout);
-            if (resizeTimeoutRef.current) {
-                clearTimeout(resizeTimeoutRef.current);
-            }
+            windowSizeAdjuster.current.cleanup();
             if (resizeObserver) {
                 resizeObserver.disconnect();
             }
@@ -115,35 +104,6 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
         console.log(`📐 [panel-mode] 자식에서 계산된 크기: ${size.width}x${size.height}`);
         adjustWindowSize(100);
     }, [adjustWindowSize]);
-
-    // 로딩 상태
-    if (!isInitialized) {
-        return (
-            <div
-                style={{
-                    width: `${PANEL_WINDOW_CONFIG.FIXED_WIDTH}px`,
-                    height: `${PANEL_WINDOW_CONFIG.DEFAULT_HEIGHT}px`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'white'
-                }}
-            >
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                        width: '32px',
-                        height: '32px',
-                        border: '2px solid #e5e7eb',
-                        borderTop: '2px solid #3b82f6',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                        margin: '0 auto 8px'
-                    }}></div>
-                    <span style={{ fontSize: '14px', color: '#6b7280' }}>Panel 모드 초기화 중...</span>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div
@@ -168,6 +128,7 @@ export default function PanelModePage({ onBackToLauncher }: PanelModePageProps) 
                     overflow: 'auto'
                 }}
             >
+
                 <PanelModeContent onSizeCalculated={handleSizeCalculated} />
             </div>
         </div>

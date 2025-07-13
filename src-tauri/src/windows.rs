@@ -137,7 +137,7 @@ impl WindowMode {
             WindowMode::CounselorDashboard => WindowConfig {
                 url: "counselor-dashboard.html".into(),
                 title: "CTI Task Master - 상담사 대시보드".into(),
-                width: 950.0,
+                width: 1400.0,
                 height: 600.0,
                 min_width: Some(950.0),
                 min_height: Some(600.0),
