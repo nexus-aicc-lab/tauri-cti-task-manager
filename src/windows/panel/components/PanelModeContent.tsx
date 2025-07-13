@@ -1,106 +1,24 @@
-
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import useMeasure from 'react-use-measure';
-import { toast } from 'react-toastify';
 import AgentStatusInfoBoxForPanelMode1 from './AgentStatusInfoBoxForPanelMode1';
 import AgentStatusInfoBoxForPanelMode2 from './AgentStatusInfoBoxForPanelMode2';
 import AgentStatusInfoBoxForPanelMode3 from './AgentStatusInfoBoxForPanelMode3';
 import AgentStatusInfoBoxForPanelMode4 from './AgentStatusInfoBoxForPanelMode4';
-import {
-    setupAllRedisEventListeners,
-    UserProfileUpdate,
-    AgentStatusInfo,
-    AgentInfo,
-    SimpleAgentStatus
-} from '../../../lib/redis-events';
-import { useAgentConsultantStatus } from '@/app/panel-mode/store/useAgentConsultantStatus';
 
 interface PanelModeContentProps {
     onSizeCalculated?: (size: { width: number; height: number }) => void;
 }
-
-const getStatusIndexByCallStatus = (callStatus: string): number => {
-    switch (callStatus) {
-        case 'BUSY': return 0;
-        case 'READY': return 1;
-        case 'BREAK': return 2;
-        case 'OFFLINE': return 3;
-        default: return 1;
-    }
-};
 
 const PanelModeContent: React.FC<PanelModeContentProps> = ({ onSizeCalculated }) => {
     const [lastNotifiedSize, setLastNotifiedSize] = useState({ width: 0, height: 0 });
     const isInitialMount = useRef(true);
     const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const { updateData1 } = useAgentConsultantStatus();
-    const [targetAgent, setTargetAgent] = useState<AgentInfo | null>(null);
-    const [lastUpdate, setLastUpdate] = useState<number>(0);
-    const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [previousCallStatus, setPreviousCallStatus] = useState<string>('');
-
     const [ref, bounds] = useMeasure({ debounce: 150, scroll: false, offsetSize: true });
 
-    const handleUserProfileUpdate = useCallback((data: UserProfileUpdate) => {
-        console.log('📱 [PanelModeContent] 사용자 프로필 업데이트:', data);
-        setLastUpdate(Date.now());
-        setIsConnected(true);
-    }, []);
-
-    const getStatusIndexByCallStatus = (callStatus: string): number => {
-        switch (callStatus) {
-            case 'BUSY': return 0;
-            case 'READY': return 1;
-            case 'BREAK': return 2;
-            case 'OFFLINE': return 3;
-            default: return 1;
-        }
-    };
-
-    const handleSingleAgentStatusUpdate = useCallback((data: SimpleAgentStatus) => {
-        console.log('📡 [단건 상태] 상담원 상태 업데이트:', data);
-
-        // 단건 Redis 메시지로 ID 2번일 경우에만 상태 적용
-        const newIndex = getStatusIndexByCallStatus(data.callStatus);
-
-        updateData1({
-            statusIndex: newIndex,
-            // 대기호/대기상담사 수는 유지
-        });
-
-        toast(`🟢 상담원 상태 갱신: ${data.name} → ${data.callStatus} → index ${newIndex}`, {
-            containerId: 'panel-mode-toast',
-            autoClose: 2500,
-        });
-    }, [updateData1]);
-
-    useEffect(() => {
-        console.log('🔌 [PanelModeContent] Redis 이벤트 리스너 설정 중...');
-
-        const setupListeners = async () => {
-            const cleanup = await setupAllRedisEventListeners(
-                handleUserProfileUpdate,
-                handleSingleAgentStatusUpdate
-            );
-
-            const connectionCheckTimer = setInterval(() => {
-                const timeSinceLastUpdate = Date.now() - lastUpdate;
-                if (timeSinceLastUpdate > 30000) setIsConnected(false);
-            }, 5000);
-
-            return () => {
-                cleanup();
-                clearInterval(connectionCheckTimer);
-            };
-        };
-
-        const cleanupPromise = setupListeners();
-        return () => { cleanupPromise.then(fn => fn()); };
-    }, [handleUserProfileUpdate, handleSingleAgentStatusUpdate, lastUpdate]);
-
+    // 🎯 크기 계산 및 통지 로직만 유지
     useEffect(() => {
         if (bounds.width > 0 && bounds.height > 0 && onSizeCalculated) {
             const TITLEBAR_HEIGHT = 42;
@@ -130,6 +48,15 @@ const PanelModeContent: React.FC<PanelModeContentProps> = ({ onSizeCalculated })
             }
         }
     }, [bounds.width, bounds.height, onSizeCalculated, lastNotifiedSize]);
+
+    // 🧹 정리 함수
+    useEffect(() => {
+        return () => {
+            if (resizeTimeoutRef.current) {
+                clearTimeout(resizeTimeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <div ref={ref} className="w-full flex flex-col gap-2 relative">

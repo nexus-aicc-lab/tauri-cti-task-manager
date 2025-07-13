@@ -1,8 +1,7 @@
-
 'use client';
 
 import React from 'react';
-import { Phone, Users, Hourglass, Coffee, WifiOff } from 'lucide-react';
+import { Phone, Users } from 'lucide-react';
 import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import RadarStyles from '../../../app/panel-mode/ui/styles/RadarStyles';
@@ -16,35 +15,35 @@ type Status = {
     callStatus: string;
 };
 
-// 🎯 Java enum (READY, BUSY, BREAK, OFFLINE)에 맞춘 상태 배열
+// 🎯 통일된 상태 배열: 대기, 통화, 후처리, 휴식 (public 아이콘 사용)
 const statuses: Status[] = [
     {
-        label: '통화중',
-        time: '00:03:45',
-        icon: <Phone className="w-4 h-4 text-gray-600" />,
-        color: '#3698A2',
-        callStatus: 'BUSY'
-    },
-    {
-        label: '대기중',
+        label: '대기',
         time: '12:03:45',
-        icon: <Hourglass className="w-4 h-4 text-gray-600" />,
+        icon: <img src="/icons/panel-mode/hourglass.png" alt="대기" className="w-4 h-4" />,
         color: '#4199E0',
         callStatus: 'READY'
     },
     {
-        label: '휴식중',
-        time: '00:01:45',
-        icon: <Coffee className="w-4 h-4 text-gray-600" />,
-        color: '#8B68A5',
-        callStatus: 'BREAK'
+        label: '통화',
+        time: '00:03:45',
+        icon: <img src="/icons/panel-mode/cell_phone.png" alt="통화" className="w-4 h-4" />,
+        color: '#3698A2',
+        callStatus: 'BUSY'
     },
     {
-        label: '오프라인',
-        time: '00:00:00',
-        icon: <WifiOff className="w-4 h-4 text-gray-600" />,
-        color: '#6B7280',
-        callStatus: 'OFFLINE'
+        label: '후처리',
+        time: '00:34:20',
+        icon: <img src="/icons/panel-mode/pencel.png" alt="후처리" className="w-4 h-4" />,
+        color: '#FF947A',
+        callStatus: 'AFTER_CALL'
+    },
+    {
+        label: '휴식',
+        time: '00:01:45',
+        icon: <img src="/icons/panel-mode/coffe.png" alt="휴식" className="w-4 h-4" />,
+        color: '#8B68A5',
+        callStatus: 'BREAK'
     },
 ];
 
@@ -53,9 +52,9 @@ const RadarDisplay: React.FC<{
     onClick: () => void;
 }> = ({ statusIndex, onClick }) => {
     const current = statuses[statusIndex];
-    // 🎯 4개 상태에 맞춘 CSS 클래스 (후처리 제거, 오프라인 추가)
-    const bgClasses = ['green-bg', 'blue-bg', 'purple-bg', 'gray-bg'];
-    const sweepClasses = ['green-sweep', 'blue-sweep', 'purple-sweep', 'gray-sweep'];
+    // 🎯 4개 상태에 맞춘 CSS 클래스
+    const bgClasses = ['blue-bg', 'green-bg', 'orange-bg', 'purple-bg'];
+    const sweepClasses = ['blue-sweep', 'green-sweep', 'orange-sweep', 'purple-sweep'];
 
     return (
         <div className="flex-1 flex justify-center items-center mb-2 relative">
@@ -114,7 +113,7 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
         <>
             <RadarStyles />
             <div className="h-full bg-gray-50 p-2 rounded-lg shadow-md border flex flex-col min-h-0 relative">
-                {/* 🎯 Radar - PanelModeContent에서 자동 업데이트됨 */}
+                {/* 🎯 Radar Display */}
                 <RadarDisplay
                     statusIndex={data1.statusIndex}
                     onClick={() =>
@@ -124,7 +123,7 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                     }
                 />
 
-                {/* 🎯 StatsCard - 고정값 유지 */}
+                {/* 🎯 Stats Cards */}
                 <div className="grid grid-cols-2 gap-2 flex-shrink-0">
                     <StatsCard
                         icon={<Phone className="w-3 h-3 text-gray-600" />}
@@ -137,19 +136,6 @@ const AgentStatusInfoBoxForPanelMode1: React.FC = () => {
                         value={data1.waitingAgents}
                     />
                 </div>
-
-                {/* 상태 표시 */}
-                {/* <div className="mt-2 text-center">
-                    <div className="text-xs text-gray-500">
-                        현재 상태: <span className="font-medium text-blue-600">{statuses[data1.statusIndex]?.label || '알 수 없음'}</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                        ID 2번 상담원 실시간 추적 중 (Index: {data1.statusIndex})
-                    </div>
-                    <div className="text-xs text-gray-300 mt-1">
-                        매핑: 0=통화중, 1=대기중, 2=휴식중, 3=오프라인
-                    </div>
-                </div> */}
             </div>
         </>
     );

@@ -11,6 +11,11 @@ export const useLogin = () => {
         onSuccess: (data) => {
             // 토큰 저장
             localStorage.setItem('token', data.token);
+            // 사용자 데이터 저장
+            localStorage.setItem('user_data', JSON.stringify({
+                email: data.email,
+                name: data.name
+            }));
             // 사용자 정보 캐시 무효화
             queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
         },
@@ -33,14 +38,21 @@ export const useRegister = () => {
     });
 };
 
-// 현재 사용자 프로필 조회 훅
+// 현재 사용자 프로필 조회 훅 (localStorage 기반)
 export const useCurrentProfile = () => {
-    return useQuery<User, Error>({
+    return useQuery<{ email: string; name: string } | null, Error>({
         queryKey: ['user', 'profile'],
-        queryFn: authApi.getCurrentProfile,
-        enabled: !!localStorage.getItem('token'), // 토큰이 있을 때만 실행
-        staleTime: 5 * 60 * 1000, // 5분
-        gcTime: 10 * 60 * 1000, // 10분
+        queryFn: () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('user_data');
+
+            if (!token || !userData) return null;
+
+            return JSON.parse(userData);
+        },
+        enabled: !!localStorage.getItem('token'),
+        staleTime: Infinity, // localStorage 데이터는 변경되지 않으므로
+        gcTime: Infinity,
     });
 };
 
@@ -63,6 +75,7 @@ export const useLogout = () => {
 
     return () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user_data'); // 사용자 데이터도 삭제
         queryClient.clear(); // 모든 쿼리 캐시 삭제
         queryClient.invalidateQueries(); // 모든 쿼리 무효화
     };

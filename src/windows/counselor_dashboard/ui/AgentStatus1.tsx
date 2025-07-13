@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import RadarStyles from '../../../app/panel-mode/ui/styles/RadarStyles';
 import { useAgentConsultantStatus } from '../../../app/panel-mode/store/useAgentConsultantStatus';
+// import { useUpdateCallStatus } from '@/shared/hook/useApiForAuth'; // ✅ 추가할 훅
 
 type Status = {
     label: string;
@@ -52,7 +53,6 @@ const RadarDisplay: React.FC<{
     onClick: () => void;
 }> = ({ statusIndex, onClick }) => {
     const current = statuses[statusIndex];
-    // 🎯 4개 상태에 맞춘 CSS 클래스
     const bgClasses = ['blue-bg', 'green-bg', 'orange-bg', 'purple-bg'];
     const sweepClasses = ['blue-sweep', 'green-sweep', 'orange-sweep', 'purple-sweep'];
 
@@ -108,12 +108,30 @@ const StatsCard: React.FC<{
 
 const AgentStatus1: React.FC = () => {
     const { data1, updateData1 } = useAgentConsultantStatus();
+    // const updateCallStatusMutation = useUpdateCallStatus(); // ✅ API 훅 사용
+
+    // ✅ 상태 업데이트 함수
+    const handleStatusUpdate = async (statusIndex: number) => {
+        try {
+            const targetStatus = statuses[statusIndex];
+
+            // API 호출
+            // await updateCallStatusMutation.mutateAsync(targetStatus.callStatus);
+
+            // 로컬 상태 업데이트
+            updateData1({ statusIndex });
+
+            console.log(`상태 업데이트 성공: ${targetStatus.label} (${targetStatus.callStatus})`);
+        } catch (error) {
+            console.error('상태 업데이트 실패:', error);
+        }
+    };
 
     return (
         <>
             <RadarStyles />
             <div className="h-full bg-gray-50 p-2 rounded-lg shadow-md border flex flex-col min-h-0 relative">
-                {/* 🎯 Radar - PanelModeContent에서 자동 업데이트됨 */}
+                {/* 🎯 Radar Display */}
                 <RadarDisplay
                     statusIndex={data1.statusIndex}
                     onClick={() =>
@@ -123,8 +141,8 @@ const AgentStatus1: React.FC = () => {
                     }
                 />
 
-                {/* 🎯 StatsCard - 고정값 유지 */}
-                <div className="grid grid-cols-2 gap-2 flex-shrink-0">
+                {/* 🎯 Stats Cards */}
+                <div className="grid grid-cols-2 gap-2 mb-3 flex-shrink-0">
                     <StatsCard
                         icon={<Phone className="w-3 h-3 text-gray-600" />}
                         label="대기호"
@@ -136,6 +154,40 @@ const AgentStatus1: React.FC = () => {
                         value={data1.waitingAgents}
                     />
                 </div>
+
+                {/* ✅ 새로 추가: 상태 업데이트 버튼들 */}
+                <div className="grid grid-cols-2 gap-1 flex-shrink-0">
+                    {statuses.map((status, index) => (
+                        <Button
+                            key={status.callStatus}
+                            onClick={() => handleStatusUpdate(index)}
+                            // disabled={updateCallStatusMutation.isPending}
+                            variant={data1.statusIndex === index ? "default" : "outline"}
+                            size="sm"
+                            className={`
+                                text-xs py-1 px-2 transition-all duration-200
+                                ${data1.statusIndex === index
+                                    ? `bg-[${status.color}] text-white border-[${status.color}]`
+                                    : 'hover:scale-105'
+                                }
+                            `}
+                            style={{
+                                backgroundColor: data1.statusIndex === index ? status.color : undefined,
+                                borderColor: data1.statusIndex === index ? status.color : undefined,
+                            }}
+                        >
+                            <span className="mr-1">{status.icon}</span>
+                            {status.label}
+                        </Button>
+                    ))}
+                </div>
+
+                {/* ✅ 로딩 상태 표시 */}
+                {/* {updateCallStatusMutation.isPending && (
+                    <div className="text-xs text-center text-gray-500 mt-1">
+                        상태 업데이트 중...
+                    </div>
+                )} */}
             </div>
         </>
     );

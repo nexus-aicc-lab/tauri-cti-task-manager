@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -18,6 +18,7 @@ import AgentStatus1 from '../ui/AgentStatus1';
 import AgentStatus2 from '../ui/AgentStatus2';
 import AgentStatus3 from '../ui/AgentStatus3';
 import LoginForm from '@/shared/ui/LoginForm/LoginForm';
+import SimpleConsultantProfile from '@/shared/ui/LoginForm/CounsultantProfile';
 import CustomTitlebar from '../components/CustomTitlebar';
 
 // ✅ User 타입 정의
@@ -67,20 +68,38 @@ const getStatusText = (status: User['callStatus']) => {
 };
 
 const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
-    const handleLogin = (username: string, password: string) => {
-        console.log('로그인 시도:', { username, password });
-        // 로그인 로직 구현
-    };
+    const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+
+    useEffect(() => {
+        const checkUserStatus = () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('user_data');
+
+            if (token && userData) {
+                try {
+                    setUser(JSON.parse(userData));
+                } catch {
+                    setUser(null);
+                }
+            } else {
+                setUser(null);
+            }
+        };
+
+        checkUserStatus();
+
+        // localStorage 변경 감지
+        window.addEventListener('storage', checkUserStatus);
+
+        return () => {
+            window.removeEventListener('storage', checkUserStatus);
+        };
+    }, []);
 
     return (
-        <div className="px-4 py-6 space-y-6 max-w-7xl mx-auto">
+        <div className="space-y-6 max-w-7xl">
+            <CustomTitlebar title='상담사 대쉬 보드' />
             {/* 메인 4열 구성 */}
-
-
-            <CustomTitlebar
-                title={"상담사 대쉬 보드"}
-            />
-
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                 <Card className="col-span-1">
@@ -101,16 +120,23 @@ const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
                     </CardContent>
                 </Card>
 
-                {/* 로그인 폼 카드 */}
+                {/* 로그인/프로필 카드 */}
                 <Card className="col-span-1">
                     <CardContent className="p-0">
-                        <LoginForm
-                            onLogin={handleLogin}
-                            isLoading={false}
-                            error=""
-                        />
+                        {user ? (
+                            <SimpleConsultantProfile
+                                user={user}
+                                onLogout={() => setUser(null)}
+                            />
+                        ) : (
+                            <LoginForm onSuccess={() => {
+                                const userData = localStorage.getItem('user_data');
+                                if (userData) setUser(JSON.parse(userData));
+                            }} />
+                        )}
                     </CardContent>
                 </Card>
+
             </div>
 
             {/* 하단 2열 */}
