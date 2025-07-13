@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import AgentDashBoardMain from '../pages/AgentDashBoardMain';
+import AgentDashBoardConatainer from '../pages/AgentDashBoardConatainer';
 import { useStoreForLoginInfo } from '../store/useStoreForLoginInfo';
 
 const App: React.FC = () => {
@@ -26,7 +26,7 @@ const App: React.FC = () => {
                 overflow: 'hidden',
             }}
         >
-            <AgentDashBoardMain />
+            <AgentDashBoardConatainer />
 
             <ToastContainer
                 position="top-center"

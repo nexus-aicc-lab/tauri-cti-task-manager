@@ -22,8 +22,6 @@ export default function PanelModeContainer({ onBackToLauncher }: PanelModePagePr
         height: PANEL_WINDOW_CONFIG.MIN_HEIGHT
     });
 
-    const { loadUserFromFile, user, isLoading, error } = useLoginStore();
-
     // DOM 참조
     const mainContainerRef = useRef<HTMLDivElement>(null);
 

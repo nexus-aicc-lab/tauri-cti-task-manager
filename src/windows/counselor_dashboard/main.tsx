@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <QueryClientProvider client={queryClient}> {/* ✅ QueryClientProvider 추가 */}
             <App />
             {/* ✅ 개발 환경에서만 DevTools 표시 */}
-            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+            {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
         </QueryClientProvider>
     </React.StrictMode>
 );

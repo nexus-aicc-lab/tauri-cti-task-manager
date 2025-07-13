@@ -138,9 +138,9 @@ impl WindowMode {
                 url: "counselor-dashboard.html".into(),
                 title: "CTI Task Master - 상담사 대시보드".into(),
                 width: 1400.0,
-                height: 600.0,
+                height: 900.0,
                 min_width: Some(950.0),
-                min_height: Some(600.0),
+                min_height: Some(300.0),
                 resizable: true,
                 always_on_top: false,
                 decorations: false, // ✅ 타이틀바 제거

@@ -1,5 +1,3 @@
-// C:\tauri\cti-task-manager-tauri\src-tauri\src\commands\panel.rs
-
 use serde::{Deserialize, Serialize};
 use std::{env, fs, path::PathBuf};
 use tauri::{Manager, PhysicalSize};
@@ -49,23 +47,28 @@ fn get_default_size(window_type: &str) -> WindowSize {
         "panel-mode" => WindowSize {
             width: 900.0,
             height: 350.0,
-        }, // windows.rs 기본값 반영
+        },
         "launcher" => WindowSize {
             width: 500.0,
             height: 600.0,
-        }, // windows.rs 기본값 반영
+        },
         "bar" => WindowSize {
             width: 1200.0,
             height: 40.0,
-        }, // windows.rs 기본값 반영
+        },
         "settings" => WindowSize {
             width: 900.0,
             height: 700.0,
-        }, // windows.rs 기본값 반영
+        },
         "login" => WindowSize {
             width: 500.0,
             height: 600.0,
-        }, // windows.rs 기본값 반영
+        },
+        // ✅ 대시보드 기본 크기 추가
+        "counselor-dashboard" => WindowSize {
+            width: 1400.0,
+            height: 650.0,
+        },
         _ => WindowSize::default(), // main 등 기타 (1000x500)
     }
 }
@@ -120,12 +123,6 @@ pub async fn load_window_size(window_type: Option<String>) -> Result<WindowSize,
 }
 
 /// 윈도우 크기 적용 (확장됨: 전체 화면 및 최대화 모드 지원)
-/// 특별한 값들:
-/// - width: -1, height: -1 -> 전체 화면 모드 활성화
-/// - width: -2, height: -2 -> 전체 화면 모드 해제
-/// - width: -3, height: -3 -> 최대화 모드
-/// - width: -4, height: -4 -> 최대화 해제
-/// - 그 외 양수 값들 -> 일반 크기 설정
 #[tauri::command]
 pub async fn apply_window_size(
     app_handle: tauri::AppHandle,
@@ -136,33 +133,46 @@ pub async fn apply_window_size(
     let window_type = window_type.unwrap_or_else(|| "main".to_string());
     let windows = app_handle.webview_windows();
 
-    // 윈도우 타입에 따른 윈도우 찾기
+    // ✅ 윈도우 타입에 따른 윈도우 찾기 (대시보드 추가)
     let target_window = match window_type.as_str() {
         "panel-mode" => {
             // panel_ 로 시작하는 윈도우 찾기
-            windows
-                .into_iter()
+            (&windows)
+                .iter()
                 .find(|(label, _)| label.starts_with("panel_"))
                 .map(|(_, window)| window.clone())
         }
+        "counselor-dashboard" => {
+            // ✅ 대시보드 윈도우 찾기 로직 추가
+            (&windows)
+                .iter()
+                .find(|(label, _)| {
+                    label.starts_with("counselor-dashboard")
+                        || label.starts_with("dashboard_")
+                        || label.contains("dashboard")
+                })
+                .map(|(_, window)| window.clone())
+                .or_else(|| app_handle.get_webview_window("counselor-dashboard"))
+                .or_else(|| app_handle.get_webview_window("dashboard"))
+        }
         "main" => app_handle.get_webview_window("main"),
-        "launcher" => windows
-            .into_iter()
+        "launcher" => (&windows)
+            .iter()
             .find(|(label, _)| label.starts_with("launcher_"))
             .map(|(_, window)| window.clone())
             .or_else(|| app_handle.get_webview_window("launcher")),
-        "bar" => windows
-            .into_iter()
+        "bar" => (&windows)
+            .iter()
             .find(|(label, _)| label.starts_with("bar_"))
             .map(|(_, window)| window.clone())
             .or_else(|| app_handle.get_webview_window("bar")),
-        "settings" => windows
-            .into_iter()
+        "settings" => (&windows)
+            .iter()
             .find(|(label, _)| label.starts_with("settings_"))
             .map(|(_, window)| window.clone())
             .or_else(|| app_handle.get_webview_window("settings")),
-        "login" => windows
-            .into_iter()
+        "login" => (&windows)
+            .iter()
             .find(|(label, _)| label.starts_with("login_"))
             .map(|(_, window)| window.clone())
             .or_else(|| app_handle.get_webview_window("login")),
@@ -219,17 +229,25 @@ pub async fn apply_window_size(
                 Ok(())
             }
             _ => {
-                // 일반적인 크기 설정 (기존 기능)
+                // ✅ 일반적인 크기 설정 (기존 기능) - 대시보드 로깅 강화
                 if width > 0.0 && height > 0.0 {
                     let size = PhysicalSize::new(width as u32, height as u32);
                     window
                         .set_size(tauri::Size::Physical(size))
                         .map_err(|e| format!("윈도우 크기 적용 실패: {}", e))?;
 
-                    println!(
-                        "✅ 윈도우 크기 적용 [{}]: {}x{}",
-                        window_type, width, height
-                    );
+                    // 대시보드의 경우 더 상세한 로깅
+                    if window_type == "counselor-dashboard" {
+                        println!(
+                            "🎯 [DASHBOARD] 윈도우 크기 적용 성공: {}x{} (Physical)",
+                            width, height
+                        );
+                    } else {
+                        println!(
+                            "✅ 윈도우 크기 적용 [{}]: {}x{}",
+                            window_type, width, height
+                        );
+                    }
                     Ok(())
                 } else {
                     Err(format!("잘못된 크기 값: {}x{}", width, height))
@@ -237,9 +255,33 @@ pub async fn apply_window_size(
             }
         }
     } else {
+        // ✅ 대시보드의 경우 더 관대한 윈도우 찾기 시도
+        if window_type == "counselor-dashboard" {
+            // 모든 윈도우 라벨 출력 (디버깅용)
+            println!("🔍 [DASHBOARD] 사용 가능한 윈도우들:");
+            for (label, _) in &windows {
+                println!("  - {}", label);
+            }
+
+            // 첫 번째 윈도우나 메인 윈도우에 적용 시도
+            if let Some((label, window)) = windows.iter().next() {
+                if width > 0.0 && height > 0.0 {
+                    let size = PhysicalSize::new(width as u32, height as u32);
+                    window
+                        .set_size(tauri::Size::Physical(size))
+                        .map_err(|e| format!("첫 번째 윈도우 크기 적용 실패: {}", e))?;
+
+                    println!(
+                        "🎯 [DASHBOARD] 첫 번째 윈도우 [{}]에 크기 적용: {}x{}",
+                        label, width, height
+                    );
+                    return Ok(());
+                }
+            }
+        }
+
         // 윈도우를 찾을 수 없으면 메인 윈도우에 적용 (기존 로직 유지)
         if let Some(window) = app_handle.get_webview_window("main") {
-            // 메인 윈도우에도 같은 로직 적용
             match (width as i32, height as i32) {
                 (-1, -1) => {
                     window
