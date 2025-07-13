@@ -13,6 +13,7 @@ export const useLogin = () => {
             localStorage.setItem('token', data.token);
             // 사용자 데이터 저장
             localStorage.setItem('user_data', JSON.stringify({
+                id: data.id,
                 email: data.email,
                 name: data.name
             }));

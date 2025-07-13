@@ -9,11 +9,10 @@ import { Loader2 } from "lucide-react";
 import { useLogin } from "@/shared/hook/useApiForAuth";
 
 interface LoginFormProps {
-    onLogin?: (email: string, password: string) => void;
-    onSuccess?: () => void;
+
 }
 
-export default function LoginForm({ onLogin, onSuccess }: LoginFormProps) {
+export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -26,8 +25,7 @@ export default function LoginForm({ onLogin, onSuccess }: LoginFormProps) {
 
         try {
             await loginMutation.mutateAsync({ email, password });
-            onLogin?.(email, password);
-            onSuccess?.();
+
         } catch (error) {
             console.error('Login failed:', error);
         }
