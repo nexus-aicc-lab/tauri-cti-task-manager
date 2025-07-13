@@ -744,7 +744,7 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
                 </div>
 
                 {/* 하단 2열 */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <Card className="min-h-[140px] h-auto flex flex-col justify-between">
                         <CardHeader>
                             <CardTitle className="text-sm font-medium flex items-center gap-1">
@@ -777,7 +777,13 @@ const AgentDashBoardContainer: React.FC<AgentDashboardContentProps> = () => {
                             ))}
                         </CardContent>
                     </Card>
-                </div> */}
+                </div>
+                <div>
+                    hi1
+                </div>
+                <div>
+                    hi2
+                </div>
 
             </div>
 
