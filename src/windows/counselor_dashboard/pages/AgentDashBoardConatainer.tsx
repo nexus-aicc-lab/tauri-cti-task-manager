@@ -6,7 +6,7 @@ import DashboardContent from '../components/AgentDashboard';
 import { adjustWindowSize } from '../lib/windowResize';
 
 const AgentDashBoardContainer: React.FC = () => {
-    const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+    const [user, setUser] = useState<{ id: Number, email: string; name: string } | null>(null);
 
     // DOM 참조
     const contentRef = useRef<HTMLDivElement>(null);

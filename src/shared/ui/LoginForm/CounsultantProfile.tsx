@@ -7,6 +7,7 @@ import { useLogout } from "@/shared/hook/useApiForAuth";
 
 interface CounsultantProfile {
     user: {
+        id: number;
         email: string;
         name: string;
     };
@@ -39,7 +40,7 @@ export default function CounsultantProfile({ user, onLogout }: CounsultantProfil
                     </Avatar>
                     <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-sm truncate">
-                            {user.name}
+                            {user.name} ({user.id})
                         </h3>
                         <p className="text-xs text-muted-foreground truncate">
                             {user.email}

@@ -8,12 +8,6 @@ import AgentDashBoardConatainer from '../pages/AgentDashBoardConatainer';
 import { useStoreForLoginInfo } from '../store/useStoreForLoginInfo';
 
 const App: React.FC = () => {
-    const { loadUserFromFile } = useStoreForLoginInfo();
-
-    // 앱 시작 시 로그인 정보 로드
-    useEffect(() => {
-        loadUserFromFile();
-    }, [loadUserFromFile]);
 
     console.log('🚀 상담사 대시보드 앱 시작');
 

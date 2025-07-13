@@ -28,8 +28,8 @@ interface User {
 }
 
 interface DashboardContentProps {
-    user: { email: string; name: string } | null;
-    onUserChange: (user: { email: string; name: string } | null) => void;
+    user: { id: number, email: string; name: string } | null;
+    onUserChange: (user: { id: number, email: string; name: string } | null) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     topGridRef: React.RefObject<HTMLDivElement>;
 }
@@ -93,17 +93,14 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                 </Card>
 
                 <Card className="h-auto flex-shrink-0" style={{ width: '350px' }}>
-                    <CardContent className="p-0">
+                    <CardContent className="p-4">
                         {user ? (
                             <SimpleConsultantProfile
                                 user={user}
                                 onLogout={() => onUserChange(null)}
                             />
                         ) : (
-                            <LoginForm onSuccess={() => {
-                                const userData = localStorage.getItem('user_data');
-                                if (userData) onUserChange(JSON.parse(userData));
-                            }} />
+                            <LoginForm />
                         )}
                     </CardContent>
                 </Card>
