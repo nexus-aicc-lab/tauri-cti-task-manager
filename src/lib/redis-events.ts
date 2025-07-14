@@ -1,3 +1,4 @@
+// C:\tauri\cti-task-pilot\src\lib\redis-events.ts
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 
 export interface SimpleAgentStatus {
@@ -15,7 +16,7 @@ export function setupSingleAgentStatusListener(
     callback: (status: SimpleAgentStatus) => void
 ): Promise<UnlistenFn> {
     return listen<SimpleAgentStatus>(
-        'redis-agent-status-single',
+        'agent-current-status-message',
         (event) => {
             console.log('🔔 단건 상담원 상태 수신:', event.payload);
             callback(event.payload);
