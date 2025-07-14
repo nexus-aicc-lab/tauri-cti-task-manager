@@ -104,6 +104,7 @@ use url::Url;
 pub struct LoginInfo {
     pub safe_token: Option<String>,
     pub username: Option<String>,
+    pub user_id: Option<String>, // userId는 username과 동일하게 처리
     pub department: Option<String>,
     pub role: Option<String>,
     pub email: Option<String>,
@@ -137,6 +138,7 @@ pub fn process_deep_link_url(url: String) {
             let mut login_info = LoginInfo {
                 safe_token: None,
                 username: None,
+                user_id: None,
                 department: None,
                 role: None,
                 email: None,
@@ -159,6 +161,10 @@ pub fn process_deep_link_url(url: String) {
                     "session_id" => login_info.session_id = Some(value.to_string()),
                     "login_method" => login_info.login_method = Some(value.to_string()),
                     "timestamp" => login_info.timestamp = Some(value.to_string()),
+                    "user_id" => {
+                        // userId는 username과 동일하게 처리
+                        login_info.user_id = Some(value.to_string());
+                    }
                     _ => {}
                 }
             }

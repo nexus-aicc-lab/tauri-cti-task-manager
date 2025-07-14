@@ -7,7 +7,7 @@ type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings' | 'counselor_das
 interface LoginInfo {
     safe_token?: string;
     username?: string;
-    userId?: string;
+    user_id?: string;
     role?: string;
     email?: string;
     session_id?: string;
@@ -171,7 +171,7 @@ const MainPage: React.FC = () => {
                             {[
                                 { label: '사용자명', value: loginInfo.username, icon: '👤' },
                                 { label: '토큰', value: loginInfo.safe_token ? '***' + loginInfo.safe_token : null, icon: '🔑' },
-                                { label: '유저아이디', value: loginInfo.userId, icon: '🏢' },
+                                { label: '유저아이디', value: loginInfo.user_id, icon: '🏢' },
                                 // { label: '역할', value: loginInfo.role, icon: '🎭' },
                                 // { label: '이메일', value: loginInfo.email, icon: '📧' },
                                 // { label: '세션 ID', value: loginInfo.session_id, icon: '🔐' },
