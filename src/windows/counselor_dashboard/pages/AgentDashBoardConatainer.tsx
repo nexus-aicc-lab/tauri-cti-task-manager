@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import CustomTitlebar from '../components/CustomTitlebar';
-import DashboardContent from '../components/AgentDashboard';
+import DashboardContent from '../components/DashboardContent';
 import { adjustWindowSize } from '../lib/windowResize';
 
 const AgentDashBoardContainer: React.FC = () => {
-    const [user, setUser] = useState<{ id: Number, email: string; name: string } | null>(null);
+    const [user, setUser] = useState<{ id: number, email: string; name: string } | null>(null);
 
     // DOM 참조
     const contentRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,12 @@ const AgentDashBoardContainer: React.FC = () => {
                 overflow: 'hidden',
             }}
         >
-            <CustomTitlebar title='상담사 대쉬 보드' />
+            {/* CustomTitlebar에 user와 onUserChange props 전달 */}
+            <CustomTitlebar
+                title='상담사 대쉬 보드'
+                user={user}
+                onUserChange={setUser}
+            />
 
             <DashboardContent
                 user={user}

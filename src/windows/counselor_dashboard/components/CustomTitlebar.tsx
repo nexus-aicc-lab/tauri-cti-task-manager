@@ -11,28 +11,26 @@ import {
     BetweenHorizontalEnd,
 } from 'lucide-react';
 import HamburgerButtonForSystemMenuWithDropdownStyle from '@/app/panel-mode/ui/HamburgerButtonForSystemMenuWithDropdownStyle';
+import LoginFormWithDropdown from './LoginFormWithDropdown';
 
-interface UserInfo {
-    id: string;
-    username: string;
+interface User {
+    id: number;
     email: string;
-    department: string;
-    role: string;
-    profileImage?: string;
+    name: string;
 }
 
 interface Props {
     title: string;
     currentSize?: { width: number; height: number };
-    user?: UserInfo | null;
+    user?: User | null;
+    onUserChange?: (user: User | null) => void;
 }
 
-export default function CustomTitlebar({ title, currentSize, user }: Props) {
+export default function CustomTitlebar({ title, currentSize, user, onUserChange }: Props) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
 
     console.log("user in CustomTitlebar:", user);
-
 
     const changeToggleMode = async () => {
         try {
@@ -101,13 +99,16 @@ export default function CustomTitlebar({ title, currentSize, user }: Props) {
             {/* 왼쪽 영역 */}
             <div className="flex items-center space-x-6" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
                 <HamburgerButtonForSystemMenuWithDropdownStyle />
-                <div className="text-sm text-white flex items-center space-x-1 pl-4">
-                    {user ? (
-                        <span>👤 {user.username}({user.id}) - {user.department}</span>
-                    ) : (
-                        <span>👤 로그인 필요</span>
-                    )}
+
+                {/* 로그인 컴포넌트 배치 */}
+                <div className="flex items-center space-x-3">
+                    <span className="text-sm text-white">로그인 컴퍼넌트 with dropbox</span>
+                    <LoginFormWithDropdown
+                        user={user}
+                        onUserChange={onUserChange}
+                    />
                 </div>
+
                 {currentSize && (
                     <div className="text-xs text-cyan-800 bg-white bg-opacity-20 px-2 py-1 rounded">
                         📏 {currentSize.width} × {currentSize.height}px

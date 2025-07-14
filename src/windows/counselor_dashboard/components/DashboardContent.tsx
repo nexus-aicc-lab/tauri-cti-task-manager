@@ -92,7 +92,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                     </CardContent>
                 </Card>
 
-                <Card className="h-auto flex-shrink-0" style={{ width: '350px' }}>
+                {/* <Card className="h-auto flex-shrink-0" style={{ width: '350px' }}>
                     <CardContent className="p-4">
                         {user ? (
                             <SimpleConsultantProfile
@@ -103,7 +103,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                             <LoginForm />
                         )}
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
 
             {/* 하단 2열 그리드 */}
