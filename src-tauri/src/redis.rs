@@ -272,8 +272,8 @@ async fn connect_and_subscribe(
     let mut con = client.get_async_connection().await?;
     let mut pubsub = con.into_pubsub();
 
-    pubsub.subscribe("personal:agent-info:1").await?;
-    println!("📡 Redis 채널 구독 시작: personal:agent-info:1");
+    pubsub.subscribe("personal:agent-info:2").await?;
+    println!("📡 Redis 채널 구독 시작: personal:agent-info:2");
 
     while let Some(msg) = pubsub.on_message().next().await {
         let payload: String = msg.get_payload()?;

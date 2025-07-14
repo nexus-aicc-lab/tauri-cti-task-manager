@@ -1,4 +1,4 @@
-// DashboardContent.tsx
+// src/windows/counselor_dashboard/DashboardContent.tsx
 'use client';
 
 import React from 'react';
@@ -18,18 +18,9 @@ import AgentStatus3 from '../ui/AgentStatus3';
 import LoginForm from '@/shared/ui/LoginForm/LoginForm';
 import SimpleConsultantProfile from '@/shared/ui/LoginForm/CounsultantProfile';
 
-interface User {
-    id: number;
-    email: string;
-    name: string;
-    profileImage?: string;
-    callStatus: 'READY' | 'BUSY' | 'BREAK' | 'OFFLINE';
-    createdAt: string;
-}
-
 interface DashboardContentProps {
-    user: { id: number, email: string; name: string } | null;
-    onUserChange: (user: { id: number, email: string; name: string } | null) => void;
+    user: { id: number; email: string; name: string } | null;
+    onUserChange: (user: { id: number; email: string; name: string } | null) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     topGridRef: React.RefObject<HTMLDivElement>;
 }
@@ -49,7 +40,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
     user,
     onUserChange,
     contentRef,
-    topGridRef
+    topGridRef,
 }) => {
     return (
         <div
@@ -61,7 +52,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                 flex: '1',
                 overflow: 'auto',
                 width: '100%',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
             }}
             className="space-y-4"
         >
@@ -71,15 +62,17 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                 className="flex gap-4 w-full"
                 style={{
                     flexWrap: 'nowrap',
-                    justifyContent: 'flex-start'
+                    justifyContent: 'flex-start',
                 }}
             >
+                {/* AgentStatus1만 user prop 넘겨주기 */}
                 <Card className="h-auto flex-shrink-0" style={{ width: '350px' }}>
                     <CardContent className="p-4">
-                        <AgentStatus1 />
+                        <AgentStatus1 user={user} />
                     </CardContent>
                 </Card>
 
+                {/* AgentStatus2, AgentStatus3 는 원래 코드 그대로 */}
                 <Card className="h-auto flex-shrink-0" style={{ width: '350px' }}>
                     <CardContent className="p-4">
                         <AgentStatus2 />
@@ -91,7 +84,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                         <AgentStatus3 />
                     </CardContent>
                 </Card>
-
             </div>
 
             {/* 하단 2열 그리드 */}
@@ -106,7 +98,9 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                         {dummyQueue.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-sm">
                                 <span>{item.name}</span>
-                                <span className="text-muted-foreground">예상 {item.expected}</span>
+                                <span className="text-muted-foreground">
+                                    예상 {item.expected}
+                                </span>
                             </div>
                         ))}
                     </CardContent>

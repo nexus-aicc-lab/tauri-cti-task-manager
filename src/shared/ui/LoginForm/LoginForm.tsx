@@ -6,7 +6,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Alert, AlertDescription } from "@/shared/ui/alert";
 import { Loader2 } from "lucide-react";
-import { useLogin } from "@/shared/hook/useApiForAuth";
+import { useLogin } from "@/shared/hooks/useApiForAuth";
 
 interface LoginFormProps {
 

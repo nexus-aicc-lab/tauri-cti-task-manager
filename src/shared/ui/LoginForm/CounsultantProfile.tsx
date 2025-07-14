@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { LogOut, User } from "lucide-react";
-import { useLogout } from "@/shared/hook/useApiForAuth";
+import { useLogout } from "@/shared/hooks/useApiForAuth";
 
 interface CounsultantProfile {
     user: {

@@ -7,7 +7,7 @@ import { Label } from "@/shared/ui/label";
 import { Alert, AlertDescription } from "@/shared/ui/alert";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Loader2, LogOut, User, ChevronDown, LogIn } from "lucide-react";
-import { useLogin, useLogout } from "@/shared/hook/useApiForAuth";
+import { useLogin, useLogout } from "@/shared/hooks/useApiForAuth";
 
 interface User {
     id: number;
