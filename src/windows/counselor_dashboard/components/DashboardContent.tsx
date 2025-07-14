@@ -15,8 +15,6 @@ import {
 import AgentStatus1 from '../ui/AgentStatus1';
 import AgentStatus2 from '../ui/AgentStatus2';
 import AgentStatus3 from '../ui/AgentStatus3';
-import LoginForm from '@/shared/ui/LoginForm/LoginForm';
-import SimpleConsultantProfile from '@/shared/ui/LoginForm/CounsultantProfile';
 
 interface DashboardContentProps {
     user: { id: number; email: string; name: string } | null;

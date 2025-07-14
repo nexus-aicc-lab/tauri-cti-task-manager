@@ -24,7 +24,7 @@ export interface User {
     email: string;
     name: string;
     profileImage?: string;
-    callStatus: 'READY' | 'BUSY' | 'BREAK' | 'OFFLINE';
+    callStatus: 'READY' | 'BUSY' | 'AFTER_CALL' | 'BREAK';
     createdAt: string;
 }
 

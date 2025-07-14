@@ -14,7 +14,7 @@ interface StatusUpdaterProps {
     userId: number;
 }
 
-type CallStatus = 'READY' | 'BUSY' | 'BREAK' | 'OFFLINE';
+type CallStatus = 'READY' | 'BUSY' | 'AFTER_CALL' | 'BREAK';
 
 const statusConfig = {
     READY: {
