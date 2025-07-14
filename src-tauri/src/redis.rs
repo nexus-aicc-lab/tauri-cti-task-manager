@@ -1,62 +1,3 @@
-// use futures_util::StreamExt;
-// use redis::{AsyncCommands, Client};
-// use serde::{Deserialize, Serialize};
-// use tauri::{AppHandle, Emitter, Manager};
-// use tokio::time::{sleep, Duration};
-
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub struct SimpleAgentStatus {
-//     #[serde(rename = "agentId")]
-//     pub agent_id: u64,
-//     pub name: String,
-//     #[serde(rename = "callStatus")]
-//     pub call_status: String,
-// }
-
-// pub async fn start_redis_subscriber(app_handle: AppHandle) {
-//     let redis_url = "redis://127.0.0.1:6379/";
-//     loop {
-//         if let Err(e) = connect_and_subscribe(&app_handle, redis_url).await {
-//             println!("❌ Redis 연결 실패: {} → 5초 후 재시도", e);
-//             sleep(Duration::from_secs(5)).await;
-//         } else {
-//             println!("✅ Redis 구독 정상 종료");
-//         }
-//     }
-// }
-
-// async fn connect_and_subscribe(
-//     app_handle: &AppHandle,
-//     redis_url: &str,
-// ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-//     let client = Client::open(redis_url)?;
-//     let mut con = client.get_async_connection().await?;
-//     let mut pubsub = con.into_pubsub();
-
-//     pubsub.subscribe("personal:agent-info:2").await?;
-//     println!("📡 Redis 채널 구독 시작: personal:agent-info:2");
-
-//     while let Some(msg) = pubsub.on_message().next().await {
-//         let payload: String = msg.get_payload()?;
-//         handle_agent_status_info(app_handle, &payload).await;
-//     }
-//     Ok(())
-// }
-
-// async fn handle_agent_status_info(app_handle: &AppHandle, payload: &str) {
-//     match serde_json::from_str::<SimpleAgentStatus>(payload) {
-//         Ok(agent_status) => {
-//             println!("✅ 상담원 상태 수신: {:?}", agent_status);
-//             if let Err(e) = app_handle.emit("redis-agent-status-single", &agent_status) {
-//                 println!("❌ 이벤트 전송 실패: {}", e);
-//             }
-//         }
-//         Err(e) => {
-//             println!("❌ JSON 파싱 실패: {} | 길이: {}", e, payload.len());
-//         }
-//     }
-// }
-
 use futures_util::StreamExt;
 use redis::{AsyncCommands, Client};
 use serde::{Deserialize, Serialize};
@@ -159,9 +100,9 @@ async fn connect_and_subscribe(
 
     // 동적으로 채널명 생성
     let channel = format!("personal:agent-info:{}", user_id);
-    println!("📡 Redis 채널 구독 시작1: {}", channel);
+    println!("📡 Redis 채널 구독 시작 확인1: {}", channel);
     pubsub.subscribe(&channel).await?;
-    println!("📡 Redis 채널 구독 시작2: {}", channel);
+    println!("📡 Redis 채널 구독 확인2: {}", channel);
 
     while let Some(msg) = pubsub.on_message().next().await {
         let payload: String = msg.get_payload()?;
@@ -174,7 +115,7 @@ async fn handle_agent_status_info(app_handle: &AppHandle, payload: &str) {
     match serde_json::from_str::<SimpleAgentStatus>(payload) {
         Ok(agent_status) => {
             println!("✅ 상담원 상태 수신: {:?}", agent_status);
-            if let Err(e) = app_handle.emit("redis-agent-status-single", &agent_status) {
+            if let Err(e) = app_handle.emit("agent-current-status-message", &agent_status) {
                 println!("❌ 이벤트 전송 실패: {}", e);
             }
         }
