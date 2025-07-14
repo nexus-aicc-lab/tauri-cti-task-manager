@@ -35,12 +35,13 @@ const statusConfig = {
         color: 'bg-yellow-500 hover:bg-yellow-600',
         textColor: 'text-yellow-700'
     },
-    OFFLINE: {
-        label: '오프라인',
-        icon: UserX,
-        color: 'bg-gray-500 hover:bg-gray-600',
-        textColor: 'text-gray-700'
+    AFTER_CALL: {
+        label: '통화후처리',
+        icon: Phone,
+        color: 'bg-blue-500 hover:bg-blue-600',
+        textColor: 'text-blue-700'
     },
+
 };
 
 export const StatusUpdater: React.FC<StatusUpdaterProps> = ({ userId }) => {

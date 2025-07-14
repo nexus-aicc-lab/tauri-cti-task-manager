@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { UserProfileUpdate } from '../../../lib/redis-events';
+
+interface UserProfileUpdate {
+  userId: string;
+  field: string;
+  newValue: string;
+  timestamp: string;
+}
 
 interface ToastProps {
   data: UserProfileUpdate;

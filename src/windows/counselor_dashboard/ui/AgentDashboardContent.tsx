@@ -50,7 +50,7 @@ const getStatusStyle = (status: User['callStatus']) => {
         case 'READY': return 'bg-green-100 text-green-800 border-green-200';
         case 'BUSY': return 'bg-red-100 text-red-800 border-red-200';
         case 'BREAK': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        case 'OFFLINE': return 'bg-gray-100 text-gray-800 border-gray-200';
+        case 'AFTER_CALL': return 'bg-gray-100 text-gray-800 border-gray-200';
         default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
 };
@@ -60,12 +60,12 @@ const getStatusText = (status: User['callStatus']) => {
         case 'READY': return '대기중';
         case 'BUSY': return '통화중';
         case 'BREAK': return '휴식중';
-        case 'OFFLINE': return '오프라인';
+        case 'AFTER_CALL': return '오프라인';
         default: return '알 수 없음';
     }
 };
 
-const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
+const AgentDashboardContent: React.FC<AgentDashboardContentProps> = ({ user }) => {
     return (
         <div className="px-4 py-6 space-y-6 max-w-7xl mx-auto">
 
@@ -74,7 +74,7 @@ const AgentDashboardContent: React.FC<AgentDashboardContentProps> = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                 <div className="col-span-1 space-y-4">
-                    <AgentStatus1 />
+                    <AgentStatus1 user={user || null} />
                 </div>
                 <div className="col-span-1 space-y-4">
                     <AgentStatus2 />

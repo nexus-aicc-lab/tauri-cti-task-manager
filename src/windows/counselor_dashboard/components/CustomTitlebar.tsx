@@ -104,7 +104,7 @@ export default function CustomTitlebar({ title, currentSize, user, onUserChange 
                 <div className="flex items-center space-x-3">
                     <span className="text-sm text-white">로그인 컴퍼넌트 with dropbox</span>
                     <LoginFormWithDropdown
-                        user={user}
+                        user={user ?? null}
                         onUserChange={onUserChange}
                     />
                 </div>

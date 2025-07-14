@@ -11,13 +11,13 @@ export const useUsers = () => {
 };
 
 // 현재 사용자 프로필
-export const useCurrentUser = () => {
-    return useQuery({
-        queryKey: ['user', 'profile'],
-        queryFn: userApi.getCurrentProfile,
-        enabled: !!localStorage.getItem('authToken'),
-    });
-};
+// export const useCurrentUser = () => {
+//     return useQuery({
+//         queryKey: ['user', 'profile'],
+//         queryFn: userApi.getCurrentProfile,
+//         enabled: !!localStorage.getItem('authToken'),
+//     });
+// };
 
 // ✅ ID로 특정 사용자 조회
 export const useUser = (id: number) => {

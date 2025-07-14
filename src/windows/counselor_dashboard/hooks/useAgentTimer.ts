@@ -1,25 +1,59 @@
-// hooks/useAgentTimer.ts
+// src/windows/counselor_dashboard/hooks/useAgentTimer.ts
 import { useEffect, useState } from 'react';
 
 export function useAgentTimer(callStatus: string) {
     const [elapsedTime, setElapsedTime] = useState('00:00:00');
 
     useEffect(() => {
-        const key = 'agent_status_started_at';
-        const saved = localStorage.getItem(key);
-        const parsed = saved ? JSON.parse(saved) : null;
+        let interval: NodeJS.Timeout;
 
-        if (!parsed || parsed.status !== callStatus) return;
+        const setupTimer = () => {
+            const key = 'agent_status_started_at';
+            const saved = localStorage.getItem(key);
+            const parsed = saved ? JSON.parse(saved) : null;
 
-        const startedAt = new Date(parsed.startedAt);
+            // 저장된 데이터가 없거나 상태가 다르면 초기화
+            if (!parsed || parsed.status !== callStatus) {
+                setElapsedTime('00:00:00');
+                return;
+            }
 
-        const interval = setInterval(() => {
-            const now = new Date();
-            const diffInSec = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
-            setElapsedTime(formatToHHMMSS(diffInSec));
-        }, 1000);
+            const startedAt = new Date(parsed.startedAt);
 
-        return () => clearInterval(interval);
+            // 기존 인터벌 정리
+            if (interval) clearInterval(interval);
+
+            // 새로운 인터벌 시작
+            interval = setInterval(() => {
+                const now = new Date();
+                const diffInSec = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+                const validDiffInSec = Math.max(0, diffInSec);
+                setElapsedTime(formatToHHMMSS(validDiffInSec));
+            }, 1000);
+        };
+
+        // 초기 설정
+        setupTimer();
+
+        // localStorage 변경 감지 이벤트 리스너
+        const handleStorageChange = () => {
+            setupTimer();
+        };
+
+        // 커스텀 이벤트 리스너 (같은 탭 내 변경 감지)
+        const handleAgentStatusUpdate = () => {
+            setupTimer();
+        };
+
+        // 이벤트 리스너 등록
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('agent-status-updated', handleAgentStatusUpdate);
+
+        return () => {
+            if (interval) clearInterval(interval);
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('agent-status-updated', handleAgentStatusUpdate);
+        };
     }, [callStatus]);
 
     return elapsedTime;
