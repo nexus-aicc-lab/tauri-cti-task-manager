@@ -24,6 +24,10 @@ interface AgentStatus1Props {
 export default function AgentStatus1({ user }: AgentStatus1Props) {
     const { data1, updateData1 } = useAgentConsultantStatus();
     const latest = useSingleAgentStatus();
+
+    console.log('🚀 AgentStatus1 컴포넌트 렌더링', { data1, latest });
+
+
     const { mutate: updateCallStatus, isPending } = useUpdateCallStatusById();
 
     // Redis 이벤트로 들어온 상태 반영
