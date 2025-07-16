@@ -5,11 +5,28 @@ interface LoginData {
     password: string;
 }
 
+interface LoginResponse {
+    result: {
+        center: string;
+        config: string;
+        cube_token: string;
+        dn: string;
+        error_code: number;
+        error_message: string;
+        login_id: string;
+        name: string;
+        tenant: string;
+    };
+}
+
 const CTILoginForm: React.FC = () => {
     const [loginData, setLoginData] = useState<LoginData>({ agent: '', password: '' });
     const [isAppInstalled, setIsAppInstalled] = useState<boolean>(false);
     const [status, setStatus] = useState<string>('');
     const [isChecking, setIsChecking] = useState<boolean>(false);
+    const [loginResponse, setLoginResponse] = useState<LoginResponse | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
 
     // 앱 설치 체크
     useEffect(() => {
@@ -90,7 +107,7 @@ const CTILoginForm: React.FC = () => {
         console.log('프로그램 실행:', testLoginUrl);
     };
 
-    // 다운로드 (필요 시)
+    // 다운로드
     const downloadApp = async () => {
         const downloadUrls = [
             './src-tauri/target/release/bundle/nsis/CTI Task Master_07151050.exe',
@@ -121,18 +138,7 @@ const CTILoginForm: React.FC = () => {
             }
         }
 
-        alert(`
-다운로드 실패 - 다음 방법을 시도해보세요:
-
-1. 로컬 서버 시작:
-   - python -m http.server 8000
-   - http://localhost:8000 접속
-
-2. 파일 직접 접근:
-   - C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe
-
-3. npm run tauri build
-    `);
+        alert(`다운로드 실패 - 다음 방법을 시도해보세요:\n\n1. 로컬 서버 시작:\n   - python -m http.server 8000\n   - http://localhost:8000 접속\n\n2. 파일 직접 접근:\n   - C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe\n\n3. npm run tauri build`);
     };
 
     // 폼 입력 처리
@@ -140,34 +146,53 @@ const CTILoginForm: React.FC = () => {
         setLoginData(prev => ({ ...prev, [field]: value }));
     };
 
-    // 폼 로그인
-    const handleLogin = () => {
+    // API 로그인
+    const handleLogin = async () => {
         if (!loginData.agent.trim() || !loginData.password.trim()) return;
 
-        const timestamp = Date.now().toString();
-        const loginUrl = `cti-personal://login?` +
-            `safe_token=${encodeURIComponent(btoa('form_' + timestamp))}&` +
-            `agent=${encodeURIComponent(loginData.agent)}&` +
-            `password=${encodeURIComponent(loginData.password)}&` +
-            `timestamp=${timestamp}&` +
-            `session_id=sess_${timestamp}&` +
-            `login_method=form_login&` +
-            `version=2.0`;
+        setIsLoading(true);
+        setError('');
+        setLoginResponse(null);
 
-        window.location.href = loginUrl;
-        console.log('로그인 시도:', loginUrl);
-    };
+        try {
+            const response = await fetch('http://10.10.40.186:21004/authorize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    authorize: {
+                        agent: loginData.agent,
+                        password: loginData.password
+                    }
+                })
+            });
 
-    // JSON 복사
-    const copyLoginJson = async () => {
-        const loginJson = { authorize: { agent: loginData.agent, password: loginData.password } };
-        const jsonString = JSON.stringify(loginJson, null, 2);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        try { await navigator.clipboard.writeText(jsonString); alert('JSON 복사됨!'); }
-        catch {
-            const ta = document.createElement('textarea'); ta.value = jsonString;
-            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            alert('JSON 복사됨!');
+            const data: LoginResponse = await response.json();
+            setLoginResponse(data);
+
+            // 로그인 성공 시 프로그램 실행
+            if (data.result.error_code === 0) {
+                const timestamp = Date.now().toString();
+                const loginUrl = `cti-personal://login?` +
+                    `safe_token=${encodeURIComponent(btoa('form_' + timestamp))}&` +
+                    `agent=${encodeURIComponent(loginData.agent)}&` +
+                    `password=${encodeURIComponent(loginData.password)}&` +
+                    `timestamp=${timestamp}&` +
+                    `session_id=sess_${timestamp}&` +
+                    `login_method=form_login&` +
+                    `version=2.0`;
+
+                window.location.href = loginUrl;
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -175,10 +200,11 @@ const CTILoginForm: React.FC = () => {
 
     return (
         <div style={{
-            minHeight: '50vh',
+            // minHeight: '100vh',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)',
             padding: '20px'
         }}>
@@ -186,10 +212,11 @@ const CTILoginForm: React.FC = () => {
                 background: '#fff',
                 borderRadius: '16px',
                 padding: '32px',
-                width: '80%',  // 넉넉한 가로폭
-                // maxWidth: '800px',
+                width: '80%',
+                maxWidth: '500px',
                 boxShadow: '0 12px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e0f7fa'
+                border: '1px solid #e0f7fa',
+                marginBottom: '20px'
             }}>
                 {/* 헤더 */}
                 <div style={{ textAlign: 'center', marginBottom: '36px' }}>
@@ -253,22 +280,22 @@ const CTILoginForm: React.FC = () => {
                         />
                     </div>
 
-                    {/* 로그인 버튼 필요 */}
+                    {/* 로그인 버튼 */}
                     <button
                         onClick={handleLogin}
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || isLoading}
                         style={{
                             width: '100%',
                             padding: '14px',
-                            backgroundColor: isFormValid ? '#00acc1' : '#b2ebf2',
+                            backgroundColor: isFormValid && !isLoading ? '#00acc1' : '#b2ebf2',
                             color: '#fff',
                             border: 'none',
                             borderRadius: '10px',
                             fontSize: '16px',
-                            cursor: isFormValid ? 'pointer' : 'not-allowed',
+                            cursor: isFormValid && !isLoading ? 'pointer' : 'not-allowed',
                             transition: 'background-color 0.3s ease'
                         }}>
-                        로그인
+                        {isLoading ? '로그인 중...' : '로그인'}
                     </button>
 
                     {/* 실행/다운로드 버튼 */}
@@ -311,10 +338,93 @@ const CTILoginForm: React.FC = () => {
                             📥 프로그램 다운로드
                         </button>
                     )}
-
-
                 </div>
             </div>
+
+            {/* 응답 표시 영역 */}
+            {(loginResponse || error) && (
+                <div style={{
+                    background: '#fff',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    width: '80%',
+                    maxWidth: '800px',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.1)',
+                    border: '1px solid #e0f7fa'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <h3 style={{ color: '#00acc1', margin: 0 }}>
+                            {error ? '❌ 로그인 오류' : loginResponse?.result.error_code === 0 ? '✅ 로그인 성공' : '❌ 로그인 실패'}
+                        </h3>
+                        <div style={{
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            backgroundColor: error ? '#ffebee' : loginResponse?.result.error_code === 0 ? '#e8f5e8' : '#ffebee',
+                            color: error ? '#c62828' : loginResponse?.result.error_code === 0 ? '#2e7d32' : '#c62828'
+                        }}>
+                            {error ? 'ERROR' : loginResponse?.result.error_code === 0 ? '200 OK' : `ERROR ${loginResponse?.result.error_code}`}
+                        </div>
+                    </div>
+
+                    {error ? (
+                        <div style={{
+                            background: '#ffebee',
+                            border: '1px solid #ffcdd2',
+                            borderRadius: '8px',
+                            padding: '16px',
+                            color: '#c62828',
+                            fontSize: '14px'
+                        }}>
+                            {error}
+                        </div>
+                    ) : loginResponse && (
+                        <div style={{
+                            background: '#f8f9fa',
+                            border: '1px solid #e9ecef',
+                            borderRadius: '8px',
+                            padding: '16px',
+                            fontSize: '13px',
+                            fontFamily: 'Monaco, Consolas, "Courier New", monospace'
+                        }}>
+                            <pre style={{
+                                margin: 0,
+                                whiteSpace: 'pre-wrap',
+                                wordWrap: 'break-word',
+                                color: '#495057'
+                            }}>
+                                {JSON.stringify(loginResponse, null, 2)}
+                            </pre>
+                        </div>
+                    )}
+
+                    {/* {loginResponse && (
+                        <div style={{
+                            marginTop: '16px',
+                            padding: '12px',
+                            background: '#e0f7fa',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            color: '#00838f'
+                        }}>
+                            <strong>응답 정보:</strong>
+                            <div style={{ marginTop: '8px' }}>
+                                • 사용자: {loginResponse.result.name} ({loginResponse.result.login_id})
+                                <br />
+                                • 센터: {loginResponse.result.center}
+                                <br />
+                                • 상태: {loginResponse.result.error_code === 0 ? '정상' : `오류 (${loginResponse.result.error_message})`}
+                            </div>
+                        </div>
+                    )} */}
+                </div>
+            )}
         </div>
     );
 };
