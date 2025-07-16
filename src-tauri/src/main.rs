@@ -161,6 +161,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_notification::init()) // 🎉 알림 플러그인 등록!
+        .plugin(tauri_plugin_updater::Builder::new().build()) // 🚀 업데이터 플러그인 추가!
         .run(tauri::generate_context!())
         .expect("❌ 앱 실행 실패");
 }
