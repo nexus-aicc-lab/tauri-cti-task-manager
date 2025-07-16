@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTI Task Master - 고급 런처</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .title {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .detection-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .status-indicator.checking {
+            background: #ffc107;
+        }
+
+        .status-indicator.installed {
+            background: #28a745;
+            animation: none;
+        }
+
+        .status-indicator.not-installed {
+            background: #dc3545;
+            animation: none;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-download:hover:not(:disabled) {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .download-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .download-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .download-info p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .download-methods {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .download-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .download-link:hover {
+            background: #5a6fd8;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .protocol-test {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .protocol-test h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .test-result {
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">🎯</div>
+        <h1 class="title">CTI Task Master</h1>
+        <p class="subtitle">통합 업무 관리 시스템</p>
+
+        <div class="detection-panel">
+            <div class="detection-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">프로그램 설치 상태 확인 중...</span>
+            </div>
+            <div class="protocol-test" id="protocolTest">
+                <h4>🔍 감지 테스트 로그</h4>
+                <div id="testResults"></div>
+            </div>
+        </div>
+
+        <div id="status" class="status hidden"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">사용자명</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="department">부서</label>
+                <select id="department" name="department" required>
+                    <option value="">부서를 선택하세요</option>
+                    <option value="영업팀">영업팀</option>
+                    <option value="고객지원팀">고객지원팀</option>
+                    <option value="기술팀">기술팀</option>
+                    <option value="관리팀">관리팀</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="role">역할</label>
+                <select id="role" name="role" required>
+                    <option value="">역할을 선택하세요</option>
+                    <option value="상담원">상담원</option>
+                    <option value="슈퍼바이저">슈퍼바이저</option>
+                    <option value="관리자">관리자</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <button type="submit" class="btn" id="loginBtn">
+                <span id="loginText">프로그램 실행 및 로그인</span>
+                <div id="loginLoading" class="loading hidden"></div>
+            </button>
+        </form>
+
+        <button class="btn btn-download" id="downloadBtn">
+            <span id="downloadText">프로그램 다운로드</span>
+            <div id="downloadLoading" class="loading hidden"></div>
+        </button>
+
+        <button class="btn btn-secondary" id="recheckBtn">
+            <span>다시 확인</span>
+        </button>
+
+        <div class="download-info">
+            <h3>📥 다운로드 정보</h3>
+            <p>CTI Task Master 프로그램을 다운로드하여 설치하세요.</p>
+            <div class="download-methods">
+                <a href="file:///C:/tauri/cti-task-pilot2/src-tauri/target/release/bundle/nsis/CTI Task Master_07151050.exe"
+                    class="download-link" download="CTI_Task_Master_Setup.exe">
+                    직접 다운로드
+                </a>
+                <a href="#" class="download-link"
+                    onclick="window.open('C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe')">
+                    파일 열기
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdvancedAppLauncher {
+            constructor() {
+                this.isAppInstalled = false;
+                this.downloadUrl = "C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe";
+                this.protocolScheme = "cti-personal";
+                this.testResults = [];
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.startDetection();
+            }
+
+            bindEvents() {
+                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('downloadBtn').addEventListener('click', () => this.handleDownload());
+                document.getElementById('recheckBtn').addEventListener('click', () => this.startDetection());
+            }
+
+            addTestResult(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                this.testResults.push({ timestamp, message, type });
+
+                const resultsEl = document.getElementById('testResults');
+                const resultEl = document.createElement('div');
+                resultEl.className = 'test-result';
+                resultEl.innerHTML = `<span style="color: #999;">[${timestamp}]</span> ${message}`;
+                resultsEl.appendChild(resultEl);
+
+                // 최대 10개까지만 표시
+                if (this.testResults.length > 10) {
+                    this.testResults.shift();
+                    resultsEl.removeChild(resultsEl.firstChild);
+                }
+            }
+
+            updateStatus(text, indicator = 'checking') {
+                document.getElementById('statusText').textContent = text;
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.className = `status-indicator ${indicator}`;
+
+                this.addTestResult(`상태 변경: ${text}`);
+            }
+
+            showStatus(message, type = 'info') {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
+                statusEl.classList.remove('hidden');
+
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                }, 7000);
+            }
+
+            async startDetection() {
+                this.updateStatus('프로그램 설치 상태 확인 중...', 'checking');
+                document.getElementById('testResults').innerHTML = '';
+                this.testResults = [];
+
+                // 여러 방법으로 감지 시도
+                const methods = [
+                    () => this.detectByProtocolHandler(),
+                    () => this.detectByTimingAttack(),
+                    () => this.detectByFocusChange(),
+                    () => this.detectByIframe()
+                ];
+
+                let detected = false;
+
+                for (const method of methods) {
+                    try {
+                        const result = await method();
+                        if (result) {
+                            detected = true;
+                            break;
+                        }
+                    } catch (error) {
+                        this.addTestResult(`감지 방법 오류: ${error.message}`, 'error');
+                    }
+                }
+
+                if (detected) {
+                    this.isAppInstalled = true;
+                    this.updateStatus('프로그램이 설치되어 있습니다!', 'installed');
+                    this.showStatus('✅ 프로그램이 설치되어 있습니다. 로그인을 진행하세요.', 'success');
+                } else {
+                    this.isAppInstalled = false;
+                    this.updateStatus('프로그램이 설치되어 있지 않습니다.', 'not-installed');
+                    this.showStatus('❌ 프로그램이 설치되어 있지 않습니다. 다운로드 후 설치하세요.', 'error');
+                }
+            }
+
+            async detectByProtocolHandler() {
+                this.addTestResult('방법 1: 프로토콜 핸들러 감지 시도');
+
+                return new Promise((resolve) => {
+                    const testUrl = `${this.protocolScheme}://test?timestamp=${Date.now()}`;
+                    const startTime = Date.now();
+
+                    // 타이머 설정
+                    const timer = setTimeout(() => {
+                        this.addTestResult('프로토콜 핸들러: 타임아웃 (미설치)');
+                        resolve(false);
+                    }, 2000);
+
+                    // 포커스 변경 감지
+                    const onBlur = () => {
+                        clearTimeout(timer);
+                        window.removeEventListener('blur', onBlur);
+                        const endTime = Date.now();
+                        this.addTestResult(`프로토콜 핸들러: 포커스 변경 감지 (${endTime - startTime}ms)`);
+                        resolve(true);
+                    };
+
+                    window.addEventListener('blur', onBlur);
+
+                    // 프로토콜 URL 실행
+                    window.location.href = testUrl;
+                });
+            }
+
+            async detectByTimingAttack() {
+                this.addTestResult('방법 2: 타이밍 어택 감지 시도');
+
+                return new Promise((resolve) => {
+                    const startTime = performance.now();
+                    const testUrl = `${this.protocolScheme}://timing-test`;
+
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = testUrl;
+
+                    iframe.onload = () => {
+                        const endTime = performance.now();
+                        const duration = endTime - startTime;
+                        this.addTestResult(`타이밍 어택: ${duration.toFixed(2)}ms`);
+
+                        document.body.removeChild(iframe);
+
+                        // 빠른 응답 시간은 프로토콜이 처리되었음을 의미
+                        resolve(duration < 100);
+                    };
+
+                    iframe.onerror = () => {
+                        this.addTestResult('타이밍 어택: 오류 발생 (미설치)');
+                        document.body.removeChild(iframe);
+                        resolve(false);
+                    };
+
+                    document.body.appendChild(iframe);
+
+                    // 타임아웃 설정
+                    setTimeout(() => {
+                        if (iframe.parentNode) {
+                            document.body.removeChild(iframe);
+                            this.addTestResult('타이밍 어택: 타임아웃 (미설치)');
+                            resolve(false);
+                        }
+                    }, 1000);
+                });
+            }
+
+            async detectByFocusChange() {
+                this.addTestResult('방법 3: 포커스 변경 감지 시도');
+
+                return new Promise((resolve) => {
+                    const testUrl = `${this.protocolScheme}://focus-test`;
+                    let resolved = false;
+
+                    const cleanup = () => {
+                        window.removeEventListener('blur', onBlur);
+                        window.removeEventListener('focus', onFocus);
+                    };
+
+                    const onBlur = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('포커스 변경: 블러 이벤트 감지 (설치됨)');
+                            resolve(true);
+                        }
+                    };
+
+                    const onFocus = () => {
+                        setTimeout(() => {
+                            if (!resolved) {
+                                resolved = true;
+                                cleanup();
+                                this.addTestResult('포커스 변경: 포커스 빠르게 복귀 (미설치)');
+                                resolve(false);
+                            }
+                        }, 500);
+                    };
+
+                    window.addEventListener('blur', onBlur);
+                    window.addEventListener('focus', onFocus);
+
+                    // 프로토콜 URL 실행
+                    window.location.href = testUrl;
+
+                    // 타임아웃
+                    setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('포커스 변경: 타임아웃 (미설치)');
+                            resolve(false);
+                        }
+                    }, 3000);
+                });
+            }
+
+            async detectByIframe() {
+                this.addTestResult('방법 4: 아이프레임 감지 시도');
+
+                return new Promise((resolve) => {
+                    const testUrl = `${this.protocolScheme}://iframe-test`;
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = testUrl;
+
+                    let resolved = false;
+
+                    const cleanup = () => {
+                        if (iframe.parentNode) {
+                            document.body.removeChild(iframe);
+                        }
+                    };
+
+                    iframe.onload = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('아이프레임: 로드 성공 (설치됨)');
+                            resolve(true);
+                        }
+                    };
+
+                    iframe.onerror = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('아이프레임: 오류 발생 (미설치)');
+                            resolve(false);
+                        }
+                    };
+
+                    document.body.appendChild(iframe);
+
+                    // 타임아웃
+                    setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('아이프레임: 타임아웃 (미설치)');
+                            resolve(false);
+                        }
+                    }, 1500);
+                });
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+
+                const loginBtn = document.getElementById('loginBtn');
+                const loginText = document.getElementById('loginText');
+                const loginLoading = document.getElementById('loginLoading');
+
+                loginText.classList.add('hidden');
+                loginLoading.classList.remove('hidden');
+                loginBtn.disabled = true;
+
+                try {
+                    const formData = new FormData(e.target);
+                    const data = Object.fromEntries(formData);
+
+                    const timestamp = Date.now().toString();
+                    const safeToken = btoa(`${data.username}_${timestamp}`);
+
+                    const loginUrl = `${this.protocolScheme}://login?` +
+                        `safe_token=${encodeURIComponent(safeToken)}&` +
+                        `username=${encodeURIComponent(data.username)}&` +
+                        `department=${encodeURIComponent(data.department)}&` +
+                        `role=${encodeURIComponent(data.role)}&` +
+                        `email=${encodeURIComponent(data.email)}&` +
+                        `timestamp=${timestamp}&` +
+                        `session_id=sess_${timestamp}&` +
+                        `login_method=safe_form&` +
+                        `korean_support=true&` +
+                        `version=2.0`;
+
+                    console.log("Tauri 호출 URL:", loginUrl);
+                    this.addTestResult(`로그인 URL 생성: ${loginUrl}`);
+
+                    const success = await this.launchApp(loginUrl);
+
+                    if (success) {
+                        this.showStatus('🚀 프로그램이 성공적으로 실행되었습니다!', 'success');
+                        this.addTestResult('로그인 성공');
+                    } else {
+                        this.showStatus('❌ 프로그램 실행에 실패했습니다. 설치 상태를 확인하세요.', 'error');
+                        this.addTestResult('로그인 실패');
+                    }
+
+                } catch (error) {
+                    console.error("로그인 중 오류:", error);
+                    this.showStatus('❌ 로그인 중 오류가 발생했습니다.', 'error');
+                    this.addTestResult(`로그인 오류: ${error.message}`);
+                } finally {
+                    loginText.classList.remove('hidden');
+                    loginLoading.classList.add('hidden');
+                    loginBtn.disabled = false;
+                }
+            }
+
+            async launchApp(url) {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    let resolved = false;
+
+                    const cleanup = () => {
+                        window.removeEventListener('blur', onBlur);
+                        window.removeEventListener('focus', onFocus);
+                    };
+
+                    const onBlur = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('앱 실행: 포커스 변경 감지');
+                            resolve(true);
+                        }
+                    };
+
+                    const onFocus = () => {
+                        setTimeout(() => {
+                            if (!resolved) {
+                                const endTime = Date.now();
+                                resolved = true;
+                                cleanup();
+                                this.addTestResult(`앱 실행: 포커스 복귀 (${endTime - startTime}ms)`);
+                                resolve(false);
+                            }
+                        }, 1000);
+                    };
+
+                    window.addEventListener('blur', onBlur);
+                    window.addEventListener('focus', onFocus);
+
+                    try {
+                        window.location.href = url;
+                        this.addTestResult('앱 실행: URL 호출 완료');
+                    } catch (error) {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult(`앱 실행: 오류 - ${error.message}`);
+                            resolve(false);
+                        }
+                    }
+
+                    // 타임아웃
+                    setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            cleanup();
+                            this.addTestResult('앱 실행: 타임아웃');
+                            resolve(false);
+                        }
+                    }, 3000);
+                });
+            }
+
+            handleDownload() {
+                const downloadBtn = document.getElementById('downloadBtn');
+                const downloadText = document.getElementById('downloadText');
+                const downloadLoading = document.getElementById('downloadLoading');
+
+                downloadText.classList.add('hidden');
+                downloadLoading.classList.remove('hidden');
+                downloadBtn.disabled = true;
+
+                try {
+                    // 다운로드 링크 생성
+                    const link = document.createElement('a');
+                    link.href = this.downloadUrl;
+                    link.download = 'CTI_Task_Master_Setup.exe';
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    this.showStatus('📥 다운로드가 시작되었습니다. 설치 후 다시 시도하세요.', 'success');
+                    this.addTestResult('다운로드 시작');
+
+                } catch (error) {
+                    console.error('다운로드 오류:', error);
+                    this.showStatus('❌ 다운로드 중 오류가 발생했습니다.', 'error');
+                    this.addTestResult(`다운로드 오류: ${error.message}`);
+                } finally {
+                    setTimeout(() => {
+                        downloadText.classList.remove('hidden');
+                        downloadLoading.classList.add('hidden');
+                        downloadBtn.disabled = false;
+                    }, 2000);
+                }
+            }
+        }
+
+        // 페이지 로드 시 앱 런처 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdvancedAppLauncher();
+        });
+    </script>
+</body>
+
+</html>

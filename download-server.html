@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTI Task Master - 다운로드 서버</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .title {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .download-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .download-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .download-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .info-item h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .info-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-launcher {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn-launcher:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #e8590c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .instructions {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .instructions h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .instructions ol {
+            color: #666;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .version-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .version-info h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .version-info p {
+            color: #0c5460;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .file-server {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .file-server h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .file-server p {
+            color: #856404;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .server-code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        @media (max-width: 768px) {
+            .download-info {
+                grid-template-columns: 1fr;
+            }
+
+            .download-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">📦</div>
+        <h1 class="title">CTI Task Master</h1>
+        <p class="subtitle">다운로드 및 설치 센터</p>
+
+        <div class="download-section">
+            <h3>🚀 프로그램 다운로드</h3>
+
+            <div class="download-info">
+                <div class="info-item">
+                    <h4>📋 파일명</h4>
+                    <p>CTI Task Master_07151050.exe</p>
+                </div>
+                <div class="info-item">
+                    <h4>📊 파일 크기</h4>
+                    <p id="fileSize">계산 중...</p>
+                </div>
+                <div class="info-item">
+                    <h4>🔢 버전</h4>
+                    <p>v2.0.0 (Build 07151050)</p>
+                </div>
+                <div class="info-item">
+                    <h4>📅 빌드 날짜</h4>
+                    <p>2024-07-15</p>
+                </div>
+            </div>
+
+            <div class="download-buttons">
+                <a href="file:///C:/tauri/cti-task-pilot2/src-tauri/target/release/bundle/nsis/CTI Task Master_07151050.exe"
+                    class="btn btn-primary" download="CTI_Task_Master_Setup.exe">
+                    <span>📥</span> 직접 다운로드
+                </a>
+                <button class="btn btn-secondary" onclick="startHttpServer()">
+                    <span>🌐</span> HTTP 서버 시작
+                </button>
+                <a href="app-launcher-advanced.html" class="btn btn-launcher">
+                    <span>🎯</span> 웹 런처 열기
+                </a>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h4>📋 설치 방법</h4>
+            <ol>
+                <li>위의 "직접 다운로드" 버튼을 클릭하여 설치 파일을 다운로드합니다.</li>
+                <li>다운로드된 <code>CTI_Task_Master_Setup.exe</code> 파일을 실행합니다.</li>
+                <li>설치 마법사의 안내에 따라 프로그램을 설치합니다.</li>
+                <li>설치 완료 후 "웹 런처 열기"를 클릭하여 로그인합니다.</li>
+                <li>로그인 정보를 입력하고 "프로그램 실행 및 로그인" 버튼을 클릭합니다.</li>
+            </ol>
+        </div>
+
+        <div class="version-info">
+            <h4>🔧 시스템 요구사항</h4>
+            <p><strong>운영체제:</strong> Windows 10/11 (64비트)</p>
+            <p><strong>메모리:</strong> 최소 4GB RAM</p>
+            <p><strong>저장공간:</strong> 500MB 이상 여유 공간</p>
+            <p><strong>네트워크:</strong> 인터넷 연결 필요</p>
+        </div>
+
+        <div class="file-server">
+            <h4>🌐 로컬 파일 서버</h4>
+            <p>
+                파일 다운로드가 작동하지 않는 경우, 아래 Python 명령어를 사용하여
+                로컬 파일 서버를 시작할 수 있습니다:
+            </p>
+            <div class="server-code">
+                # Python 3이 설치된 경우
+                cd "C:\tauri\cti-task-pilot2\src-tauri\target\release\bundle\nsis"
+                python -m http.server 8000
+
+                # 그 후 브라우저에서 http://localhost:8000 접속
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 파일 크기 계산 (추정)
+        document.getElementById('fileSize').textContent = '약 15-20MB';
+
+        // HTTP 서버 시작 함수
+        function startHttpServer() {
+            const serverInfo = `
+로컬 파일 서버를 시작하려면:
+
+1. 명령 프롬프트(CMD)를 관리자 권한으로 실행
+2. 다음 명령어 입력:
+   cd "C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis"
+   python -m http.server 8000
+
+3. 브라우저에서 http://localhost:8000 접속
+4. 파일 목록에서 "CTI Task Master_07151050.exe" 클릭하여 다운로드
+
+또는 Node.js가 설치된 경우:
+   npx serve .
+            `;
+
+            alert(serverInfo);
+
+            // 클립보드에 복사 시도
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText('cd "C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis"\npython -m http.server 8000');
+            }
+        }
+
+        // 페이지 로드 시 파일 존재 여부 확인
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('CTI Task Master 다운로드 페이지 로드됨');
+
+            // 실제 파일 서버 시작을 위한 추가 기능
+            checkFileExists();
+        });
+
+        function checkFileExists() {
+            const filePath = "C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe";
+
+            // 파일 존재 여부는 브라우저에서 직접 확인할 수 없으므로
+            // 사용자에게 알림으로 안내
+            console.log('파일 경로:', filePath);
+        }
+
+        // 다운로드 링크 클릭 이벤트
+        document.querySelector('.btn-primary').addEventListener('click', function (e) {
+            console.log('다운로드 시작:', e.target.href);
+
+            // 다운로드 성공 메시지 (약간의 지연 후)
+            setTimeout(() => {
+                alert('다운로드가 시작되었습니다!\n\n파일이 다운로드되지 않는 경우:\n1. "HTTP 서버 시작" 버튼 클릭\n2. 명령 프롬프트에서 서버 실행\n3. http://localhost:8000 접속');
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>
