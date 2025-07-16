@@ -86,23 +86,99 @@ const App: React.FC = () => {
         console.log('프로그램 실행:', testLoginUrl);
     };
 
-    const downloadApp = () => {
-        try {
-            // 다운로드 링크 생성
-            const link = document.createElement('a');
-            link.href = 'C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe';
-            link.download = 'CTI_Task_Master_Setup.exe';
-            link.style.display = 'none';
+    const downloadApp = async () => {
+        const downloadUrls = [
+            // 1. 상대 경로 (개발 환경)
+            './src-tauri/target/release/bundle/nsis/CTI Task Master_07151050.exe',
+            // 2. 로컬 서버 (8000 포트)
+            'http://localhost:8000/CTI Task Master_07151050.exe',
+            // 3. 절대 경로 (로컬 파일 시스템)
+            'file:///C:/tauri/cti-task-pilot2/src-tauri/target/release/bundle/nsis/CTI Task Master_07151050.exe',
+            // 4. 대체 다운로드 링크 (GitHub 등)
+            'https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/latest/download/CTI_Task_Master_Setup.exe'
+        ];
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        for (let i = 0; i < downloadUrls.length; i++) {
+            try {
+                const url = downloadUrls[i];
+                console.log(`다운로드 시도 ${i + 1}: ${url}`);
 
-            setStatus('📥 다운로드가 시작되었습니다. 설치 후 새로고침하세요.');
+                // HTTP URL인 경우 먼저 존재 여부 확인
+                if (url.startsWith('http')) {
+                    try {
+                        const response = await fetch(url, { method: 'HEAD' });
+                        if (!response.ok) {
+                            console.log(`파일이 존재하지 않음: ${url}`);
+                            continue;
+                        }
+                    } catch (fetchError) {
+                        console.log(`서버 연결 실패: ${url}`);
+                        continue;
+                    }
+                }
 
-        } catch (error) {
-            console.error('다운로드 오류:', error);
-            setStatus('❌ 다운로드 실패. 수동으로 파일을 다운로드하세요.');
+                // 다운로드 링크 생성
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'CTI_Task_Master_Setup.exe';
+                link.style.display = 'none';
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                setStatus(`📥 다운로드가 시작되었습니다. (방법 ${i + 1}) 설치 후 새로고침하세요.`);
+                return; // 성공하면 함수 종료
+
+            } catch (error) {
+                console.error(`다운로드 방법 ${i + 1} 실패:`, error);
+                continue; // 다음 방법 시도
+            }
+        }
+
+        // 모든 방법이 실패한 경우
+        setStatus('❌ 다운로드 실패. 아래 방법을 시도해보세요.');
+
+        // 대체 다운로드 방법 안내
+        const fallbackMessage = `
+다운로드 실패 - 다음 방법을 시도해보세요:
+
+1. 로컬 서버 시작:
+   - 명령 프롬프트에서 프로젝트 폴더로 이동
+   - python -m http.server 8000 실행
+   - http://localhost:8000 접속
+
+2. 파일 직접 접근:
+   - 파일 탐색기에서 다음 경로 이동:
+   - C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\
+   - CTI Task Master_07151050.exe 실행
+
+3. 프로그램 빌드:
+   - npm run tauri build 실행
+        `;
+
+        alert(fallbackMessage);
+    };
+
+    const openLocalServer = () => {
+        // 로컬 서버 열기
+        window.open('http://localhost:8000', '_blank');
+    };
+
+    const openFileLocation = () => {
+        // 파일 위치 안내
+        const filePathMessage = `
+파일 위치:
+C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe
+
+파일 탐색기에서 위 경로로 이동하여 직접 실행하세요.
+        `;
+
+        alert(filePathMessage);
+
+        // 클립보드에 경로 복사 시도
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText('C:\\tauri\\cti-task-pilot2\\src-tauri\\target\\release\\bundle\\nsis\\CTI Task Master_07151050.exe');
         }
     };
 
@@ -126,7 +202,7 @@ const App: React.FC = () => {
                 boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
             }}>
                 <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🎯</div>
-                <h1 style={{ color: '#333', marginBottom: '30px' }}>UCTI Personal Launcher</h1>
+                <h1 style={{ color: '#333', marginBottom: '30px' }}>UCTI Personal Application</h1>
 
                 <div style={{
                     padding: '20px',
@@ -161,24 +237,62 @@ const App: React.FC = () => {
                     ) : null}
 
                     {showDownload ? (
-                        <button
-                            onClick={downloadApp}
-                            style={{
-                                padding: '15px 30px',
-                                backgroundColor: '#007bff',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '10px',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                        >
-                            📥 프로그램 다운로드
-                        </button>
+                        <>
+                            <button
+                                onClick={downloadApp}
+                                style={{
+                                    padding: '15px 30px',
+                                    backgroundColor: '#007bff',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
+                                📥 프로그램 다운로드
+                            </button>
+                            {/* <button
+                                onClick={openLocalServer}
+                                style={{
+                                    padding: '15px 20px',
+                                    backgroundColor: '#17a2b8',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
+                                🌐 로컬 서버
+                            </button>
+                            <button
+                                onClick={openFileLocation}
+                                style={{
+                                    padding: '15px 20px',
+                                    backgroundColor: '#ffc107',
+                                    color: '#212529',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
+                                📂 파일 위치
+                            </button> */}
+                        </>
                     ) : null}
 
                     <button
@@ -212,9 +326,15 @@ const App: React.FC = () => {
                     <ol style={{ color: '#666', fontSize: '14px', paddingLeft: '20px' }}>
                         <li>페이지 로드 시 자동으로 프로그램 설치 상태를 확인합니다.</li>
                         <li>설치되어 있으면 "프로그램 실행" 버튼이 나타납니다.</li>
-                        <li>설치되어 있지 않으면 "프로그램 다운로드" 버튼이 나타납니다.</li>
-                        <li>다운로드 후 설치하고 "다시 확인" 버튼을 클릭하세요.</li>
+                        <li>설치되어 있지 않으면 다음 방법으로 설치하세요:</li>
+                        <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                            <li>"📥 프로그램 다운로드" - 자동으로 여러 방법을 시도합니다</li>
+                            <li>"🌐 로컬 서버" - 로컬 파일 서버에서 다운로드</li>
+                            <li>"📂 파일 위치" - 설치 파일 위치를 확인하여 직접 실행</li>
+                        </ul>
+                        <li>다운로드 후 설치하고 "🔄 다시 확인" 버튼을 클릭하세요.</li>
                     </ol>
+
                 </div>
             </div>
         </div>
