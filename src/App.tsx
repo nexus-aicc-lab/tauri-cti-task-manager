@@ -126,7 +126,7 @@ const App: React.FC = () => {
                 boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
             }}>
                 <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🎯</div>
-                <h1 style={{ color: '#333', marginBottom: '30px' }}>CTI Task Master</h1>
+                <h1 style={{ color: '#333', marginBottom: '30px' }}>UCTI Personal Launcher</h1>
 
                 <div style={{
                     padding: '20px',
