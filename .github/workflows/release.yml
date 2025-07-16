@@ -1,4 +1,3 @@
-# C:\tauri\cti-task-pilot2\.github\workflows\release.yml
 name: Release
 
 on:
@@ -13,18 +12,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [windows-latest]  # 일단 Windows만
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
@@ -55,99 +48,3 @@ jobs:
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
-
-      - name: Upload to S3
-        if: matrix.platform == 'ubuntu-20.04'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # AWS CLI 설치
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-          
-          # 버전 정보 추출
-          VERSION=${{ github.ref_name }}
-          
-          # 릴리스 에셋 다운로드 및 S3 업로드
-          gh release download $VERSION --dir ./release-assets
-          
-          # 각 플랫폼별 파일을 S3에 업로드
-          find ./release-assets -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.dmg" -o -name "*.app.tar.gz" | while read file; do
-            echo "Uploading $file to S3..."
-            aws s3 cp "$file" "s3://$S3_BUCKET/releases/$VERSION/$(basename "$file")"
-          done
-          
-          # 서명 파일들도 업로드
-          find ./release-assets -name "*.sig" | while read file; do
-            echo "Uploading signature $file to S3..."
-            aws s3 cp "$file" "s3://$S3_BUCKET/releases/$VERSION/$(basename "$file")"
-          done
-
-      - name: Update latest.json
-        if: matrix.platform == 'ubuntu-20.04'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: |
-          VERSION=${{ github.ref_name }}
-          
-          # latest.json 생성
-          cat > latest.json << EOF
-          {
-            "version": "$VERSION",
-            "notes": "CTI Task Manager 업데이트 $VERSION",
-            "pub_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "platforms": {
-              "windows-x86_64": {
-                "signature": "",
-                "url": "https://$S3_BUCKET.s3.$AWS_REGION.amazonaws.com/releases/$VERSION/CTI-Task-Master_${VERSION#v}_x64_en-US.msi"
-              },
-              "linux-x86_64": {
-                "signature": "",
-                "url": "https://$S3_BUCKET.s3.$AWS_REGION.amazonaws.com/releases/$VERSION/cti-task-master_${VERSION#v}_amd64.deb"
-              },
-              "darwin-x86_64": {
-                "signature": "",
-                "url": "https://$S3_BUCKET.s3.$AWS_REGION.amazonaws.com/releases/$VERSION/CTI-Task-Master_${VERSION#v}_x64.dmg"
-              },
-              "darwin-aarch64": {
-                "signature": "",
-                "url": "https://$S3_BUCKET.s3.$AWS_REGION.amazonaws.com/releases/$VERSION/CTI-Task-Master_${VERSION#v}_aarch64.dmg"
-              }
-            }
-          }
-          EOF
-          
-          # 실제 서명 정보로 업데이트 (서명 파일에서 읽어옴)
-          if [ -f "./release-assets/CTI-Task-Master_${VERSION#v}_x64_en-US.msi.sig" ]; then
-            WINDOWS_SIG=$(cat "./release-assets/CTI-Task-Master_${VERSION#v}_x64_en-US.msi.sig")
-            sed -i "s/\"windows-x86_64\":{\"signature\":\"\"/\"windows-x86_64\":{\"signature\":\"$WINDOWS_SIG\"/" latest.json
-          fi
-          
-          if [ -f "./release-assets/cti-task-master_${VERSION#v}_amd64.deb.sig" ]; then
-            LINUX_SIG=$(cat "./release-assets/cti-task-master_${VERSION#v}_amd64.deb.sig")
-            sed -i "s/\"linux-x86_64\":{\"signature\":\"\"/\"linux-x86_64\":{\"signature\":\"$LINUX_SIG\"/" latest.json
-          fi
-          
-          if [ -f "./release-assets/CTI-Task-Master_${VERSION#v}_x64.dmg.sig" ]; then
-            DARWIN_X64_SIG=$(cat "./release-assets/CTI-Task-Master_${VERSION#v}_x64.dmg.sig")
-            sed -i "s/\"darwin-x86_64\":{\"signature\":\"\"/\"darwin-x86_64\":{\"signature\":\"$DARWIN_X64_SIG\"/" latest.json
-          fi
-          
-          if [ -f "./release-assets/CTI-Task-Master_${VERSION#v}_aarch64.dmg.sig" ]; then
-            DARWIN_ARM_SIG=$(cat "./release-assets/CTI-Task-Master_${VERSION#v}_aarch64.dmg.sig")
-            sed -i "s/\"darwin-aarch64\":{\"signature\":\"\"/\"darwin-aarch64\":{\"signature\":\"$DARWIN_ARM_SIG\"/" latest.json
-          fi
-          
-          # S3에 latest.json 업로드
-          aws s3 cp latest.json "s3://$S3_BUCKET/releases/latest.json" --content-type "application/json"
-          
-          echo "✅ latest.json updated successfully!"
-          cat latest.json
