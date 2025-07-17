@@ -13,6 +13,30 @@ const App: React.FC = () => {
 
     console.log('🚀 상담사 대시보드 앱 시작');
 
+    // 업데이트 상태 변화 로그
+    useEffect(() => {
+        console.log('📱 isTauri:', isTauri);
+        console.log('🔄 업데이트 상태 변화:', {
+            checking: updateInfo.checking,
+            downloading: updateInfo.downloading,
+            available: updateInfo.available,
+            latestVersion: updateInfo.latestVersion,
+            error: updateInfo.error,
+            currentVersion: updateInfo.currentVersion
+        });
+    }, [updateInfo, isTauri]);
+
+    // 수동 업데이트 확인 함수 (로그 추가)
+    const handleCheckForUpdates = async () => {
+        console.log('👆 수동 업데이트 확인 버튼 클릭');
+        try {
+            await checkForUpdates();
+            console.log('✅ 수동 업데이트 확인 완료');
+        } catch (error) {
+            console.error('❌ 수동 업데이트 확인 실패:', error);
+        }
+    };
+
     return (
         <div
             style={{
@@ -51,6 +75,8 @@ const App: React.FC = () => {
                     {updateInfo.available && !updateInfo.downloading && (
                         <div style={{ color: '#28a745' }}>
                             🆕 새 버전 {updateInfo.latestVersion} 사용 가능!
+                            <br />
+                            현재: {updateInfo.currentVersion}
                         </div>
                     )}
 
@@ -63,7 +89,7 @@ const App: React.FC = () => {
             {/* 수동 업데이트 확인 버튼 (Tauri 환경에서만) */}
             {isTauri && (
                 <button
-                    onClick={checkForUpdates}
+                    onClick={handleCheckForUpdates}
                     disabled={updateInfo.checking || updateInfo.downloading}
                     style={{
                         position: 'fixed',
