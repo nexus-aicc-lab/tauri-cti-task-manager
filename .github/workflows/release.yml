@@ -114,7 +114,6 @@ jobs:
         run: Start-Sleep -Seconds 10
         shell: powershell
 
-      # GitHub CLI를 사용하여 latest.json 업로드
       - name: Upload latest.json using GitHub CLI
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
