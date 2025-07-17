@@ -12,7 +12,7 @@ const App: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showVersion, setShowVersion] = useState(false);
 
-    console.log('🚀 런처 윈도우 앱 시작 (FSD 구조)');
+    console.log('🚀 런처 윈도우 앱 시작 (FSD 구조) !');
 
     useEffect(() => {
         const fetchVersion = async () => {
