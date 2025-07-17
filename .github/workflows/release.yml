@@ -184,6 +184,7 @@ on:
 
 permissions:
   contents: write
+  packages: write  # 추가 권한
 
 jobs:
   release:
@@ -232,7 +233,20 @@ jobs:
           Write-Host "Installing dependencies..."
           npm install --no-audit --no-fund --legacy-peer-deps
 
-      # Tauri 앱 빌드
+      # 먼저 GitHub Release 생성
+      - name: Create Release First
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: 'CTI Task Manager ${{ github.ref_name }}'
+          body: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tauri 앱 빌드 (릴리즈 이미 존재함)
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
         env:
@@ -245,6 +259,7 @@ jobs:
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
+          args: --verbose
 
       # 빌드 완료 대기
       - name: Wait for build completion
