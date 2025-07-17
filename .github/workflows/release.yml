@@ -142,7 +142,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: 'ap-northeast-2'
 
       # S3에 파일 업로드
       - name: Upload to S3
@@ -183,14 +183,34 @@ jobs:
         shell: pwsh
 
       # GitHub Release에 latest.json 업로드
+      # - name: Upload latest.json to GitHub Release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     if [ -f "latest.json" ]; then
+      #       gh release upload ${{ github.ref_name }} latest.json --clobber
+      #     else
+      #       echo "latest.json not found!"
+      #     fi
+      #   shell: bash
+      # GitHub Release에 latest.json 업로드
       - name: Upload latest.json to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # 파일 존재 확인
           if [ -f "latest.json" ]; then
+            echo "latest.json found, uploading to release..."
             gh release upload ${{ github.ref_name }} latest.json --clobber
+            
+            # 업로드 확인
+            echo "Verifying upload..."
+            gh release view ${{ github.ref_name }} --json assets -q '.assets[].name'
           else
-            echo "latest.json not found!"
+            echo "ERROR: latest.json not found in current directory!"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
           fi
         shell: bash
 
