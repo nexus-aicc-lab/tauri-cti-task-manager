@@ -5,8 +5,7 @@ on:
     tags:
       - 'v*.*.*'
 
-permissions:
-  contents: write   # 👈 요 위치에 있어야 함!
+permissions: write-all
 
 jobs:
   release:
