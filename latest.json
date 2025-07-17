@@ -1,0 +1,11 @@
+{
+    "version": "2.0.5",
+    "notes": "CTI Task Manager v2.0.5 - 새로운 기능과 버그 수정이 포함되었습니다.",
+    "pub_date": "2025-01-17T10:00:00.000Z",
+    "platforms": {
+        "windows-x86_64": {
+            "signature": "",
+            "url": "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v2.0.5/CTI.Task.Manager_2.0.5_x64-setup.exe"
+        }
+    }
+}
