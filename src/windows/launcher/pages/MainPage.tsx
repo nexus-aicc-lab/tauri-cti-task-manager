@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
+import { useAutoUpdate } from '../../../hooks/useAutoUpdate';
 
 type Mode = 'launcher' | 'bar' | 'panel' | 'login' | 'settings' | 'counselor_dashboard';
 
@@ -20,6 +21,9 @@ const MainPage: React.FC = () => {
     const [loginInfo, setLoginInfo] = useState<LoginInfo>({});
     const [lastUpdate, setLastUpdate] = useState<string>('-');
     const [loading, setLoading] = useState(true);
+
+    // useAutoUpdate hook 사용
+    const { updateInfo, isTauri } = useAutoUpdate();
 
     // 로그인 정보 로드
     const loadLoginInfo = async () => {
@@ -219,6 +223,18 @@ const MainPage: React.FC = () => {
                         <p className="text-xs text-gray-500 text-center">
                             마지막 업데이트: <span className="font-mono">{lastUpdate}</span>
                         </p>
+                        {isTauri && (
+                            <p className="text-xs text-gray-500 text-center mt-1">
+                                버전: <span className="font-mono text-gray-600">
+                                    {updateInfo.currentVersion}
+                                    {updateInfo.available && (
+                                        <span className="text-green-600 ml-2">
+                                            (새 버전 {updateInfo.latestVersion} 사용 가능)
+                                        </span>
+                                    )}
+                                </span>
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

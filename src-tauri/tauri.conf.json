@@ -63,6 +63,7 @@
     }
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
     "icon": [
@@ -79,7 +80,7 @@
         "https://ucti-personal-releases.s3.ap-northeast-2.amazonaws.com/releases/latest.json"
       ],
       "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERBRDRFNEUyMEQ3RDg5QzEKUldUQmlYME40dVRVMnV5aDV6cXpMLythdTJOYzhTclVxMm5MYkVWVnB1OUF3TzM1VVBRSGNIaWkK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEzQTQxMkNENDgzMEU5QUMKUldTczZUQkl6UktrRXdGUXRHb01ZcFFiUlphT25wdjkzVGRienQxWjlLTzlBamowd3ZyZFRVTGUK"
     },
     "deep-link": {
       "mobile": [

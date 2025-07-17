@@ -48,3 +48,39 @@ jobs:
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
+
+      - name: Get version
+        id: get_version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create latest.json
+        shell: pwsh
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")
+          
+          $json = @{
+            version = $version
+            notes = "CTI Task Manager v$version - 새 버전이 출시되었습니다. 업데이트를 확인해보세요!"
+            pub_date = $date
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = ""
+                url = "https://github.com/${{ github.repository }}/releases/download/v$version/CTI.Task.Manager_$($version)_x64-setup.exe"
+              }
+            }
+          }
+          
+          $json | ConvertTo-Json -Depth 3 | Out-File -FilePath latest.json -Encoding UTF8
+          
+          Write-Host "Created latest.json for version $version"
+          Get-Content latest.json
+
+      - name: Upload latest.json to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: latest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

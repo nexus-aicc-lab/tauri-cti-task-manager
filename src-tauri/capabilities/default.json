@@ -12,6 +12,7 @@
   "permissions": [
     "core:default",
     "dialog:default",
+    "updater:default",
     "dialog:allow-message",
     "opener:default",
     "core:window:allow-minimize",
