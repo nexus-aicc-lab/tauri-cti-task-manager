@@ -5,14 +5,15 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write   # 👈 요 위치에 있어야 함!
+
 jobs:
   release:
-    permissions:
-      contents: write
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-latest]  # 일단 Windows만
+        platform: [windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
