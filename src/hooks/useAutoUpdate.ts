@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react';
 
-// Tauri window 타입 확장
-declare global {
-    interface Window {
-        __TAURI__?: any;
-    }
-}
-
 interface UpdateInfo {
     available: boolean;
     currentVersion: string;
@@ -19,7 +12,7 @@ interface UpdateInfo {
 export const useAutoUpdate = () => {
     const [updateInfo, setUpdateInfo] = useState<UpdateInfo>({
         available: false,
-        currentVersion: '0.1.0',
+        currentVersion: '0.1.8', // 실제 현재 버전으로 수정
         checking: false,
         downloading: false,
     });

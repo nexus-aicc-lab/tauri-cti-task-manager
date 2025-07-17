@@ -11,6 +11,8 @@ import { useAutoUpdate } from '../../../hooks/useAutoUpdate';
 const App: React.FC = () => {
     const { updateInfo, checkForUpdates, isTauri } = useAutoUpdate();
 
+    console.log("updateInfo:", updateInfo);
+
     console.log('🚀 상담사 대시보드 앱 시작');
 
     // 업데이트 상태 변화 로그
