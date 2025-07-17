@@ -30,11 +30,43 @@ jobs:
       - name: Sync node version and setup cache
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
+          node-version: '20'  # LTS 대신 구체적인 버전
+          cache: ''  # 캐시 비활성화
 
-      - name: Install frontend dependencies
-        run: npm install
+      # npm 설치 문제 해결
+      - name: Clean and Install Dependencies
+        shell: pwsh
+        run: |
+          Write-Host "Cleaning npm cache..."
+          npm cache clean --force
+          
+          Write-Host "Setting npm registry..."
+          npm config set registry https://registry.npmjs.org/
+          
+          Write-Host "Removing existing files..."
+          if (Test-Path "node_modules") { 
+            Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          if (Test-Path "package-lock.json") { 
+            Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue
+          }
+          
+          Write-Host "Installing dependencies (attempt 1)..."
+          npm install --no-audit --no-fund --legacy-peer-deps
+          
+          # 실패 시 재시도
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "First attempt failed, retrying with --force..."
+            npm cache clean --force
+            npm install --force --no-audit --no-fund
+          }
+          
+          # 그래도 실패하면 yarn 시도
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "npm failed, trying yarn..."
+            npm install -g yarn
+            yarn install --network-timeout 100000
+          }
 
       - name: Build the app
         id: tauri_build
