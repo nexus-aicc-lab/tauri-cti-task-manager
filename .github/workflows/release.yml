@@ -284,48 +284,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # S3에 파일 업로드
-      - name: Upload to S3
-        run: |
-          # 버전 추출
-          $version = "${{ github.ref_name }}".Replace("v", "")
-          
-          Write-Host "=== Uploading files to S3 ==="
-          
-          # NSIS installer 업로드
-          $nsisFile = "src-tauri/target/release/bundle/nsis/CTI Task Master_${version}_x64-setup.exe"
-          if (Test-Path $nsisFile) {
-            Write-Host "Uploading NSIS installer..."
-            aws s3 cp "$nsisFile" "s3://${{ secrets.S3_BUCKET }}/CTI.Task.Master_${version}_x64-setup.exe"
-            aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} `
-              --key "CTI.Task.Master_${version}_x64-setup.exe" --acl public-read
-          } else {
-            Write-Host "NSIS installer not found!"
-          }
-          
-          # MSI installer 업로드
-          $msiFile = "src-tauri/target/release/bundle/msi/CTI Task Master_${version}_x64_en-US.msi"
-          if (Test-Path $msiFile) {
-            Write-Host "Uploading MSI installer..."
-            aws s3 cp "$msiFile" "s3://${{ secrets.S3_BUCKET }}/CTI.Task.Master_${version}_x64_en-US.msi"
-            aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} `
-              --key "CTI.Task.Master_${version}_x64_en-US.msi" --acl public-read
-          } else {
-            Write-Host "MSI installer not found!"
-          }
-          
-          # latest.json 업로드
-          if (Test-Path "latest.json") {
-            Write-Host "Uploading latest.json..."
-            aws s3 cp latest.json "s3://${{ secrets.S3_BUCKET }}/latest.json"
-            aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} --key "latest.json" --acl public-read
-          } else {
-            Write-Host "latest.json not found!"
-          }
-          
-          Write-Host "S3 upload completed!"
-        shell: pwsh
-
       # 최종 검증
       - name: Verify all uploads
         run: |
