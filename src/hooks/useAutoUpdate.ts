@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
 
+// Extend Window interface to include Tauri's __TAURI__ property
+declare global {
+    interface Window {
+        __TAURI__?: any;
+    }
+}
+
 interface UpdateInfo {
     available: boolean;
     currentVersion: string;
