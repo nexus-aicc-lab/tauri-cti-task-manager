@@ -1,3 +1,4 @@
+// C:\tauri\cti-task-pilot2\src\shared\ui\LoginForm\LoginForm.tsx
 import React, { useState, useEffect } from 'react';
 
 interface LoginData {
