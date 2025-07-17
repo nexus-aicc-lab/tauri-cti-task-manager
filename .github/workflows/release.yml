@@ -48,3 +48,11 @@ jobs:
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
+            
+      - name: Upload latest.json to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: latest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
