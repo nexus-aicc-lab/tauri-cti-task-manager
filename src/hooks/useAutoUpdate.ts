@@ -19,7 +19,7 @@ interface UpdateInfo {
 export const useAutoUpdate = () => {
     const [updateInfo, setUpdateInfo] = useState<UpdateInfo>({
         available: false,
-        currentVersion: '0.1.8', // 실제 현재 버전으로 수정
+        currentVersion: 'Unknown', // 초기값
         checking: false,
         downloading: false,
     });
@@ -27,12 +27,30 @@ export const useAutoUpdate = () => {
     // Tauri 환경 확인
     const isTauri = typeof window !== 'undefined' && window.__TAURI__;
 
-    // 앱 시작 시 자동 업데이트 체크 (Tauri 환경에서만)
+    // 앱 시작 시 현재 버전 가져오기 및 자동 업데이트 체크 (Tauri 환경에서만)
     useEffect(() => {
         if (isTauri) {
-            checkForUpdates();
+            getCurrentVersion();
+            // 버전을 먼저 가져온 후 업데이트 체크
+            setTimeout(() => {
+                checkForUpdates();
+            }, 1000);
         }
     }, [isTauri]);
+
+    const getCurrentVersion = async () => {
+        if (!isTauri) return;
+
+        try {
+            const { getVersion } = await import('@tauri-apps/api/app');
+            const version = await getVersion();
+            setUpdateInfo(prev => ({ ...prev, currentVersion: version }));
+            console.log('📱 현재 앱 버전:', version);
+        } catch (error) {
+            console.error('❌ 버전 정보 가져오기 실패:', error);
+            setUpdateInfo(prev => ({ ...prev, currentVersion: '0.1.8' })); // fallback
+        }
+    };
 
     const checkForUpdates = async () => {
         if (!isTauri) {
