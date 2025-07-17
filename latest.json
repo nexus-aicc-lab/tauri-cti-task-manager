@@ -5,7 +5,7 @@
     "platforms": {
         "windows-x86_64": {
             "signature": "",
-            "url": "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v0.2.9/CTI.Task.Manager_0.2.9_x64-setup.exe"
+            "url": "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v0.2.9/CTI.Task.Master.0.2.9.x64-setup.exe"
         }
     }
 }
