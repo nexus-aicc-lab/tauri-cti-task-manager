@@ -1,5 +1,4 @@
 // C:\tauri\cti-task-manager-tauri\src\windows\panel\app\App.tsx
-
 import React from 'react'
 import PanelModeContainer from '../pages/PanelModeContainer'
 import { useAutoUpdate } from '../../../hooks/useAutoUpdate'
