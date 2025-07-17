@@ -68,7 +68,7 @@ export const useAutoUpdate = () => {
             console.error('❌ 버전 정보 가져오기 실패:', error);
 
             // package.json 버전을 fallback으로 사용
-            const fallbackVersion = '2.0.4';
+            const fallbackVersion = '2.0.5';
             console.log('📱 Fallback 버전 사용:', fallbackVersion);
 
             currentVersionRef.current = fallbackVersion;
