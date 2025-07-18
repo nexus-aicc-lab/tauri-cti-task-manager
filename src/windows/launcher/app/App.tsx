@@ -188,13 +188,127 @@ const App: React.FC = () => {
     }, [isLoading, appVersion]);
 
     // 업데이트 체크 함수
+    // const checkForUpdates = async (isAutoCheck: boolean = false) => {
+    //     try {
+    //         setUpdateStatus(prev => ({ ...prev, checking: true, error: undefined }));
+    //         console.log('🔍 업데이트 확인 중...');
+
+    //         const update = await check();
+    //         console.log('업데이트 체크 결과:', update);
+
+    //         if (update && update.available) {
+    //             console.log('🆕 새 버전 발견:', update.version);
+    //             setUpdateStatus(prev => ({
+    //                 ...prev,
+    //                 available: true,
+    //                 latestVersion: update.version,
+    //                 checking: false,
+    //             }));
+
+    //             // 자동 체크가 아닌 경우에만 즉시 다이얼로그 표시
+    //             if (!isAutoCheck) {
+    //                 await promptUpdate(update);
+    //             } else {
+    //                 // 자동 체크인 경우 토스트 알림
+    //                 toast.info(`새 버전 ${update.version}이 사용 가능합니다!`, {
+    //                     onClick: () => promptUpdate(update),
+    //                     autoClose: false,
+    //                     closeOnClick: false,
+    //                 });
+    //             }
+    //         } else {
+    //             console.log('✅ 최신 버전입니다.');
+    //             setUpdateStatus(prev => ({
+    //                 ...prev,
+    //                 available: false,
+    //                 checking: false,
+    //             }));
+
+    //             if (!isAutoCheck) {
+    //                 toast.success('현재 최신 버전을 사용중입니다!');
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error('❌ 업데이트 확인 실패:', error);
+    //         setUpdateStatus(prev => ({
+    //             ...prev,
+    //             checking: false,
+    //             error: error instanceof Error ? error.message : '업데이트 확인 실패',
+    //         }));
+
+    //         if (!isAutoCheck) {
+    //             toast.error('업데이트 확인에 실패했습니다.');
+    //         }
+    //     }
+    // };
+
     const checkForUpdates = async (isAutoCheck: boolean = false) => {
         try {
             setUpdateStatus(prev => ({ ...prev, checking: true, error: undefined }));
             console.log('🔍 업데이트 확인 중...');
+            console.log('📌 현재 앱 버전:', appVersion);
+            console.log('📌 자동 체크 여부:', isAutoCheck);
+            console.log('📌 체크 시작 시간:', new Date().toISOString());
 
-            const update = await check();
-            console.log('업데이트 체크 결과:', update);
+            // Tauri 설정 정보 확인
+            try {
+                // @ts-ignore
+                if (window.__TAURI__) {
+                    console.log('📌 Tauri 환경 확인됨');
+                    // @ts-ignore
+                    console.log('📌 Tauri 버전:', window.__TAURI__.version);
+                }
+            } catch (e) {
+                console.log('📌 Tauri 환경 정보 확인 불가');
+            }
+
+            console.log('📌 업데이트 체크 API 호출 시작...');
+
+            let update;
+            try {
+                update = await check();
+                console.log('✅ 업데이트 체크 API 호출 성공');
+                console.log('📌 업데이트 객체 타입:', typeof update);
+                console.log('📌 업데이트 객체 전체:', JSON.stringify(update, null, 2));
+
+                if (update) {
+                    console.log('📌 update.available:', update.available);
+                    console.log('📌 update.version:', update.version);
+                    console.log('📌 update.body:', update.body);
+                    console.log('📌 update.date:', update.date);
+
+                    // version 필드 상세 분석
+                    if (update.version) {
+                        console.log('📌 버전 문자열 분석:');
+                        console.log('  - 타입:', typeof update.version);
+                        console.log('  - 길이:', update.version.length);
+                        console.log('  - 문자 코드:', Array.from(update.version).map(c => `${c}(${c.charCodeAt(0)})`).join(' '));
+                        console.log('  - 정규식 테스트 (semver):', /^\d+\.\d+\.\d+/.test(update.version));
+                    }
+                }
+            } catch (checkError) {
+                console.error('❌ check() 함수 호출 중 에러 발생');
+                console.error('📌 에러 타입:', checkError?.constructor?.name);
+                console.error('📌 에러 메시지:', checkError?.message);
+                console.error('📌 에러 스택:', checkError?.stack);
+
+                // 에러 메시지 상세 분석
+                if (checkError?.message) {
+                    const errorMsg = checkError.message;
+                    console.error('📌 에러 메시지 분석:');
+                    console.error('  - 전체 메시지:', errorMsg);
+                    console.error('  - "y" 문자 위치:', errorMsg.indexOf('y'));
+
+                    // 버전 관련 문자열 찾기
+                    const versionPattern = /version[:\s]*([^\s,]+)/i;
+                    const versionMatch = errorMsg.match(versionPattern);
+                    if (versionMatch) {
+                        console.error('  - 추출된 버전 문자열:', versionMatch[1]);
+                    }
+                }
+
+                throw checkError;
+            }
 
             if (update && update.available) {
                 console.log('🆕 새 버전 발견:', update.version);
@@ -218,6 +332,8 @@ const App: React.FC = () => {
                 }
             } else {
                 console.log('✅ 최신 버전입니다.');
+                console.log('📌 업데이트 불가 이유:', update ? '최신 버전' : '업데이트 객체 없음');
+
                 setUpdateStatus(prev => ({
                     ...prev,
                     available: false,
@@ -230,15 +346,38 @@ const App: React.FC = () => {
             }
         } catch (error) {
             console.error('❌ 업데이트 확인 실패:', error);
+            console.error('📌 최종 에러 정보:');
+            console.error('  - 타입:', error?.constructor?.name);
+            console.error('  - 메시지:', error?.message || error);
+            console.error('  - 스택:', error?.stack);
+
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
+            // 특정 에러 메시지 분석
+            if (errorMessage.includes('unexpected character')) {
+                console.error('📌 버전 파싱 에러 감지됨');
+                console.error('  - 현재 앱 버전:', appVersion);
+                console.error('  - 에러 발생 문자:', errorMessage.match(/character '(\w)'/)?.[1]);
+
+                // tauri.conf.json 설정 힌트
+                console.error('💡 가능한 원인:');
+                console.error('  1. tauri.conf.json의 version 필드 형식 확인');
+                console.error('  2. GitHub Release 태그 형식 확인 (v 접두사 문제)');
+                console.error('  3. latest.json 파일의 version 필드 형식 확인');
+            }
+
             setUpdateStatus(prev => ({
                 ...prev,
                 checking: false,
-                error: error instanceof Error ? error.message : '업데이트 확인 실패',
+                error: errorMessage,
             }));
 
             if (!isAutoCheck) {
-                toast.error('업데이트 확인에 실패했습니다.');
+                toast.error(`업데이트 확인 실패: ${errorMessage}`);
             }
+        } finally {
+            console.log('📌 업데이트 체크 종료 시간:', new Date().toISOString());
+            console.log('📌 최종 업데이트 상태:', updateStatus);
         }
     };
 
