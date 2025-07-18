@@ -282,7 +282,7 @@ const App: React.FC = () => {
                         console.log('📌 버전 문자열 분석:');
                         console.log('  - 타입:', typeof update.version);
                         console.log('  - 길이:', update.version.length);
-                        console.log('  - 문자 코드:', Array.from(update.version).map(c => `${c}(${c.charCodeAt(0)})`).join(' '));
+                        console.log('  - 문자 코드:', Array.from(update.version).map((c: string) => `${c}(${c.charCodeAt(0)})`).join(' '));
                         console.log('  - 정규식 테스트 (semver):', /^\d+\.\d+\.\d+/.test(update.version));
                     }
                 }
@@ -552,7 +552,7 @@ const App: React.FC = () => {
                     }}
                 >
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: '600' }}>
-                        CTI Task Manager
+                        CTI Task Manager2
                     </h4>
                     <div style={{ marginBottom: '5px' }}>
                         <strong>현재 버전:</strong> {appVersion}

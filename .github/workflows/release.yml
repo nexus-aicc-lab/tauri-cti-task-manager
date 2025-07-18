@@ -276,22 +276,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # AWS S3 설정
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       # 최종 검증
-      - name: Verify all uploads
+      - name: Verify GitHub Release Assets
         run: |
           Write-Host "=== GitHub Release Assets ==="
           gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
-          
-          Write-Host "`n=== S3 Bucket Contents ==="
-          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
