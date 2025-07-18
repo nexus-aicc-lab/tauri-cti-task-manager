@@ -71,7 +71,8 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "createUpdaterArtifacts": true
   },
   "plugins": {
     "updater": {
@@ -79,6 +80,7 @@
         "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/latest/download/latest.json"
       ],
       "dialog": false,
+      "active": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERBRDRFNEUyMEQ3RDg5QzEKUldUQmlYME40dVRVMnV5aDV6cXpMLythdTJOYzhTclVxMm5MYkVWVnB1OUF3TzM1VVBRSGNIaWkK"
     },
     "deep-link": {
