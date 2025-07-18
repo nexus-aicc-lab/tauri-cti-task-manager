@@ -267,14 +267,40 @@ jobs:
         shell: powershell
 
       # GitHub Release에 latest.json 추가
-      - name: Upload latest.json to GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: latest.json
-          fail_on_unmatched_files: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Upload latest.json to GitHub Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     tag_name: ${{ github.ref_name }}
+      #     files: latest.json
+      #     fail_on_unmatched_files: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate latest.json with signature
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".Replace("v", "")
+          $sigPath = "src-tauri/target/release/bundle/updater/CTI.Task.Master_${version}_x64-setup.exe.sig"
+          if (!(Test-Path $sigPath)) {
+            Write-Error "Signature file not found at $sigPath"
+            exit 1
+          }
+
+          $sigLines = Get-Content $sigPath
+          $sig = $sigLines[1]  # minisign은 첫 줄이 comment, 두 번째 줄이 signature
+
+          $json = @{
+            version = "$version"
+            notes = "CTI Task Manager v$version - 새 버전이 출시되었습니다."
+            pub_date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $sig
+                url = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v${version}/CTI.Task.Master_${version}_x64-setup.exe"
+              }
+            }
+          } | ConvertTo-Json -Depth 5
+
+          $json | Out-File -Encoding UTF8 -FilePath "latest.json"
 
       # 최종 검증
       - name: Verify GitHub Release Assets
