@@ -552,7 +552,7 @@ const App: React.FC = () => {
                     }}
                 >
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: '600' }}>
-                        CTI Task Manager2
+                        CTI Task Manager 3
                     </h4>
                     <div style={{ marginBottom: '5px' }}>
                         <strong>현재 버전:</strong> {appVersion}
