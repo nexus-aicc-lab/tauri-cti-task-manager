@@ -1,11 +1,11 @@
 {
-    "version": "0.1.3",
-    "notes": "CTI Task Manager v0.1.3 - 새 버전이 출시되었습니다. 업데이트를 확인해보세요!",
+    "version": "0.1.4",
+    "notes": "CTI Task Manager v0.1.4 - 새 버전이 출시되었습니다. 업데이트를 확인해보세요!",
     "pub_date": "2025-01-17T10:00:00.000Z",
     "platforms": {
         "windows-x86_64": {
             "signature": "",
-            "url": "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v0.1.3/CTI.Task.Master_0.1.3_x64-setup.exe"
+            "url": "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v0.1.4/CTI.Task.Master_0.1.4_x64-setup.exe"
         }
     }
 }
