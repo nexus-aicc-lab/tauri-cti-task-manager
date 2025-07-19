@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "CTI Task Master",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "identifier": "com.cti-task-master.app",
   "build": {
     "beforeDevCommand": "vite",
@@ -81,7 +81,7 @@
       ],
       "dialog": true,
       "active": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJDNjkwRjk1REU3QzRFRjcKUldUM1RuemVsUTlwTEFuRGNaejVIbUltWHhKWlV1QWU5emtaRlFINlZDbU9ZRU1lMDZNNy9jUFAK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ2NkRCMEU3MzdGMzlGRkQKUldUOW4vTTM1N0J0MXRWbGI3ZWpPYnFLMkduRkpYLzZWekZWcVU3U08yY0c4dTQzNjgvYmtVRVkK"
     },
     "deep-link": {
       "mobile": [
