@@ -1,3 +1,4 @@
+
 # name: Release
 
 # on:
@@ -6,8 +7,7 @@
 #       - 'v*.*.*'
 
 # permissions:
-#   contents: write
-#   packages: write
+#   contents: write  # write-all 대신 구체적인 권한 지정
 
 # jobs:
 #   release:
@@ -35,114 +35,280 @@
 #           node-version: '20'
 #           cache: ''
 
+#       # npm 설치 문제 해결
 #       - name: Clean and Install Dependencies
 #         shell: pwsh
 #         run: |
+#           Write-Host "Cleaning npm cache..."
 #           npm cache clean --force
+          
+#           Write-Host "Setting npm registry..."
 #           npm config set registry https://registry.npmjs.org/
-#           if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue }
-#           if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue }
+          
+#           Write-Host "Removing existing files..."
+#           if (Test-Path "node_modules") { 
+#             Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue
+#           }
+#           if (Test-Path "package-lock.json") { 
+#             Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue
+#           }
+          
+#           Write-Host "Installing dependencies..."
 #           npm install --no-audit --no-fund --legacy-peer-deps
 
-#       - name: Create GitHub Release
+#       # 먼저 릴리즈 생성 (tauri-action이 생성하기 전에)
+#       - name: Create GitHub Release First
 #         uses: softprops/action-gh-release@v1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #         with:
 #           tag_name: ${{ github.ref_name }}
 #           name: 'CTI Task Manager ${{ github.ref_name }}'
 #           body: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
 #           draft: false
 #           prerelease: false
+
+#       # 빌드 (이미 생성된 릴리즈 사용)
+#       - name: Build the app
+#         id: tauri_build
+#         uses: tauri-apps/tauri-action@v0
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+#           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+#         with:
+#           tagName: ${{ github.ref_name }}
+#           releaseName: 'CTI Task Manager v__VERSION__'
+#           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
+#           releaseDraft: false
+#           prerelease: false
+#           # 이미 생성된 릴리즈 사용
+#           updaterJsonKeepUniversal: true
 
-#       - name: Restore .tauri/tauri.key from secret
+#       # AWS S3에 업로드
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: 'ap-northeast-2'
+
+#       # S3에 파일 업로드
+#       - name: Upload to S3
 #         run: |
-#           mkdir -p .tauri
-#           echo "${{ secrets.TAURI_PRIVATE_KEY }}" | base64 -d > .tauri/tauri.key
+#           # 버전 추출
+#           $version = "${{ github.ref_name }}".Replace("v", "")
+          
+#           Write-Host "Looking for build files..."
+#           Get-ChildItem -Path "src-tauri/target/release/bundle" -Recurse -Filter "*.exe" | ForEach-Object { Write-Host $_.FullName }
+#           Get-ChildItem -Path "src-tauri/target/release/bundle" -Recurse -Filter "*.msi" | ForEach-Object { Write-Host $_.FullName }
+          
+#           # NSIS installer 업로드 (파일명에 공백 포함)
+#           $nsisFile = "src-tauri/target/release/bundle/nsis/CTI Task Master_${version}_x64-setup.exe"
+#           if (Test-Path $nsisFile) {
+#             Write-Host "Uploading NSIS installer..."
+#             aws s3 cp "$nsisFile" "s3://${{ secrets.S3_BUCKET }}/CTI.Task.Master_${version}_x64-setup.exe"
+#             aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} `
+#               --key "CTI.Task.Master_${version}_x64-setup.exe" --acl public-read
+#           }
+          
+#           # MSI installer 업로드 (파일명에 공백 포함)
+#           $msiFile = "src-tauri/target/release/bundle/msi/CTI Task Master_${version}_x64_en-US.msi"
+#           if (Test-Path $msiFile) {
+#             Write-Host "Uploading MSI installer..."
+#             aws s3 cp "$msiFile" "s3://${{ secrets.S3_BUCKET }}/CTI.Task.Master_${version}_x64_en-US.msi"
+#             aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} `
+#               --key "CTI.Task.Master_${version}_x64_en-US.msi" --acl public-read
+#           }
+          
+#           # latest.json 업로드
+#           if (Test-Path "latest.json") {
+#             Write-Host "Uploading latest.json..."
+#             aws s3 cp latest.json "s3://${{ secrets.S3_BUCKET }}/latest.json"
+#             aws s3api put-object-acl --bucket ${{ secrets.S3_BUCKET }} --key "latest.json" --acl public-read
+#           }
+          
+#           Write-Host "S3 upload completed!"
+#         shell: pwsh
 
-#       - name: Export TAURI_KEY_PASSWORD to environment
-#         run: echo "TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}" >> $GITHUB_ENV
-
-#       - name: Build Tauri App
-#         run: npm run tauri build -- --verbose
+#       # GitHub Release에 latest.json 업로드
+#       # - name: Upload latest.json to GitHub Release
+#       #   env:
+#       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       #   run: |
+#       #     if [ -f "latest.json" ]; then
+#       #       gh release upload ${{ github.ref_name }} latest.json --clobber
+#       #     else
+#       #       echo "latest.json not found!"
+#       #     fi
+#       #   shell: bash
+#       # GitHub Release에 latest.json 업로드
+#       - name: Upload latest.json to GitHub Release
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           # 파일 존재 확인
+#           if [ -f "latest.json" ]; then
+#             echo "latest.json found, uploading to release..."
+#             gh release upload ${{ github.ref_name }} latest.json --clobber
+            
+#             # 업로드 확인
+#             echo "Verifying upload..."
+#             gh release view ${{ github.ref_name }} --json assets -q '.assets[].name'
+#           else
+#             echo "ERROR: latest.json not found in current directory!"
+#             echo "Current directory contents:"
+#             ls -la
+#             exit 1
+#           fi
 #         shell: bash
 
-#       - name: Generate latest.json
-#         shell: pwsh
-#         run: |
-#           $version = "${{ github.ref_name }}".Replace("v", "")
-#           $sigPath = "src-tauri/target/release/bundle/updater/CTI.Task.Master_${version}_x64-setup.exe.sig"
-#           if (!(Test-Path $sigPath)) {
-#             Write-Error "Signature file not found at $sigPath"
-#             exit 1
-#           }
-
-#           $sigLines = Get-Content $sigPath
-#           $sig = $sigLines[1]
-
-#           $json = @{
-#             version = "$version"
-#             notes = "CTI Task Manager v$version - 새 버전이 출시되었습니다."
-#             pub_date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-#             platforms = @{
-#               "windows-x86_64" = @{
-#                 signature = $sig
-#                 url = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v${version}/CTI Task Master_${version}_x64-setup.exe"
-#               }
-#             }
-#           } | ConvertTo-Json -Depth 5
-
-#           $json | Out-File -Encoding UTF8 -FilePath "latest.json"
-
-#       - name: Upload latest.json to GitHub Release
-#         run: |
-#           gh release upload ${{ github.ref_name }} latest.json --clobber
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#       - name: Verify GitHub Release Assets
+#       # 업로드 확인
+#       - name: Verify uploads
 #         run: |
 #           Write-Host "=== GitHub Release Assets ==="
-#           gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
+#           gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' 2>$null || Write-Host "Release not found"
+          
+#           Write-Host "`n=== S3 Bucket Contents ==="
+#           aws s3 ls s3://${{ secrets.S3_BUCKET }}/ 2>$null || Write-Host "S3 listing failed"
 #         shell: pwsh
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-name: Verify Tauri Secrets
+name: Release
 
 on:
-  push:            # push 시 자동 실행
-    branches:
-      - main       # 또는 개발 브랜치 이름
-  workflow_dispatch: # 수동 실행도 가능하게
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  packages: write  # 추가 권한
 
 jobs:
-  check-secrets:
-    runs-on: ubuntu-latest
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [windows-latest]
+
+    runs-on: ${{ matrix.platform }}
     steps:
-      - name: 🛠️ Check if secrets are loaded properly
-        run: |
-          echo "🔍 Checking TAURI_KEY_PASSWORD"
-          if [ -z "${{ secrets.TAURI_KEY_PASSWORD }}" ]; then
-            echo "❌ TAURI_KEY_PASSWORD is EMPTY"
-            exit 1
-          else
-            echo "✅ TAURI_KEY_PASSWORD is SET"
-          fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-          echo "🔍 Checking TAURI_PRIVATE_KEY (base64)"
-          if [ -z "${{ secrets.TAURI_PRIVATE_KEY }}" ]; then
-            echo "❌ TAURI_PRIVATE_KEY is EMPTY"
-            exit 1
-          else
-            echo "✅ TAURI_PRIVATE_KEY is SET (length: ${#{{ secrets.TAURI_PRIVATE_KEY }}})"
-          fi
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: 🧪 Try decoding and writing tauri.key
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: ''
+
+      # npm 설치
+      - name: Clean and Install Dependencies
+        shell: pwsh
         run: |
-          mkdir -p .tauri
-          echo "${{ secrets.TAURI_PRIVATE_KEY }}" | base64 -d > .tauri/tauri.key
-          echo "📂 .tauri contents:"
-          ls -l .tauri
-          echo "🔐 Preview tauri.key (first 5 lines)"
-          head -n 5 .tauri/tauri.key || echo "❌ Error reading file"
+          Write-Host "Cleaning npm cache..."
+          npm cache clean --force
+          
+          Write-Host "Setting npm registry..."
+          npm config set registry https://registry.npmjs.org/
+          
+          Write-Host "Removing existing files..."
+          if (Test-Path "node_modules") { 
+            Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          if (Test-Path "package-lock.json") { 
+            Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue
+          }
+          
+          Write-Host "Installing dependencies..."
+          npm install --no-audit --no-fund --legacy-peer-deps
+
+      # 먼저 GitHub Release 생성
+      - name: Create Release First
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: 'CTI Task Manager ${{ github.ref_name }}'
+          body: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tauri 앱 빌드 (릴리즈 이미 존재함)
+      - name: Build the app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'CTI Task Manager v__VERSION__'
+          releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
+          releaseDraft: false
+          prerelease: false
+          args: --verbose
+
+      # 빌드 완료 대기
+      - name: Wait for build completion
+        run: Start-Sleep -Seconds 5
+        shell: powershell
+
+      # GitHub Release에 latest.json 추가
+      # - name: Upload latest.json to GitHub Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     tag_name: ${{ github.ref_name }}
+      #     files: latest.json
+      #     fail_on_unmatched_files: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate latest.json with signature
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".Replace("v", "")
+          $sigPath = "src-tauri/target/release/bundle/updater/CTI.Task.Master_${version}_x64-setup.exe.sig"
+          if (!(Test-Path $sigPath)) {
+            Write-Error "Signature file not found at $sigPath"
+            exit 1
+          }
+
+          $sigLines = Get-Content $sigPath
+          $sig = $sigLines[1]  # minisign은 첫 줄이 comment, 두 번째 줄이 signature
+
+          $json = @{
+            version = "$version"
+            notes = "CTI Task Manager v$version - 새 버전이 출시되었습니다."
+            pub_date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $sig
+                url = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v${version}/CTI.Task.Master_${version}_x64-setup.exe"
+              }
+            }
+          } | ConvertTo-Json -Depth 5
+
+          $json | Out-File -Encoding UTF8 -FilePath "latest.json"
+
+      # 최종 검증
+      - name: Verify GitHub Release Assets
+        run: |
+          Write-Host "=== GitHub Release Assets ==="
+          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
