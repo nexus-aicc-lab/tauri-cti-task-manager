@@ -1,7 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "CTI Task Master",
-  "version": "0.1.5\","identifier": "com.cti-task-master.app",
+  "version": "0.1.6",
+  "identifier": "com.cti-task-master.app",
   "build": {
     "beforeDevCommand": "vite",
     "devUrl": "http://localhost:1420",
