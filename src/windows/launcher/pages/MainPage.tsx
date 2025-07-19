@@ -72,7 +72,7 @@ const MainPage: React.FC = () => {
             <div className="w-1/2 flex flex-col justify-center p-6 border-r border-gray-300">
                 <div className="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto w-full">
                     <h1 className="text-xl font-bold text-center mb-6 text-gray-800">
-                        CTI Task Master
+                        CTI Task Master 2
                     </h1>
 
                     <div className="space-y-3">
