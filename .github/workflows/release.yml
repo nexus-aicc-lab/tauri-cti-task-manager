@@ -126,7 +126,7 @@ name: Validate Tauri Signing Key
 on:
   push:
     branches:
-      - main  # ✅ 필요 시 원하는 브랜치 이름으로 변경
+      - main  # 필요 시 변경 (예: 'feature/**', 'test/**')
 
 jobs:
   validate-signing-key:
@@ -149,19 +149,25 @@ jobs:
         run: |
           echo "🔐 서명 키 검증 시작..."
 
-          echo "$TAURI_SIGNING_PRIVATE_KEY" | base64 -d >/tmp/key.bin || {
+          # 키 디코딩
+          echo "$TAURI_SIGNING_PRIVATE_KEY" | base64 -d > /tmp/key.bin || {
             echo "❌ base64 디코딩 실패: 키가 잘못되었어요!"
             exit 1
           }
 
-          echo "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" >/tmp/pass.txt
+          # 비밀번호 저장
+          echo "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" > /tmp/pass.txt
 
           echo "✅ base64 디코딩 성공!"
 
+          # 테스트용 파일 생성
+          echo "This is a test message to be signed." > /tmp/to-sign.txt
+
+          # 서명 시도
           cargo tauri signer sign \
             --private-key "$(cat /tmp/key.bin)" \
             --password "$(cat /tmp/pass.txt)" \
-            --message "test-message" > /tmp/signed.txt || {
+            /tmp/to-sign.txt || {
               echo "❌ 서명 실패! 비밀번호 또는 키가 틀렸을 가능성 있음."
               exit 1
             }
