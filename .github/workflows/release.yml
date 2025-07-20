@@ -12,6 +12,7 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+
     steps:
       # 1) 코드 체크아웃
       - name: Checkout repository
@@ -25,29 +26,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: npm
 
       # 3) 프런트엔드 의존성 설치
       - name: Install npm dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       # 4) Tauri 앱 빌드
       - name: Build Tauri app
-        run: |
-          # --release 로도 동일하게 동작합니다.
-          npx tauri build --timestamp
+        shell: pwsh
+        run: npx tauri build --timestamp
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-      # 5) GitHub Release 생성
+      # 6) GitHub Release 생성
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: CTI Task Manager ${{ github.ref_name }}
+          release_name: CTI Task Manager ${{ github.ref_name }}
           body: |
             새 버전이 출시되었습니다.  
             업데이트를 확인해보세요!  
@@ -56,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6) 생성된 .msi, .exe, .zip, latest.json 을 명시적으로 업로드
+      # 7) .msi, .exe, .zip, latest.json 업로드
       - name: Upload MSI installer
         uses: actions/upload-release-asset@v1
         with:
@@ -89,7 +88,7 @@ jobs:
           asset_name: latest.json
           asset_content_type: application/json
 
-      # 7) (옵션) AWS S3 업로드 / 검증
+      # 8) (옵션) AWS S3 설정 & 업로드 검증
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -99,13 +98,10 @@ jobs:
 
       - name: Verify S3 upload
         shell: pwsh
-        run: |
-          Write-Host "=== S3 Bucket Contents ==="
-          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
+        run: aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "S3 확인 실패"
 
-      # 8) 릴리스 자산 확인 로그
+      # 9) GitHub Release 에 올라간 자산 확인
       - name: List GitHub Release assets
-        run: |
-          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name'
+        run: gh release view ${{ github.ref_name }} --json assets -q '.assets[].name'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
