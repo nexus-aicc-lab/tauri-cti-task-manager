@@ -3,9 +3,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { getVersion } from '@tauri-apps/api/app';
-import { checkUpdate, installUpdate } from '@tauri-apps/api/updater';
-import { confirm } from '@tauri-apps/api/dialog';
-import { relaunch } from '@tauri-apps/api/process';
+import { confirm } from '@tauri-apps/plugin-dialog';
+import { relaunch } from '@tauri-apps/plugin-process';
+import { check } from '@tauri-apps/plugin-updater';
 
 import MainPage from '../pages/MainPage';
 
@@ -40,21 +40,21 @@ const App: React.FC = () => {
     const checkForUpdates = async (isAutoCheck = false) => {
         try {
             setUpdateStatus(prev => ({ ...prev, checking: true, error: undefined }));
-            const { shouldUpdate, manifest } = await checkUpdate();
+            const update = await check();
 
-            if (shouldUpdate) {
+            if (update) {
                 setUpdateStatus(prev => ({
                     ...prev,
                     available: true,
-                    latestVersion: manifest?.version,
+                    latestVersion: update.version,
                     checking: false,
                 }));
 
                 if (!isAutoCheck) {
-                    await promptUpdate(manifest?.version);
+                    await promptUpdate(update.version);
                 } else {
-                    toast.info(`새 버전 ${manifest?.version}이 사용 가능합니다!`, {
-                        onClick: () => promptUpdate(manifest?.version),
+                    toast.info(`새 버전 ${update.version}이 사용 가능합니다!`, {
+                        onClick: () => promptUpdate(update.version),
                         autoClose: false,
                     });
                 }
@@ -81,9 +81,12 @@ const App: React.FC = () => {
         try {
             setUpdateStatus(prev => ({ ...prev, downloading: true }));
             toast.info('업데이트 다운로드 중...', { autoClose: false });
-            await installUpdate();
-            toast.success('업데이트 완료! 앱을 재시작합니다.');
-            setTimeout(() => relaunch(), 2000);
+            const update = await check();
+            if (update) {
+                await update.downloadAndInstall();
+                toast.success('업데이트 완료! 앱을 재시작합니다.');
+                setTimeout(() => relaunch(), 2000);
+            }
         } catch (error: any) {
             toast.error('업데이트에 실패했습니다.');
             setUpdateStatus(prev => ({ ...prev, downloading: false, error: error.message }));
