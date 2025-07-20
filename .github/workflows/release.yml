@@ -79,12 +79,13 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            src-tauri/target/release/bundle/**/*.msi
-            src-tauri/target/release/bundle/**/*.exe
-            src-tauri/target/release/bundle/**/*.zip
-            src-tauri/target/release/bundle/latest.json
+            "src-tauri/target/release/bundle/nsis/CTI_Task_Master_*.msi"
+            "src-tauri/target/release/bundle/nsis/CTI_Task_Master_*setup.exe"
+            "src-tauri/target/release/bundle/**/*.zip"
+            "src-tauri/target/release/bundle/latest.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -94,7 +95,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Verify uploads
-        run: |
+        run: |  
           Write-Host "=== GitHub Release Assets ==="
           gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
 

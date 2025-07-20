@@ -1,5 +1,5 @@
 {
-  "name": "cti-task-manager-tauri",
+  "name": "cti-task-master",
   "private": true,
   "version": "0.1.0",
   "type": "module",
