@@ -1,131 +1,9 @@
-
-# name: Release
-
-# on:
-#   push:
-#     tags:
-#       - 'v*.*.*'
-
-# permissions:
-#   contents: write
-#   packages: write  # 추가 권한
-
-# jobs:
-#   release:
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         platform: [windows-latest]
-
-#     runs-on: ${{ matrix.platform }}
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
-
-#       - name: Rust setup
-#         uses: dtolnay/rust-toolchain@stable
-
-#       - name: Rust cache
-#         uses: swatinem/rust-cache@v2
-#         with:
-#           workspaces: './src-tauri -> target'
-
-#       - name: Sync node version and setup cache
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '20'
-#           cache: ''
-
-#       # npm 설치
-#       - name: Clean and Install Dependencies
-#         shell: pwsh
-#         run: |
-#           Write-Host "Cleaning npm cache..."
-#           npm cache clean --force
-          
-#           Write-Host "Setting npm registry..."
-#           npm config set registry https://registry.npmjs.org/
-          
-#           Write-Host "Removing existing files..."
-#           if (Test-Path "node_modules") { 
-#             Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue
-#           }
-#           if (Test-Path "package-lock.json") { 
-#             Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue
-#           }
-          
-#           Write-Host "Installing dependencies..."
-#           npm install --no-audit --no-fund --legacy-peer-deps
-
-#       # 먼저 GitHub Release 생성
-#       - name: Create Release First
-#         id: create_release
-#         uses: softprops/action-gh-release@v1
-#         with:
-#           tag_name: ${{ github.ref_name }}
-#           name: 'CTI Task Manager ${{ github.ref_name }}'
-#           body: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
-#           draft: false
-#           prerelease: false
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#       # Tauri 앱 빌드 (릴리즈 이미 존재함)
-#       - name: Build the app
-#         uses: tauri-apps/tauri-action@v0.2.0
-#         env:
-#           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-#           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           tagName: ${{ github.ref_name }}
-#           releaseName: 'CTI Task Manager ${{ github.ref_name }}'
-#           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
-#           releaseDraft: false
-#           prerelease: false
-#           args: --verbose
-
-#       # 빌드 완료 대기
-#       - name: Wait for build completion
-#         run: Start-Sleep -Seconds 5
-#         shell: powershell
-
-#       # GitHub Release에 latest.json 추가
-#       - name: Upload latest.json to GitHub Release
-#         uses: softprops/action-gh-release@v1
-#         with:
-#           tag_name: ${{ github.ref_name }}
-#           files: latest.json
-#           fail_on_unmatched_files: false
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#       # AWS S3 설정
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: ${{ secrets.AWS_REGION }}
-
-#       # 최종 검증
-#       - name: Verify all uploads
-#         run: |
-#           Write-Host "=== GitHub Release Assets ==="
-#           gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
-          
-#           Write-Host "`n=== S3 Bucket Contents ==="
-#           aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
-#         shell: pwsh
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 name: Release
 
 on:
   push:
     tags:
-      - 'v*.*.*' # 태그 푸시 시에만 실행
+      - 'v*.*.*'
 
 permissions:
   contents: write
@@ -141,39 +19,36 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: 📦 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🦀 Set up Rust
+      - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
 
-      - name: ⚡️ Cache Rust build
+      - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
 
-      - name: 🟢 Set up Node.js
+      - name: Sync node version and setup cache
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: ''
 
-      - name: 📥 Clean & Install Dependencies
+      - name: Clean and Install Dependencies
         shell: pwsh
         run: |
+          Write-Host "Cleaning npm cache..."
           npm cache clean --force
           npm config set registry https://registry.npmjs.org/
-          if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force }
-          if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force }
+          if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue }
+          if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue }
+          Write-Host "Installing dependencies..."
           npm install --no-audit --no-fund --legacy-peer-deps
 
-      - name: 🧰 Install NSIS and WiX
-        shell: pwsh
-        run: |
-          choco install nsis -y
-          choco install wixtoolset -y
-
-      - name: 🚀 Create GitHub Release
+      - name: Create GitHub Release (empty first)
+        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
@@ -184,21 +59,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🛠️ Build the Tauri App
+      - name: Build the app with Tauri
         uses: tauri-apps/tauri-action@v0.2.0
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: 'CTI Task Manager ${{ github.ref_name }}'
+          releaseName: 'CTI Task Manager v__VERSION__'
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
           args: --verbose
 
-      - name: 📦 Upload Tauri Build Artifacts
+      # 새롭게 추가된 업로드 스텝
+      - name: Upload release artifacts
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
@@ -206,29 +82,24 @@ jobs:
             src-tauri/target/release/bundle/**/*.msi
             src-tauri/target/release/bundle/**/*.exe
             src-tauri/target/release/bundle/**/*.zip
+            src-tauri/target/release/bundle/latest.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📄 Upload latest.json
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: latest.json
-          fail_on_unmatched_files: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: ☁️ Configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: ✅ Verify uploads
-        shell: pwsh
+      - name: Verify uploads
         run: |
-          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "❌ Failed to list GitHub assets"
-          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "❌ Failed to list S3 contents"
+          Write-Host "=== GitHub Release Assets ==="
+          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
+
+          Write-Host "`n=== S3 Bucket Contents ==="
+          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
+        shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
