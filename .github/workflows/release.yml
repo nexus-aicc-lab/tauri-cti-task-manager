@@ -125,7 +125,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*' # 태그 푸시 시에만 실행
 
 permissions:
   contents: write
@@ -166,6 +166,12 @@ jobs:
           if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force }
           if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force }
           npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: 🧰 Install NSIS and WiX
+        shell: pwsh
+        run: |
+          choco install nsis -y
+          choco install wixtoolset -y
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v1
