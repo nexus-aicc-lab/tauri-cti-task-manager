@@ -172,7 +172,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Tauri 앱 빌드
+      # Tauri 앱 빌드 (릴리즈는 이미 생성됨)
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
         env:
@@ -183,6 +183,7 @@ jobs:
           releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
           releaseDraft: false
           prerelease: false
+          includeRelease: false  # 릴리즈 생성하지 않고 빌드만 수행
           args: --verbose
 
       # 빌드 완료 대기
