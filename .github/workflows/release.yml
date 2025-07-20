@@ -193,65 +193,108 @@ jobs:
         run: Start-Sleep -Seconds 10
         shell: powershell
 
-      # latest.json 생성 및 업로드
-      - name: Generate and Upload latest.json
+      # latest.json 검증 및 업로드
+      - name: Validate and Upload latest.json
         shell: pwsh
         run: |
+          Write-Host "=== Validating latest.json ==="
+          
           # 버전 정보 추출 (v 제거)
-          $version = "${{ github.ref_name }}".Substring(1)
+          $tagVersion = "${{ github.ref_name }}".Substring(1)
           
-          # 현재 시간 (ISO 8601 형식)
-          $pubDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-          
-          # latest.json 내용 생성
-          $latestJson = @{
-            version = $version
-            notes = "CTI Task Manager v$version - 새 버전이 출시되었습니다. 업데이트를 확인해보세요!"
-            pub_date = $pubDate
-            platforms = @{
-              "windows-x86_64" = @{
-                signature = ""
-                url = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/${{ github.ref_name }}/CTI.Task.Master_${version}_x64-setup.exe"
-              }
-            }
+          # latest.json 파일 확인
+          if (-not (Test-Path "latest.json")) {
+            Write-Error "❌ latest.json not found in repository root!"
+            Write-Error "Please create latest.json before creating a release tag."
+            exit 1
           }
           
-          # JSON 파일로 저장
-          $latestJson | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest.json" -Encoding UTF8
+          # JSON 파일 읽기 및 파싱
+          try {
+            $jsonContent = Get-Content "latest.json" -Raw
+            $json = $jsonContent | ConvertFrom-Json
+            Write-Host "✅ latest.json found and parsed successfully"
+          } catch {
+            Write-Error "❌ Failed to parse latest.json: $_"
+            exit 1
+          }
           
-          Write-Host "Generated latest.json:"
+          # 버전 검증
+          if ($json.version -ne $tagVersion) {
+            Write-Error "❌ Version mismatch!"
+            Write-Error "   latest.json version: $($json.version)"
+            Write-Error "   Git tag version: $tagVersion"
+            Write-Error "Please update latest.json version to match the tag."
+            exit 1
+          }
+          Write-Host "✅ Version matches: $tagVersion"
+          
+          # URL 형식 검증
+          $expectedUrlPattern = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v$tagVersion/CTI.Task.Master_${tagVersion}_x64-setup.exe"
+          $actualUrl = $json.platforms."windows-x86_64".url
+          
+          if ($actualUrl -ne $expectedUrlPattern) {
+            Write-Warning "⚠️ URL format doesn't match expected pattern"
+            Write-Host "   Expected: $expectedUrlPattern"
+            Write-Host "   Actual: $actualUrl"
+            Write-Host "Updating URL to match expected pattern..."
+            
+            # URL 자동 수정
+            $json.platforms."windows-x86_64".url = $expectedUrlPattern
+            $json | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest.json" -Encoding UTF8
+            Write-Host "✅ URL updated"
+          } else {
+            Write-Host "✅ URL format is correct"
+          }
+          
+          # pub_date 업데이트 (현재 시간으로)
+          $currentDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+          $json.pub_date = $currentDate
+          $json | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest.json" -Encoding UTF8
+          Write-Host "✅ Updated pub_date to: $currentDate"
+          
+          # 최종 내용 출력
+          Write-Host ""
+          Write-Host "=== Final latest.json content ==="
           Get-Content "latest.json"
+          Write-Host "================================="
           
-          # GitHub Release에 latest.json 업로드
+          # GitHub Release에 업로드
+          Write-Host ""
+          Write-Host "Uploading latest.json to GitHub Release..."
           gh release upload "${{ github.ref_name }}" latest.json --clobber
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 서명 파일 생성 시도 (옵션)
-      - name: Try to generate signature
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          $version = "${{ github.ref_name }}".Substring(1)
-          $setupFile = "CTI.Task.Master_${version}_x64-setup.exe"
           
-          # Release에서 설치 파일 다운로드
-          gh release download "${{ github.ref_name }}" --pattern $setupFile
-          
-          if (Test-Path $setupFile) {
-            # 여기에 서명 생성 로직 추가 가능
-            Write-Host "Setup file found: $setupFile"
-            # 예: tauri-cli를 사용한 서명 생성
-            # cargo tauri signer sign $setupFile --private-key "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}"
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Successfully uploaded latest.json to release"
+          } else {
+            Write-Error "❌ Failed to upload latest.json"
+            exit 1
           }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 최종 검증
       - name: Verify GitHub Release Assets
-        run: |
-          Write-Host "=== GitHub Release Assets ==="
-          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
         shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "=== Verifying GitHub Release Assets ==="
+          
+          # Release 정보 가져오기
+          $assets = gh release view "${{ github.ref_name }}" --json assets -q '.assets[].name' 2>$null
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Release assets:"
+            $assets | ForEach-Object { Write-Host "   - $_" }
+            
+            # latest.json 확인
+            if ($assets -contains "latest.json") {
+              Write-Host "✅ latest.json is present in release"
+            } else {
+              Write-Warning "⚠️ latest.json not found in release assets"
+            }
+          } else {
+            Write-Warning "⚠️ Could not retrieve release information"
+          }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
