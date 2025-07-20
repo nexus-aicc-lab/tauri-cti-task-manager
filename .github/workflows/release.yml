@@ -1,3 +1,4 @@
+# .github/workflows/release.yml
 name: Release
 
 on:
@@ -7,86 +8,88 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   release:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [windows-latest]
-
-    runs-on: ${{ matrix.platform }}
-
+    runs-on: windows-latest
     steps:
+      # 1) 코드 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Rust setup
+      # 2) Rust & Node.js 설정
+      - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
-
-      - name: Sync node version and setup cache
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: ''
+          cache: 'npm'
 
-      - name: Clean and Install Dependencies
-        shell: pwsh
+      # 3) 프런트엔드 의존성 설치
+      - name: Install npm dependencies
         run: |
-          Write-Host "Cleaning npm cache..."
-          npm cache clean --force
-          npm config set registry https://registry.npmjs.org/
-          if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue }
-          if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue }
-          Write-Host "Installing dependencies..."
-          npm install --no-audit --no-fund --legacy-peer-deps
+          npm ci
 
-      - name: Create GitHub Release (empty first)
+      # 4) Tauri 앱 빌드
+      - name: Build Tauri app
+        run: |
+          # --release 로도 동일하게 동작합니다.
+          npx tauri build --timestamp
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      # 5) GitHub Release 생성
+      - name: Create GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: actions/create-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-          name: 'CTI Task Manager ${{ github.ref_name }}'
-          body: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
+          release_name: CTI Task Manager ${{ github.ref_name }}
+          body: |
+            새 버전이 출시되었습니다.  
+            업데이트를 확인해보세요!  
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build the app with Tauri
-        uses: tauri-apps/tauri-action@v0.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      # 6) 생성된 .msi, .exe, .zip, latest.json 을 명시적으로 업로드
+      - name: Upload MSI installer
+        uses: actions/upload-release-asset@v1
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'CTI Task Manager v__VERSION__'
-          releaseBody: '새 버전이 출시되었습니다. 업데이트를 확인해보세요!'
-          releaseDraft: false
-          prerelease: false
-          args: --verbose
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src-tauri/target/release/bundle/msi/CTI_Task_Master_*.msi
+          asset_name: CTI_Task_Master_${{ github.ref_name }}_x64.msi
+          asset_content_type: application/octet-stream
 
-      # 새롭게 추가된 업로드 스텝
-      - name: Upload release artifacts
-        uses: softprops/action-gh-release@v1
+      - name: Upload NSIS EXE installer
+        uses: actions/upload-release-asset@v1
         with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            "src-tauri/target/release/bundle/nsis/CTI_Task_Master_*.msi"
-            "src-tauri/target/release/bundle/nsis/CTI_Task_Master_*setup.exe"
-            "src-tauri/target/release/bundle/**/*.zip"
-            "src-tauri/target/release/bundle/latest.json"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src-tauri/target/release/bundle/nsis/CTI_Task_Master_*_setup.exe
+          asset_name: CTI_Task_Master_${{ github.ref_name }}_x64-setup.exe
+          asset_content_type: application/octet-stream
 
+      - name: Upload ZIP bundles
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src-tauri/target/release/bundle/**/*.zip
+          asset_name: CTI_Task_Master_${{ github.ref_name }}_bundle.zip
+          asset_content_type: application/zip
 
+      - name: Upload latest.json
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src-tauri/target/release/bundle/latest.json
+          asset_name: latest.json
+          asset_content_type: application/json
+
+      # 7) (옵션) AWS S3 업로드 / 검증
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -94,13 +97,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Verify uploads
-        run: |  
-          Write-Host "=== GitHub Release Assets ==="
-          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "Failed to list GitHub assets"
-
-          Write-Host "`n=== S3 Bucket Contents ==="
-          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
+      - name: Verify S3 upload
         shell: pwsh
+        run: |
+          Write-Host "=== S3 Bucket Contents ==="
+          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "Failed to list S3 contents"
+
+      # 8) 릴리스 자산 확인 로그
+      - name: List GitHub Release assets
+        run: |
+          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
