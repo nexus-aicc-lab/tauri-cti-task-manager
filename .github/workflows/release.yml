@@ -177,9 +177,6 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'CTI Task Manager v__VERSION__'
@@ -192,86 +189,6 @@ jobs:
       - name: Wait for build completion
         run: Start-Sleep -Seconds 10
         shell: powershell
-
-      # latest.json 검증 및 업로드
-      - name: Validate and Upload latest.json
-        shell: pwsh
-        run: |
-          Write-Host "=== Validating latest.json ==="
-          
-          # 버전 정보 추출 (v 제거)
-          $tagVersion = "${{ github.ref_name }}".Substring(1)
-          
-          # latest.json 파일 확인
-          if (-not (Test-Path "latest.json")) {
-            Write-Error "❌ latest.json not found in repository root!"
-            Write-Error "Please create latest.json before creating a release tag."
-            exit 1
-          }
-          
-          # JSON 파일 읽기 및 파싱
-          try {
-            $jsonContent = Get-Content "latest.json" -Raw
-            $json = $jsonContent | ConvertFrom-Json
-            Write-Host "✅ latest.json found and parsed successfully"
-          } catch {
-            Write-Error "❌ Failed to parse latest.json: $_"
-            exit 1
-          }
-          
-          # 버전 검증
-          if ($json.version -ne $tagVersion) {
-            Write-Error "❌ Version mismatch!"
-            Write-Error "   latest.json version: $($json.version)"
-            Write-Error "   Git tag version: $tagVersion"
-            Write-Error "Please update latest.json version to match the tag."
-            exit 1
-          }
-          Write-Host "✅ Version matches: $tagVersion"
-          
-          # URL 형식 검증
-          $expectedUrlPattern = "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/download/v$tagVersion/CTI.Task.Master_${tagVersion}_x64-setup.exe"
-          $actualUrl = $json.platforms."windows-x86_64".url
-          
-          if ($actualUrl -ne $expectedUrlPattern) {
-            Write-Warning "⚠️ URL format doesn't match expected pattern"
-            Write-Host "   Expected: $expectedUrlPattern"
-            Write-Host "   Actual: $actualUrl"
-            Write-Host "Updating URL to match expected pattern..."
-            
-            # URL 자동 수정
-            $json.platforms."windows-x86_64".url = $expectedUrlPattern
-            $json | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest.json" -Encoding UTF8
-            Write-Host "✅ URL updated"
-          } else {
-            Write-Host "✅ URL format is correct"
-          }
-          
-          # pub_date 업데이트 (현재 시간으로)
-          $currentDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-          $json.pub_date = $currentDate
-          $json | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest.json" -Encoding UTF8
-          Write-Host "✅ Updated pub_date to: $currentDate"
-          
-          # 최종 내용 출력
-          Write-Host ""
-          Write-Host "=== Final latest.json content ==="
-          Get-Content "latest.json"
-          Write-Host "================================="
-          
-          # GitHub Release에 업로드
-          Write-Host ""
-          Write-Host "Uploading latest.json to GitHub Release..."
-          gh release upload "${{ github.ref_name }}" latest.json --clobber
-          
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ Successfully uploaded latest.json to release"
-          } else {
-            Write-Error "❌ Failed to upload latest.json"
-            exit 1
-          }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 최종 검증
       - name: Verify GitHub Release Assets
@@ -286,13 +203,6 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ Release assets:"
             $assets | ForEach-Object { Write-Host "   - $_" }
-            
-            # latest.json 확인
-            if ($assets -contains "latest.json") {
-              Write-Host "✅ latest.json is present in release"
-            } else {
-              Write-Warning "⚠️ latest.json not found in release assets"
-            }
           } else {
             Write-Warning "⚠️ Could not retrieve release information"
           }
