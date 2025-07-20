@@ -192,6 +192,17 @@ jobs:
           prerelease: false
           args: --verbose
 
+      - name: 📦 Upload Tauri Build Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 📄 Upload latest.json
         uses: softprops/action-gh-release@v1
         with:
