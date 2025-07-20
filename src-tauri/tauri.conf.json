@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "CTI_Task_Master",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "identifier": "com.cti-task-master.app",
   "build": {
     "beforeDevCommand": "vite",
@@ -78,17 +78,15 @@
     ]
   },
   "plugins": {
-    "plugins": {
-      "updater": {
-        "active": true,
-        "endpoints": [
-          "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/latest/download/latest.json"
-        ],
-        "dialog": {
-          "title": "업데이트 안내",
-          "description": "CTI Task Master의 새로운 버전이 준비되어 있습니다. 지금 업데이트할까요?",
-          "buttonLabel": "지금 업데이트"
-        }
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/nexus-aicc-lab/tauri-cti-task-manager/releases/latest/download/latest.json"
+      ],
+      "dialog": {
+        "title": "업데이트 안내",
+        "description": "CTI Task Master의 새로운 버전이 준비되어 있습니다. 지금 업데이트할까요?",
+        "buttonLabel": "지금 업데이트"
       }
     },
     "deep-link": {
