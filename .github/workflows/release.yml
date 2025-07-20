@@ -119,6 +119,7 @@
 #         shell: pwsh
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 name: Release
 
 on:
@@ -138,34 +139,35 @@ jobs:
         platform: [windows-latest]
 
     runs-on: ${{ matrix.platform }}
+
     steps:
-      - name: Checkout repository
+      - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Rust setup
+      - name: 🦀 Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
+      - name: ⚡️ Cache Rust build
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Sync node version and setup cache
+      - name: 🟢 Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: ''
+          cache: 'npm'
 
-      - name: Clean and Install Dependencies
+      - name: 📥 Clean & Install Dependencies
         shell: pwsh
         run: |
           npm cache clean --force
           npm config set registry https://registry.npmjs.org/
-          if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue }
-          if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force -ErrorAction SilentlyContinue }
+          if (Test-Path "node_modules") { Remove-Item "node_modules" -Recurse -Force }
+          if (Test-Path "package-lock.json") { Remove-Item "package-lock.json" -Force }
           npm install --no-audit --no-fund --legacy-peer-deps
 
-      - name: Create Release First
+      - name: 🚀 Create empty GitHub Release (pre-build)
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
@@ -177,9 +179,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build the app
+      - name: 🛠️ Build the Tauri App
         uses: tauri-apps/tauri-action@v0.2.0
         env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
@@ -189,11 +193,39 @@ jobs:
           prerelease: false
           args: --verbose
 
-      - name: Upload latest.json to GitHub Release
+      - name: 📤 Upload artifacts (.exe, .msi) to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📄 Upload latest.json to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           files: latest.json
           fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ☁️ Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ✅ Verify uploads
+        shell: pwsh
+        run: |
+          Write-Host "=== GitHub Release Assets ==="
+          gh release view ${{ github.ref_name }} --json assets -q '.assets[].name' || Write-Host "❌ Failed to list GitHub assets"
+
+          Write-Host "`n=== S3 Bucket Contents ==="
+          aws s3 ls s3://${{ secrets.S3_BUCKET }}/ || Write-Host "❌ Failed to list S3 contents"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
